@@ -1,23 +1,22 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func Index(c *gin.Context) {
-	uuid := uuid.New()
-	room := uuid.String()
-	c.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/%s", room))
-	// c.HTML(http.StatusOK, "index.html", nil)
+	// uuid, _ := uuid.NewRandom()
+	// room := uuid.String()
+	// fmt.Println(uuid)
+	// c.Redirect(http.StatusFound, fmt.Sprintf("/%s", room))
+	c.HTML(http.StatusOK, "index.html", nil)
 }
 
 func Room(c *gin.Context) {
 	room := c.Param("room")
-	c.HTML(http.StatusOK, "index.html", gin.H{
+	c.HTML(http.StatusOK, "room.html", gin.H{
 		"roomId": room,
 	})
 }

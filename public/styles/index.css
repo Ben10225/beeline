@@ -1,0 +1,229 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap");
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #e8e8e8;
+  font-family: "Roboto", sans-serif;
+}
+
+.wrapper main #form-container {
+  width: 400px;
+  box-shadow: var(--shadow);
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 5px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  font-weight: 500;
+  transform: translate(-50%, -50%);
+}
+.wrapper main #form-container img {
+  display: block;
+  width: 150px;
+  margin: 0 auto;
+}
+.wrapper main #form-container #welcome-message {
+  text-align: center;
+  margin: 20px;
+}
+.wrapper main #form-container #welcome-message h1 {
+  font-size: 30px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+.wrapper main #form-container #welcome-message p {
+  font-size: 22px;
+}
+.wrapper main #form-container .user-info {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+}
+.wrapper main #form-container .user-info.show {
+  opacity: 1;
+  visibility: visible;
+}
+.wrapper main #form-container .user-info .auto-img {
+  margin-top: 30px;
+  position: relative;
+  cursor: pointer;
+}
+.wrapper main #form-container .user-info .auto-img h3 {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 70px;
+  color: #fff;
+  font-weight: 500;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.wrapper main #form-container .user-info .auto-img .img-bg {
+  width: 150px;
+  height: 150px;
+  background-color: rgb(254, 152, 28);
+  border-radius: 50%;
+}
+.wrapper main #form-container .user-info .username {
+  font-size: 25px;
+  letter-spacing: 0.1em;
+  margin: 20px 0;
+}
+.wrapper main #form-container .user-info .stream {
+  margin-top: 40px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background-color: rgb(87, 87, 87);
+  opacity: 0.3;
+  transition: 0.5s;
+}
+.wrapper main #form-container .user-info .stream:hover {
+  opacity: 0.8;
+}
+.wrapper main #form-container .user-info .signout {
+  margin-top: 20px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #999;
+  opacity: 0.3;
+  background: transparent;
+  transition: 0.5s;
+}
+.wrapper main #form-container .user-info .signout:hover {
+  opacity: 0.8;
+}
+.wrapper main #form-container .select {
+  display: flex;
+  justify-content: center;
+}
+.wrapper main #form-container .select h2 {
+  display: inline-block;
+  margin: 10px 10px;
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0.1;
+  transition: 0.4s;
+}
+.wrapper main #form-container .select h2.devide-line {
+  cursor: default;
+  opacity: 0.3;
+}
+.wrapper main #form-container .select h2.show {
+  opacity: 0.5;
+}
+.wrapper main #form-container #form-signin {
+  position: absolute;
+  width: 340px;
+  margin-top: 30px;
+}
+.wrapper main #form-container #form-signup, .wrapper main #form-container #form-signin {
+  opacity: 0;
+  visibility: hidden;
+}
+.wrapper main #form-container #form-signup.show-block, .wrapper main #form-container #form-signin.show-block {
+  opacity: 1;
+  visibility: visible;
+}
+.wrapper main #form-container #form-signup .form-field, .wrapper main #form-container #form-signin .form-field {
+  margin: 20px;
+}
+.wrapper main #form-container #form-signup .form-field label, .wrapper main #form-container #form-signin .form-field label {
+  font-size: 16px;
+  line-height: 1.7em;
+}
+.wrapper main #form-container #form-signup .form-field input, .wrapper main #form-container #form-signin .form-field input {
+  width: 100%;
+  border: 2px solid rgb(198, 202, 219);
+  border-radius: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: 0.4s;
+  outline: none;
+  font-size: 15px;
+}
+.wrapper main #form-container #form-signup .form-field input::-webkit-input-placeholder, .wrapper main #form-container #form-signin .form-field input::-webkit-input-placeholder {
+  color: black;
+  opacity: 0.3;
+}
+.wrapper main #form-container #form-signup .form-field input[type=submit], .wrapper main #form-container #form-signin .form-field input[type=submit] {
+  width: 100px;
+  margin-top: 10px;
+  background-color: rgb(75, 93, 172);
+  border: none;
+  color: #fff;
+  opacity: 0.3;
+  transition: 0.4s;
+  pointer-events: none;
+  cursor: default;
+}
+.wrapper main #form-container #form-signup .form-field.pwd-role, .wrapper main #form-container #form-signin .form-field.pwd-role {
+  transition: 0.4s;
+  height: 40px;
+}
+.wrapper main #form-container #form-signup .form-field.pwd-role .role, .wrapper main #form-container #form-signin .form-field.pwd-role .role {
+  margin-top: 10px;
+  margin-left: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.5s;
+  transform: translateY(-20px);
+}
+.wrapper main #form-container #form-signup .form-field.pwd-role .role.show, .wrapper main #form-container #form-signin .form-field.pwd-role .role.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0px);
+}
+.wrapper main #form-container #form-signup .form-field.pwd-role .role h4, .wrapper main #form-container #form-signin .form-field.pwd-role .role h4 {
+  transition: 0.3s;
+  font-weight: 400;
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.2;
+}
+.wrapper main #form-container #form-signup .form-field.submit, .wrapper main #form-container #form-signin .form-field.submit {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  transition: 0.5s;
+}
+.wrapper main #form-container #form-signup .form-field .caution, .wrapper main #form-container #form-signin .form-field .caution {
+  letter-spacing: 0.1em;
+  color: rgb(196, 30, 30);
+  opacity: 0;
+  transition: 0.3s;
+  height: 0px;
+}
+
+@media screen and (max-width: 450px) {
+  #form-container {
+    width: 95%;
+  }
+  #welcome-message h1 {
+    font-size: 24px;
+  }
+}/*# sourceMappingURL=index.css.map */

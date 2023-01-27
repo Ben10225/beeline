@@ -1,9 +1,11 @@
 package main
 
 import (
+	"beeline/api"
+	"beeline/configs"
 	"beeline/handlers"
+	"beeline/utils"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	socketio "github.com/googollee/go-socket.io"
@@ -11,35 +13,20 @@ import (
 
 // nodemon --exec go run main.go --signal SIGTERM
 
-// const portNumber = ":3000"
+const portNumber = ":3000"
 
 // router := gin.Default()
 
 // router.LoadHTMLGlob("templates/*")
 // router.Static("/public", "./public")
 
-// router.GET("/", handlers.Index)
-// router.Run(portNumber)
-
-func GinMiddleware(allowOrigin string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", allowOrigin)
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, Content-Length, X-CSRF-Token, Token, session, Origin, Host, Connection, Accept-Encoding, Accept-Language, X-Requested-With")
-
-		if c.Request.Method == http.MethodOptions {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Request.Header.Del("Origin")
-		c.Next()
-	}
-}
-
 func main() {
 	router := gin.New()
+
+	configs.ConnectDB()
+
+	// routes.UserRoute(router)
+
 	server := socketio.NewServer(nil)
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
@@ -59,7 +46,6 @@ func main() {
 		s.Join(roomId)
 		// fmt.Println(userId)
 		server.BroadcastToRoom("/", roomId, "user-connected", userId)
-
 		// s.Emit("user-connected", userId)
 
 		server.OnEvent("/", "stop-camera", func(s socketio.Conn, userId string) {
@@ -70,14 +56,16 @@ func main() {
 			s.Emit("open-camera-view", userId)
 		})
 
+		server.OnDisconnect("/", func(s socketio.Conn, msg string) {
+			s.Emit("user-disconnected", userId)
+			server.BroadcastToRoom("/", roomId, "user-disconnected", userId)
+			log.Println("closed", msg)
+		})
+
 		// s.Leave()
 
 		// return roomId
 		// s.Emit("reply", "have "+msg)
-	})
-
-	server.OnDisconnect("/", func(s socketio.Conn, msg string) {
-		log.Println("closed", msg)
 	})
 
 	go func() {
@@ -87,11 +75,10 @@ func main() {
 	}()
 	defer server.Close()
 
-	// router.Use(GinMiddleware("http://localhost:4000"))
-	router.Use(gin.Recovery())
+	router.Use(utils.GinMiddleware("http://localhost:4000"))
+	// router.Use(gin.Recovery())
 	router.GET("/socket.io/*any", gin.WrapH(server))
 	router.POST("/socket.io/*any", gin.WrapH(server))
-	// router.StaticFS("/public", http.Dir("../asset"))
 
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/public", "./public")
@@ -99,7 +86,10 @@ func main() {
 	router.GET("/", handlers.Index)
 	router.GET("/:room", handlers.Room)
 
-	if err := router.Run(":3000"); err != nil {
-		log.Fatal("failed run app: ", err)
-	}
+	router.GET("/api/auth", api.Auth)
+	router.POST("/api/signup", api.Signup)
+	router.POST("/api/signin", api.Signin)
+	router.GET("/api/signout", api.Signout)
+
+	router.Run(portNumber)
 }

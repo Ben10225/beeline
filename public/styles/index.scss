@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: #e8e8e8;
+    font-family: 'Roboto', sans-serif
+}
+
+.wrapper{
+    main{
+        #form-container{
+            width: 400px;
+            box-shadow: var(--shadow);
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 5px;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            font-weight: 500;
+            transform: translate(-50%, -50%);
+            img{
+                display: block;
+                width: 150px;
+                margin: 0 auto;
+            }
+            #welcome-message{
+                text-align: center;
+                margin: 20px;
+                h1{
+                    font-size: 30px;
+                    margin-top: 40px;
+                    margin-bottom: 10px;
+                }
+                p{
+                    font-size: 22px;
+                }
+            }
+            .user-info{
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                visibility: hidden;
+                &.show{
+                    opacity: 1;
+                    visibility: visible;
+                }
+                .auto-img{
+                    margin-top: 30px;
+                    position: relative;
+                    cursor: pointer;
+                    h3{
+                        display: inline-block;
+                        position: absolute;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 70px;
+                        color: #fff;
+                        font-weight: 500;
+                        pointer-events: none;
+                        user-select: none;
+                    }
+                    .img-bg{
+                        width: 150px;
+                        height: 150px;
+                        background-color: rgb(254, 152, 28);
+                        border-radius: 50%;
+                    }
+                }
+                .username{
+                    font-size: 25px;
+                    letter-spacing: 0.1em;
+                    margin: 20px 0;
+                }
+                .stream{
+                    margin-top: 40px;
+                    padding: 10px 12px;
+                    border-radius: 7px;
+                    cursor: pointer;
+                    border: none;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #fff;
+                    background-color: rgb(87, 87, 87);
+                    opacity: 0.3;
+                    transition: 0.5s;
+                    &:hover{
+                        opacity: 0.8;
+                    }
+                }
+                .signout{
+                    margin-top: 20px;
+                    padding: 10px 12px;
+                    border-radius: 7px;
+                    cursor: pointer;
+                    border: none;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #999;
+                    opacity: 0.3;
+                    background: transparent;
+                    transition: 0.5s;
+                    &:hover{
+                        opacity: 0.8;
+                    }
+                }
+            }
+            .select{
+                display: flex;
+                justify-content: center;
+                h2{
+                    display: inline-block;
+                    margin: 10px 10px;
+                    cursor: pointer;
+                    font-size: 20px;
+                    opacity: 0.1;
+                    transition: 0.4s;
+                    &.devide-line{
+                        cursor: default;
+                        opacity: 0.3;
+                    }
+                    &.show{
+                        opacity: 0.5;
+                    }
+                }
+            }
+            #form-signin{
+                position: absolute;
+                width: 340px;
+                margin-top: 30px;
+            }
+            #form-signup, #form-signin{
+                opacity: 0;
+                visibility: hidden;
+                &.show-block{
+                    opacity: 1;
+                    visibility: visible;
+                }
+                .form-field{
+                    margin: 20px;
+                    label{
+                        font-size: 16px;
+                        line-height: 1.7em;
+                    }
+                    input{
+                        width: 100%;
+                        border: 2px solid rgb(198, 202, 219);
+                        border-radius: 5px;
+                        padding: 10px;
+                        box-sizing: border-box;
+                        transition: 0.4s;
+                        outline: none;
+                        font-size: 15px;
+                        &::-webkit-input-placeholder {
+                            color: black;
+                            opacity: 0.3;
+                        }
+                    }
+                    input[type="submit"]{
+                        // position: relative;
+                        // transform: translateX(-50%);
+                        // left: 50%;
+                        width: 100px;
+                        margin-top: 10px;
+                        background-color: rgb(75, 93, 172);
+                        border: none;
+                        color: #fff;
+                        opacity: 0.3;
+                        transition: 0.4s;
+                        pointer-events: none;
+                        cursor: default;
+                    }
+                    &.pwd-role{
+                        transition: 0.4s;
+                        height: 40px;
+                        .role{
+                            margin-top: 10px;
+                            margin-left: 10px;
+                            opacity: 0;
+                            visibility: hidden;
+                            transition: 0.5s;
+                            transform: translateY(-20px);
+                            &.show{
+                                opacity: 1;
+                                visibility: visible;
+                                transform: translateY(0px);
+                            }
+                            h4{
+                                transition: 0.3s;
+                                font-weight: 400;
+                                margin-top: 6px;
+                                font-size: 14px;
+                                opacity: 0.2;
+                            }
+                        }
+                    }
+                    &.submit{
+                        display: flex;
+                        align-items: center;
+                        flex-direction: column;
+                        transition: 0.5s;
+                    }
+                    .caution{
+                        letter-spacing: 0.1em;
+                        color: rgb(196, 30, 30);
+                        opacity: 0;
+                        transition: 0.3s;
+                        height: 0px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 450px) {
+    #form-container{
+        width: 95%;
+    }
+    #welcome-message h1{
+        font-size: 24px;
+    }
+}

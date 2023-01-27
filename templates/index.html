@@ -4,39 +4,93 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Beeline</title>
 
-    <style>
-        #video-grid{
-            display: grid;
-            grid-template-columns: repeat(auto-fill, 300px);
-            grid-auto-rows: 300px;
-        }
-        video{
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
+    <link rel="stylesheet" href="/public/styles/index.css">
 </head>
 <body>
-    <div id="video-grid">
-        <div class="local-container"></div>
-        <div class="remote-container"></div>
+    <div class="wrapper">
+        <nav></nav>
+        <main>
+            <section id="form-container">
+                <img id="logo" src="/public/images/logo.svg" alt="">
+        
+                <div id="welcome-message">
+                    <h1>Welcome to Beeline</h1>
+                    <p>Be with you online!</p>
+                </div>
+
+                <div class="user-info">
+                    <div class="user-img"></div>
+                    <div class="auto-img">
+                        <h3></h3>
+                        <div class="img-bg"></div>
+                    </div>
+                    <div class="username"></div>
+                    <button class="stream">Let's Bee！</button>
+                    <button class="signout">Sign out</button>
+                </div>
+
+                <div class="sign-wrapper">
+                    <div class="select">
+                        <h2 class="signin-select show">Sign in</h2>
+                        <h2 class="devide-line">|</h2>
+                        <h2 class="signup-select">Sign up</h2>
+                    </div>
+    
+                    <form id="form-signin" class="show-block">
+                        <div class="form-field">
+                            <input id="input-email-signin" type="text" name="email_signin" placeholder="Enter your email...">
+                        </div>
+    
+                        <div class="form-field pwd-role">
+                            <input id="input-pwd-signin" type="password" name="password_signin" placeholder="Enter your password...">
+                            <div class="role signin">
+                                <h4 class="role-length signin">At least 8 characters</h4>
+                                <h4 class="role-number signin">At least one number</h4>
+                                <h4 class="role-english signin">At least one lowercase character</h4>
+                            </div>
+                        </div>
+    
+                        <div class="form-field submit">
+                            <h4 class="caution signin"></h4>
+                            <input id="signin-btn" type="submit" value="Sign in">
+                        </div>
+                    </form>
+            
+                    <form id="form-signup">
+                        <div class="form-field">
+                            <input id="input-name" type="text" name="name" placeholder="Sign your name...">
+                        </div>
+            
+                        <div class="form-field">
+                            <input id="input-email" type="text" name="email" placeholder="Sign your email...">
+                        </div>
+    
+                        <div class="form-field pwd-role">
+                            <input id="input-pwd" type="password" name="password" placeholder="Sign your password...">
+                            <div class="role signup">
+                                <h4 class="role-length signup">At least 8 characters</h4>
+                                <h4 class="role-number signup">At least one number</h4>
+                                <h4 class="role-english signup">At least one lowercase character</h4>
+                            </div>
+                        </div>
+    
+                        <div class="form-field">
+                            <input id="input-pwd-certain" type="password" name="password-certain" placeholder="Certain your password...">
+                        </div>
+            
+                        <div class="form-field submit">
+                            <h4 class="caution signup"></h4>
+                            <input id="signup-btn" type="submit" value="Sign up">
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+        <footer></footer>
     </div>
-    <button class="open-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">open audio</button>
-    <button class="close-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">close audio</button>
-    <button class="open-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">open video</button>
-    <button class="close-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">close video</button>
 
-    <script>
-        const ROOM_ID = "{{ .roomId }}"
-    </script>
-
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.0/socket.io.js"></script>
-    <!-- <script src='https://cdn.socket.io/socket.io-2.0.0.js'></script> -->
-    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js' integrity='sha512-YeeA/Qxn5hYdkukScTCNNOhTrv1C2RubAGButJ1rmgQwZf/HdRaCGl+JAVkqsqaNRaYNHdheiuKKuPf9mDcqKg==' crossorigin='anonymous'></script> -->
-    <script src="/public/js/index.js" defer></script>
+    <script src="/public/js/index.js"></script>
 </body>
 </html>
