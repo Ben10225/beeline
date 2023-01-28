@@ -84,7 +84,7 @@ func Signin(c *gin.Context) {
 	email := req.Email
 	password := req.Password
 
-	userUuid, userName, userPwd, emailExist := models.GetUser(c, email)
+	userData, emailExist := models.GetUser(c, email)
 	if !emailExist {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   true,
@@ -93,7 +93,7 @@ func Signin(c *gin.Context) {
 		return
 	}
 
-	checked := utils.PwdVerify(password, userPwd)
+	checked := utils.PwdVerify(password, userData.Password)
 	if !checked {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   true,
@@ -102,7 +102,7 @@ func Signin(c *gin.Context) {
 		return
 	}
 
-	token, _ := utils.MakeToken(userUuid, userName, "")
+	token, _ := utils.MakeToken(userData.Uuid, userData.Name, "")
 	c.SetCookie("token", token, 0, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -114,4 +114,51 @@ func Signout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})
+}
+
+func GetUserName(c *gin.Context) {
+	var req structs.User
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	peerId := req.PeerId
+
+	userData := models.GetUserByPeerId(c, peerId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": userData.Name,
+	})
+}
+
+func SetUserPeerId(c *gin.Context) {
+	var req structs.User
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := req.Uuid
+	peerId := req.PeerId
+
+	models.SetPeerIdByUuid(c, uuid, peerId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func GetUserPeerId(c *gin.Context) {
+	var req structs.User
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := req.Uuid
+
+	userData := models.GetPeerIdByUuidAndRemove(c, uuid)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": userData.PeerId,
+	})
+
 }

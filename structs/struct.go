@@ -1,11 +1,8 @@
 package structs
 
 import (
-	"context"
-
 	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MyClaims struct {
@@ -29,15 +26,10 @@ type UserResponse struct {
 
 type User struct {
 	Id       primitive.ObjectID `json:"id,omitempty"`
-	Uuid     string             `json:"uuid,omitempty"`
+	Uuid     string             `json:"uuid,omitempty" validate:"required"`
+	PeerId   string             `json:"peerid,omitempty"`
 	Name     string             `json:"name,omitempty" validate:"required"`
 	Email    string             `json:"email,omitempty" validate:"required"`
 	Password string             `json:"password,omitempty" validate:"required"`
 	ImgUrl   string             `json:"imgurl,omitempty"`
-}
-
-type RecipesHandler struct {
-	Collection *mongo.Collection
-	Ctx        context.Context
-	// redisClient *redis.Client
 }

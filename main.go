@@ -1,9 +1,8 @@
 package main
 
 import (
-	"beeline/api"
 	"beeline/configs"
-	"beeline/handlers"
+	"beeline/routers"
 	"beeline/utils"
 	"log"
 
@@ -21,11 +20,10 @@ const portNumber = ":3000"
 // router.Static("/public", "./public")
 
 func main() {
-	router := gin.New()
+	r := gin.New()
+	// r := gin.Default()
 
 	configs.ConnectDB()
-
-	// routes.UserRoute(router)
 
 	server := socketio.NewServer(nil)
 	server.OnConnect("/", func(s socketio.Conn) error {
@@ -41,24 +39,28 @@ func main() {
 
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, userId string) {
 		// s.SetContext(roomId)
-		// log.Println("get:", roomId, userId)
 
 		s.Join(roomId)
 		// fmt.Println(userId)
 		server.BroadcastToRoom("/", roomId, "user-connected", userId)
 		// s.Emit("user-connected", userId)
 
-		server.OnEvent("/", "stop-camera", func(s socketio.Conn, userId string) {
-			s.Emit("close-camera-view", userId)
-		})
+		// server.OnEvent("/", "stop-camera", func(s socketio.Conn, userId string) {
+		// 	s.Emit("close-camera-view", userId)
+		// })
 
-		server.OnEvent("/", "open-camera", func(s socketio.Conn, userId string) {
-			s.Emit("open-camera-view", userId)
+		// server.OnEvent("/", "open-camera", func(s socketio.Conn, userId string) {
+		// 	s.Emit("open-camera-view", userId)
+		// })
+
+		server.OnEvent("/", "leave-room", func(s socketio.Conn, peerId string) {
+			server.BroadcastToRoom("/", roomId, "leave-video-remove", peerId)
 		})
 
 		server.OnDisconnect("/", func(s socketio.Conn, msg string) {
 			s.Emit("user-disconnected", userId)
 			server.BroadcastToRoom("/", roomId, "user-disconnected", userId)
+			server.BroadcastToRoom("/", roomId, "leave-video-remove", userId)
 			log.Println("closed", msg)
 		})
 
@@ -75,21 +77,16 @@ func main() {
 	}()
 	defer server.Close()
 
-	router.Use(utils.GinMiddleware("http://localhost:4000"))
+	r.Use(utils.GinMiddleware("http://localhost:4000"))
 	// router.Use(gin.Recovery())
-	router.GET("/socket.io/*any", gin.WrapH(server))
-	router.POST("/socket.io/*any", gin.WrapH(server))
 
-	router.LoadHTMLGlob("templates/*")
-	router.Static("/public", "./public")
+	r.GET("/socket.io/*any", gin.WrapH(server))
+	r.POST("/socket.io/*any", gin.WrapH(server))
 
-	router.GET("/", handlers.Index)
-	router.GET("/:room", handlers.Room)
+	r.LoadHTMLGlob("templates/*")
+	r.Static("/public", "./public")
 
-	router.GET("/api/auth", api.Auth)
-	router.POST("/api/signup", api.Signup)
-	router.POST("/api/signin", api.Signin)
-	router.GET("/api/signout", api.Signout)
+	routers.Routers(r)
 
-	router.Run(portNumber)
+	r.Run(portNumber)
 }

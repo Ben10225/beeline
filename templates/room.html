@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beeline</title>
 
-    <style>
+    <link rel="stylesheet" href="/public/styles/room.css">
+    <!-- <style>
         #video-grid{
             display: grid;
             grid-template-columns: repeat(auto-fill, 300px);
@@ -17,24 +18,45 @@
             height: 100%;
             object-fit: cover;
         }
-    </style>
+    </style> -->
 </head>
 <body>
-    <div id="video-grid">
-        <div class="local-container"></div>
-        <div class="remote-container"></div>
-    </div>
-    <button class="open-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">open audio</button>
-    <button class="close-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">close audio</button>
-    <button class="open-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">open video</button>
-    <button class="close-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">close video</button>
+    <div class="wrapper">
+        <section id="room-url-wrapper">
+            <p>Room url：<span id="room-url"></span><i class="fa-regular fa-copy"></i></p>
+        </section>
+    
+        <section id="video-streams">
+            <div class="remote-container"></div>
+            <div class="local-container"></div>
+        </section>
 
+        <section id="controls-wrapper">
+            <div class="icon-wrapper">
+                <div class="control-icon" id="audio-btn"></div>
+            </div>
+    
+            <div class="icon-wrapper">
+                <div class="control-icon" id="camera-btn"></div>
+            </div>
+    
+            <div class="icon-wrapper">
+                <div class="control-icon" id="leave-btn"></div>
+            </div>
+        </section>
+
+        <!-- <button class="open-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">open audio</button>
+        <button class="close-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">close audio</button>
+        <button class="open-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">open video</button>
+        <button class="close-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">close video</button>  -->
+    </div>
     <script>
         const ROOM_ID = "{{ .roomId }}"
+        const USER_ID = "{{ .userId }}"
     </script>
 
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.0/socket.io.js"></script>
-     <script src="/public/js/room.js" defer></script>
+     <script type="module" src="/public/js/room.js" defer></script>
 </body>
 </html>

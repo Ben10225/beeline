@@ -3,7 +3,9 @@ package models
 import (
 	"beeline/configs"
 	"beeline/structs"
+	"context"
 	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -40,13 +42,55 @@ func CreateUser(c *gin.Context, uuid, name, email, password string) bool {
 	return true
 }
 
-func GetUser(c *gin.Context, email string) (string, string, string, bool) {
+func GetUser(c *gin.Context, email string) (*structs.User, bool) {
 	user := structs.User{
 		Email: email,
 	}
 	err := userCollection.FindOne(c, bson.M{"email": email}).Decode(&user)
 	if err != nil {
-		return "", "", "", false
+		return nil, false
 	}
-	return user.Uuid, user.Name, user.Password, true
+	return &user, true
+}
+
+func GetUserByPeerId(c *gin.Context, peerId string) *structs.User {
+	user := structs.User{
+		PeerId: peerId,
+	}
+	err := userCollection.FindOne(c, bson.M{"peerid": peerId}).Decode(&user)
+	if err != nil {
+		return nil
+	}
+	return &user
+}
+
+func SetPeerIdByUuid(c *gin.Context, uuid, peerId string) {
+	// update := structs.User{
+	// 	PeerId: peerId,
+	// }
+	filter := bson.D{{"uuid", uuid}}
+	update := bson.D{{"$set", bson.D{{"peerid", peerId}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	// _, err := userCollection.UpdateOne(c, bson.M{"uuid": uuid}, bson.M{"$set": update})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+}
+
+func GetPeerIdByUuidAndRemove(c *gin.Context, uuid string) *structs.User {
+	user := structs.User{}
+	err := userCollection.FindOne(c, bson.M{"uuid": uuid}).Decode(&user)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	filter := bson.D{{"uuid", uuid}}
+	update := bson.D{{"$set", bson.D{{"peerid", ""}}}}
+	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return &user
 }

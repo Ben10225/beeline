@@ -1,7 +1,7 @@
-const signWrapper = document.querySelector(".sign-wrapper");
+import utils from "./utils.js" 
+
 const signinSelect = document.querySelector(".signin-select");
 const signupSelect = document.querySelector(".signup-select");
-const stream = document.querySelector(".stream");
 const signoutBtn = document.querySelector(".signout");
 
 const formSignin = document.querySelector("#form-signin");
@@ -340,59 +340,8 @@ let signout = async () => {
 }
 
 
-let goStream = async () => {
-    let room = makeid();
 
-    let response = await fetch(`/get_token/${room}`);
-    let data = await response.json();
-
-    let uid = data.uid;
-    let token = data.token;
-    let name = data.name;
-
-    sessionStorage.setItem('uid', uid);
-    sessionStorage.setItem('token', token);
-    sessionStorage.setItem('room', room);
-    sessionStorage.setItem('name', name);
-
-    window.open(`/redirect/${room}`, '_self');
-    // window.open(`/${room}`, '_self');
-}
-
-
-let makeid = () => {
-    let result           = '';
-    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
-    let shortLength = [2, 3, 4];
-    for(let i=0; i<3; i++){
-        let l1 = Math.floor(Math.random() * shortLength.length);
-        for(let j=0; j<shortLength[l1]; j++){
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        result += "-"
-    }
-    result = result.slice(0,-1);
-    return result;
-}
-
-
-let auth = async () => {
-    let response = await fetch(`/api/auth`);
-    let data = await response.json();
-    if(data.ok){
-        signWrapper.style = "opacity: 0; visibility: hidden; pointer-events: none;"
-        document.querySelector(".user-info").classList.add("show");
-        let firstLetter = data.data.name[0];
-        document.querySelector(".auto-img h3").textContent = firstLetter;
-        document.querySelector(".username").textContent = data.data.name;
-        stream.onclick = () => {
-            goStream();
-        }
-    }
-}
-
-auth();
+utils.auth("index");
 signTwoBlockButtonInit();
 inputEmailSignin.addEventListener("input", checkEmailSignin);
 inputPwdSignin.addEventListener("input", checkPwdSignin);
