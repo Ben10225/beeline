@@ -177,7 +177,7 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         </div>
         `
     
-        localContainer.insertAdjacentHTML("beforeend", player);
+        remoteContainer.insertAdjacentHTML("beforeend", player);
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
@@ -185,22 +185,23 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
     }else{
         tempRemoteMediaStreamId = stream.id
 
-        let remoteName = await getRemoteUser(remotePeerid);
-
         let player = `
         <div class="video-container" id="wrapper-${remotePeerid}">
             <div class="username-wrapper">
-                <span class="user-name">${remoteName}</span>
+                <span class="user-name"></span>
             </div>
             <div class="video-player" id="user-${remotePeerid}"></div>
         </div>
         `
     
-        remoteContainer.insertAdjacentHTML("beforeend", player);
+        remoteContainer.insertAdjacentHTML("afterbegin", player);
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
         document.querySelector(`#user-${remotePeerid}`).append(video)
+
+        let remoteName = await getRemoteUser(remotePeerid);
+        document.querySelector(`#wrapper-${remotePeerid} span`).textContent = remoteName;
     }
 }
 

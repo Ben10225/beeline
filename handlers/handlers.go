@@ -8,10 +8,6 @@ import (
 )
 
 func Index(c *gin.Context) {
-	// uuid, _ := uuid.NewRandom()
-	// room := uuid.String()
-	// fmt.Println(uuid)
-	// c.Redirect(http.StatusFound, fmt.Sprintf("/%s", room))
 	c.HTML(http.StatusOK, "index.html", nil)
 }
 
@@ -19,11 +15,13 @@ func Room(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
+		return
 	}
 	payload, err := utils.ParseToken(token)
 	if err != nil {
 		c.SetCookie("token", "", -1, "/", "", false, true)
 		c.Redirect(http.StatusFound, "/")
+		return
 	}
 
 	room := c.Param("room")

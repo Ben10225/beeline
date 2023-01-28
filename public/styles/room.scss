@@ -36,10 +36,22 @@ body{
 
 #video-streams{
     display: flex;
-    flex-wrap: wrap;
+    justify-content: center;
+    // flex-direction: row;
+    // flex-wrap: wrap;
     // width: 50%;
     // height: calc(100vh - 230px);
     // margin: 0 auto;
+    // display: grid;
+    // grid-template-columns: 1fr 1fr;
+    .remote-container{
+        // width: 1200px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .local-container{
+        // display: flex;
+    }
 }
 
 .video-container{

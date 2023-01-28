@@ -32,9 +32,12 @@ body {
 
 #video-streams {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: center;
 }
-
+#video-streams .remote-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 .video-container {
   border: 3px solid rgb(75, 95, 172);
   border-radius: 8px;
