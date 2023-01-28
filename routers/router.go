@@ -20,7 +20,7 @@ func Routers(router *gin.Engine) {
 		user.POST("/signup", api.Signup)
 		user.POST("/signin", api.Signin)
 		user.GET("/signout", api.Signout)
-		user.POST("/getusername", api.GetUserName)
+		user.POST("/getremoteuser", api.GetRemoteUser)
 		user.POST("/setpeerid", api.SetUserPeerId)
 		user.POST("/getlocalpeerid", api.GetUserPeerId)
 	}

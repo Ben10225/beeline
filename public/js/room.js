@@ -5,7 +5,8 @@ let userData = null;
 userData = await utils.auth("room");
 let localUuid = userData.uuid;
 let localName = userData.name;
-// let localImgUrl = userData.imgUrl;
+let localImgUrl = userData.imgUrl;
+let localPeerId = null;
 
 
 
@@ -68,22 +69,25 @@ navigator.mediaDevices.getUserMedia({
 
 
 myPeer.on('open', id => {
-    setPeerid(localUuid, id)
-    socket.emit('join-room', ROOM_ID, id)
+    setPeerid(localUuid, id);
+    localPeerId = id;
+    socket.emit('join-room', ROOM_ID, id);
 })
 
 
-// socket.on('close-camera-view', (userId) => {
-//     let html = `
-//     <div class="black-block" style="background: #111; width:300px; height:300px; position: absolute; top:0"; left: 0></div>
-//     `
-//     document.querySelector(`#user-${userId} video`).insertAdjacentHTML("beforeend", html);
-// })
+socket.on('close-camera-view', (peerId) => {
+    let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
+    if(remoteDiv){
+        remoteDiv.classList.add("show");
+    }
+})
 
-
-// socket.on('open-camera-view', (userId) => {
-//     document.querySelector(`#user-${userId} .black-block`).remove();
-// })
+socket.on('open-camera-view', (peerId) => {
+    let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
+    if(remoteDiv){
+        remoteDiv.classList.remove("show");
+    }
+})
 
 socket.on('leave-video-remove', (peerId) => {
     let remoteUserWrapper =  document.querySelector(`#wrapper-${peerId}`);
@@ -108,12 +112,14 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             let isOpen = stream.getTracks()[1].enabled;
             if(isOpen){
                 cameraBtn.classList.add("disable");
+                document.querySelector(".user-block.local").classList.add("show");
                 stream.getTracks()[1].enabled = false;
-                // socket.emit("stop-camera", stream.id);
+                socket.emit("stop-camera", localPeerId);
             }else{
                 cameraBtn.classList.remove("disable");
+                document.querySelector(".user-block.local").classList.remove("show");
                 stream.getTracks()[1].enabled = true;
-                // socket.emit("open-camera", stream.id);
+                socket.emit("open-camera", localPeerId);
             }
         }
         cameraBtn.onclick = () => {
@@ -168,12 +174,23 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         })
         */
 
+        if(localImgUrl[0] !== "#"){
+
+        }
         let player = `
         <div class="video-container">
             <div class="username-wrapper">
                 <span class="user-name">${localName}</span>
             </div>
-            <div class="video-player" id="user-${stream.id}"></div>
+            <div class="video-player" id="user-${stream.id}">
+                <div class="user-block local">
+                    <div class="user-img"></div>
+                    <div class="auto-img">
+                        <h3>${localName[0]}</h3>
+                        <div class="img-bg" style="background-color: ${localImgUrl};"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         `
     
@@ -190,7 +207,15 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             <div class="username-wrapper">
                 <span class="user-name"></span>
             </div>
-            <div class="video-player" id="user-${remotePeerid}"></div>
+            <div class="video-player" id="user-${remotePeerid}">
+                <div class="user-block">
+                    <div class="user-img"></div>
+                    <div class="auto-img">
+                        <h3></h3>
+                        <div class="img-bg"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         `
     
@@ -200,8 +225,12 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         })
         document.querySelector(`#user-${remotePeerid}`).append(video)
 
-        let remoteName = await getRemoteUser(remotePeerid);
+        let data = await getRemoteUser(remotePeerid);
+        let remoteName = data.name;
+        let remoteImgUrl = data.imgurl;
         document.querySelector(`#wrapper-${remotePeerid} span`).textContent = remoteName;
+        document.querySelector(`#wrapper-${remotePeerid} h3`).textContent = remoteName[0];
+        document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `background-color: ${remoteImgUrl}`;
     }
 }
 
@@ -221,7 +250,7 @@ function connectToNewUser(userId, stream){
 
 
 let getRemoteUser = async (remotePeerid) => {
-    let response = await fetch(`/api/getusername`, {
+    let response = await fetch(`/api/getremoteuser`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"

@@ -44,13 +44,13 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "user-connected", userId)
 		// s.Emit("user-connected", userId)
 
-		// server.OnEvent("/", "stop-camera", func(s socketio.Conn, userId string) {
-		// 	s.Emit("close-camera-view", userId)
-		// })
+		server.OnEvent("/", "stop-camera", func(s socketio.Conn, peerId string) {
+			server.BroadcastToRoom("/", roomId, "close-camera-view", peerId)
+		})
 
-		// server.OnEvent("/", "open-camera", func(s socketio.Conn, userId string) {
-		// 	s.Emit("open-camera-view", userId)
-		// })
+		server.OnEvent("/", "open-camera", func(s socketio.Conn, peerId string) {
+			server.BroadcastToRoom("/", roomId, "open-camera-view", peerId)
+		})
 
 		server.OnEvent("/", "leave-room", func(s socketio.Conn, peerId string) {
 			server.BroadcastToRoom("/", roomId, "leave-video-remove", peerId)

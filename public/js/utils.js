@@ -6,6 +6,7 @@ let auth = async (page) => {
         document.querySelector(".user-info").classList.add("show");
         let firstLetter = data.data.name[0];
         document.querySelector(".auto-img h3").textContent = firstLetter;
+        document.querySelector(".img-bg").style = `background-color: ${data.data.imgUrl};`;
         document.querySelector(".username").textContent = data.data.name;
         document.querySelector(".stream").onclick = () => {
             goStream();

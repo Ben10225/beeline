@@ -25,13 +25,14 @@ func CheckEmailExist(c *gin.Context, email string) bool {
 	return err == nil
 }
 
-func CreateUser(c *gin.Context, uuid, name, email, password string) bool {
+func CreateUser(c *gin.Context, uuid, name, email, password, color string) bool {
 	newUser := structs.User{
 		Id:       primitive.NewObjectID(),
 		Uuid:     uuid,
 		Name:     name,
 		Email:    email,
 		Password: password,
+		ImgUrl:   color,
 	}
 
 	_, err := userCollection.InsertOne(c, newUser)

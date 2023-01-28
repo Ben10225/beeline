@@ -5,7 +5,9 @@ import (
 	"beeline/structs"
 	"beeline/utils"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,7 +60,11 @@ func Signup(c *gin.Context) {
 	uuid := utils.GenerateUuid()
 	password, _ = utils.PwdHash(password)
 
-	status := models.CreateUser(c, uuid, name, email, password)
+	bgColor := []string{"#228fe8", "#2c8e22", "#FE981C", "#db2e2e", "#b65ed1", "#1dadad", "#e1b30f", "#bf95ff", "#048ef1"}
+	rand.Seed(time.Now().Unix())
+	color := bgColor[rand.Intn(len(bgColor))]
+
+	status := models.CreateUser(c, uuid, name, email, password, color)
 
 	if !status {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -68,7 +74,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	token, _ := utils.MakeToken(uuid, name, "")
+	token, _ := utils.MakeToken(uuid, name, color)
 	c.SetCookie("token", token, 0, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -102,7 +108,7 @@ func Signin(c *gin.Context) {
 		return
 	}
 
-	token, _ := utils.MakeToken(userData.Uuid, userData.Name, "")
+	token, _ := utils.MakeToken(userData.Uuid, userData.Name, userData.ImgUrl)
 	c.SetCookie("token", token, 0, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -116,7 +122,7 @@ func Signout(c *gin.Context) {
 	})
 }
 
-func GetUserName(c *gin.Context) {
+func GetRemoteUser(c *gin.Context) {
 	var req structs.User
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -127,7 +133,7 @@ func GetUserName(c *gin.Context) {
 	userData := models.GetUserByPeerId(c, peerId)
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": userData.Name,
+		"data": userData,
 	})
 }
 
