@@ -52,7 +52,6 @@ navigator.mediaDevices.getUserMedia({
 
 
     socket.on('user-connected', userId => {
-        // console.log("User connected: " + userId)
         console.log("User connected: ", userId)
         connectToNewUser(userId, stream)
     })
@@ -270,7 +269,6 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
         document.querySelector(`#wrapper-${remotePeerid} span`).textContent = remoteName;
-        console.log(remoteImgUrl);
         if(remoteImgUrl[0] !== "#"){
             document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `
                 background-image: url('${remoteImgUrl}');
