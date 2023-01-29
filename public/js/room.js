@@ -3,6 +3,7 @@ import utils from "./utils.js"
 let userData = null;
 
 userData = await utils.auth("room");
+
 let localUuid = userData.uuid;
 let localName = userData.name;
 let localImgUrl = userData.imgUrl;
@@ -74,7 +75,7 @@ myPeer.on('open', id => {
     socket.emit('join-room', ROOM_ID, id);
 })
 
-
+// camera
 socket.on('close-camera-view', (peerId) => {
     let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
     if(remoteDiv){
@@ -89,6 +90,23 @@ socket.on('open-camera-view', (peerId) => {
     }
 })
 
+// audio
+socket.on('show-unvoice-icon', (peerId) => {
+    let remoteVoiceIcon = document.querySelector(`#user-${peerId} .micro-status-icon`);
+    if(remoteVoiceIcon){
+        remoteVoiceIcon.classList.add("show");
+    }
+})
+
+socket.on('hide-unvoice-icon', (peerId) => {
+    let remoteVoiceIcon = document.querySelector(`#user-${peerId} .micro-status-icon`);
+    if(remoteVoiceIcon){
+        remoteVoiceIcon.classList.remove("show");
+    }
+})
+
+
+
 socket.on('leave-video-remove', (peerId) => {
     let remoteUserWrapper =  document.querySelector(`#wrapper-${peerId}`);
     if(remoteUserWrapper){
@@ -102,6 +120,9 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
     video.srcObject = stream
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
+
+    // stream.getTracks()[1].enabled = false;
+    // stream.getTracks()[0].enabled = false;
 
     if(islocal){
         tempMediaStreamId = stream.id;
@@ -133,14 +154,21 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             if(isVolumn){
                 audioBtn.classList.add("disable");
                 stream.getTracks()[0].enabled = false;
+                document.querySelector(".micro-status-icon.local").classList.add("show");
+                socket.emit("stop-audio", localPeerId);
             }else{
                 audioBtn.classList.remove("disable");
                 stream.getTracks()[0].enabled = true;
+                document.querySelector(".micro-status-icon.local").classList.remove("show");
+                socket.emit("open-audio", localPeerId);
             }
         }
         audioBtn.onclick = () => {
             toggleAudio();
         }
+        stream.getTracks()[0].enabled = false;
+        stream.getTracks()[1].enabled = false;
+
 
         // leave room
         const leaveBtn = document.querySelector("#leave-btn");
@@ -183,11 +211,13 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
                 <span class="user-name">${localName}</span>
             </div>
             <div class="video-player" id="user-${stream.id}">
-                <div class="user-block local">
+                <div class="micro-status-icon local show"></div>
+                <div class="user-block local show">
                     <div class="user-img"></div>
                     <div class="auto-img">
-                        <h3>${localName[0]}</h3>
-                        <div class="img-bg" style="background-color: ${localImgUrl};"></div>
+                        <div class="img-bg" style="background-color: ${localImgUrl};">
+                            <h3>${localName[0]}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -208,11 +238,13 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
                 <span class="user-name"></span>
             </div>
             <div class="video-player" id="user-${remotePeerid}">
-                <div class="user-block">
+            <div class="micro-status-icon show"></div>
+                <div class="user-block show">
                     <div class="user-img"></div>
                     <div class="auto-img">
-                        <h3></h3>
-                        <div class="img-bg"></div>
+                        <div class="img-bg">
+                            <h3></h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -294,3 +326,28 @@ let getLocalPeerId = async (uuid) => {
         return data.data
     }
 }
+
+
+let generateShortLink = async () => {
+    let currentUrl = window.location.href;
+    const copyIcon = document.querySelector(".fa-copy");
+    document.querySelector("#room-url").textContent = currentUrl;
+    copyIcon.addEventListener("click", ()=>{
+        copyContent(currentUrl);
+        copyIcon.style.opacity = "0.8";
+        setTimeout(()=>{
+            copyIcon.style.opacity = "0.3";
+        }, 700)
+    })
+}
+
+
+let copyContent = async (url) => {
+    try {
+        await navigator.clipboard.writeText(url)
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+    }
+}
+
+generateShortLink();

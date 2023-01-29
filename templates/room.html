@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beeline</title>
 
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.css' integrity='sha512-FA9cIbtlP61W0PRtX36P6CGRy0vZs0C2Uw26Q1cMmj3xwhftftymr0sj8/YeezDnRwL9wtWw8ZwtCiTDXlXGjQ==' crossorigin='anonymous'/>
     <link rel="stylesheet" href="/public/styles/room.css">
     <!-- <style>
         #video-grid{
@@ -22,33 +23,28 @@
 </head>
 <body>
     <div class="wrapper">
-        <section id="room-url-wrapper">
-            <p>Room url：<span id="room-url"></span><i class="fa-regular fa-copy"></i></p>
-        </section>
-    
         <section id="video-streams">
             <div class="remote-container"></div>
             <div class="local-container"></div>
         </section>
 
         <section id="controls-wrapper">
+            <div id="room-url-wrapper">
+                <span id="room-url"></span><i class="fa-regular fa-copy"></i>
+            </div>
+
             <div class="icon-wrapper">
-                <div class="control-icon" id="audio-btn"></div>
+                <div class="control-icon disable" id="audio-btn"></div>
             </div>
     
             <div class="icon-wrapper">
-                <div class="control-icon" id="camera-btn"></div>
+                <div class="control-icon disable" id="camera-btn"></div>
             </div>
     
             <div class="icon-wrapper">
                 <div class="control-icon" id="leave-btn"></div>
             </div>
         </section>
-
-        <!-- <button class="open-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">open audio</button>
-        <button class="close-audio" style="z-index: 50; cursor: pointer; margin-top: 100px;">close audio</button>
-        <button class="open-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">open video</button>
-        <button class="close-video" style="z-index: 50; cursor: pointer; margin-top: 100px;">close video</button>  -->
     </div>
     <script>
         const ROOM_ID = "{{ .roomId }}"

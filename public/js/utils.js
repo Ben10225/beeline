@@ -1,9 +1,15 @@
 let auth = async (page) => {
     let response = await fetch(`/api/auth`);
     let data = await response.json();
+    // if(page === "index"){
+
+    // }
     if(page === "index" && data.ok){
-        document.querySelector(".sign-wrapper").style = "opacity: 0; visibility: hidden; pointer-events: none;"
-        document.querySelector(".user-info").classList.add("show");
+        setTimeout(() => {
+            document.querySelector(".loading").remove();
+            document.querySelector("#sign-wrapper").style = "opacity: 0; visibility: hidden; pointer-events: none;"
+            document.querySelector(".user-info").classList.add("show");
+        }, 600)
         let firstLetter = data.data.name[0];
         document.querySelector(".auto-img h3").textContent = firstLetter;
         document.querySelector(".img-bg").style = `background-color: ${data.data.imgUrl};`;
@@ -11,6 +17,11 @@ let auth = async (page) => {
         document.querySelector(".stream").onclick = () => {
             goStream();
         }
+    }else if(page === "index" && data.error){
+        setTimeout(() => {
+            document.querySelector(".loading").remove();
+            document.querySelector("#sign-wrapper").style = `opacity: 1; visibility: visible;`;
+        }, 600)
     }
     if(page === "room" && data.ok){
         let res = data.data;

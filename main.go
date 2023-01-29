@@ -44,12 +44,22 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "user-connected", userId)
 		// s.Emit("user-connected", userId)
 
+		// camera
 		server.OnEvent("/", "stop-camera", func(s socketio.Conn, peerId string) {
 			server.BroadcastToRoom("/", roomId, "close-camera-view", peerId)
 		})
 
 		server.OnEvent("/", "open-camera", func(s socketio.Conn, peerId string) {
 			server.BroadcastToRoom("/", roomId, "open-camera-view", peerId)
+		})
+
+		// audio
+		server.OnEvent("/", "stop-audio", func(s socketio.Conn, peerId string) {
+			server.BroadcastToRoom("/", roomId, "show-unvoice-icon", peerId)
+		})
+
+		server.OnEvent("/", "open-audio", func(s socketio.Conn, peerId string) {
+			server.BroadcastToRoom("/", roomId, "hide-unvoice-icon", peerId)
 		})
 
 		server.OnEvent("/", "leave-room", func(s socketio.Conn, peerId string) {

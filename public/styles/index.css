@@ -39,6 +39,32 @@ body {
 .wrapper main #form-container #welcome-message p {
   font-size: 22px;
 }
+.wrapper main #form-container .loading {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translateX(-50%);
+  z-index: 50;
+}
+.wrapper main #form-container .loading .loading-txt {
+  font-size: 24px;
+  letter-spacing: 0.05em;
+  color: #555;
+  font-weight: 400;
+  display: inline-block;
+}
+.wrapper main #form-container .loading .loading-gif {
+  width: 65px;
+  height: 65px;
+  background-image: url("/public/images/loading.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: inline-block;
+  position: relative;
+  top: 24px;
+  margin-left: 10px;
+}
 .wrapper main #form-container .user-info {
   position: absolute;
   left: 50%;
@@ -117,11 +143,15 @@ body {
 .wrapper main #form-container .user-info .signout:hover {
   opacity: 0.8;
 }
-.wrapper main #form-container .select {
+.wrapper main #form-container #sign-wrapper {
+  opacity: 0;
+  visibility: hidden;
+}
+.wrapper main #form-container #sign-wrapper .select {
   display: flex;
   justify-content: center;
 }
-.wrapper main #form-container .select h2 {
+.wrapper main #form-container #sign-wrapper .select h2 {
   display: inline-block;
   margin: 10px 10px;
   cursor: pointer;
@@ -129,34 +159,34 @@ body {
   opacity: 0.1;
   transition: 0.4s;
 }
-.wrapper main #form-container .select h2.devide-line {
+.wrapper main #form-container #sign-wrapper .select h2.devide-line {
   cursor: default;
   opacity: 0.3;
 }
-.wrapper main #form-container .select h2.show {
+.wrapper main #form-container #sign-wrapper .select h2.show {
   opacity: 0.5;
 }
-.wrapper main #form-container #form-signin {
+.wrapper main #form-container #sign-wrapper #form-signin {
   position: absolute;
   width: 340px;
   margin-top: 30px;
 }
-.wrapper main #form-container #form-signup, .wrapper main #form-container #form-signin {
+.wrapper main #form-container #sign-wrapper #form-signup, .wrapper main #form-container #sign-wrapper #form-signin {
   opacity: 0;
   visibility: hidden;
 }
-.wrapper main #form-container #form-signup.show-block, .wrapper main #form-container #form-signin.show-block {
+.wrapper main #form-container #sign-wrapper #form-signup.show-block, .wrapper main #form-container #sign-wrapper #form-signin.show-block {
   opacity: 1;
   visibility: visible;
 }
-.wrapper main #form-container #form-signup .form-field, .wrapper main #form-container #form-signin .form-field {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field, .wrapper main #form-container #sign-wrapper #form-signin .form-field {
   margin: 20px;
 }
-.wrapper main #form-container #form-signup .form-field label, .wrapper main #form-container #form-signin .form-field label {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field label, .wrapper main #form-container #sign-wrapper #form-signin .form-field label {
   font-size: 16px;
   line-height: 1.7em;
 }
-.wrapper main #form-container #form-signup .form-field input, .wrapper main #form-container #form-signin .form-field input {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field input, .wrapper main #form-container #sign-wrapper #form-signin .form-field input {
   width: 100%;
   border: 2px solid rgb(198, 202, 219);
   border-radius: 5px;
@@ -166,11 +196,11 @@ body {
   outline: none;
   font-size: 15px;
 }
-.wrapper main #form-container #form-signup .form-field input::-webkit-input-placeholder, .wrapper main #form-container #form-signin .form-field input::-webkit-input-placeholder {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field input::-webkit-input-placeholder, .wrapper main #form-container #sign-wrapper #form-signin .form-field input::-webkit-input-placeholder {
   color: black;
   opacity: 0.3;
 }
-.wrapper main #form-container #form-signup .form-field input[type=submit], .wrapper main #form-container #form-signin .form-field input[type=submit] {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field input[type=submit], .wrapper main #form-container #sign-wrapper #form-signin .form-field input[type=submit] {
   width: 100px;
   margin-top: 10px;
   background-color: rgb(75, 93, 172);
@@ -181,11 +211,11 @@ body {
   pointer-events: none;
   cursor: default;
 }
-.wrapper main #form-container #form-signup .form-field.pwd-role, .wrapper main #form-container #form-signin .form-field.pwd-role {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field.pwd-role, .wrapper main #form-container #sign-wrapper #form-signin .form-field.pwd-role {
   transition: 0.4s;
   height: 40px;
 }
-.wrapper main #form-container #form-signup .form-field.pwd-role .role, .wrapper main #form-container #form-signin .form-field.pwd-role .role {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field.pwd-role .role, .wrapper main #form-container #sign-wrapper #form-signin .form-field.pwd-role .role {
   margin-top: 10px;
   margin-left: 10px;
   opacity: 0;
@@ -193,25 +223,25 @@ body {
   transition: 0.5s;
   transform: translateY(-20px);
 }
-.wrapper main #form-container #form-signup .form-field.pwd-role .role.show, .wrapper main #form-container #form-signin .form-field.pwd-role .role.show {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field.pwd-role .role.show, .wrapper main #form-container #sign-wrapper #form-signin .form-field.pwd-role .role.show {
   opacity: 1;
   visibility: visible;
   transform: translateY(0px);
 }
-.wrapper main #form-container #form-signup .form-field.pwd-role .role h4, .wrapper main #form-container #form-signin .form-field.pwd-role .role h4 {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field.pwd-role .role h4, .wrapper main #form-container #sign-wrapper #form-signin .form-field.pwd-role .role h4 {
   transition: 0.3s;
   font-weight: 400;
   margin-top: 6px;
   font-size: 14px;
   opacity: 0.2;
 }
-.wrapper main #form-container #form-signup .form-field.submit, .wrapper main #form-container #form-signin .form-field.submit {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field.submit, .wrapper main #form-container #sign-wrapper #form-signin .form-field.submit {
   display: flex;
   align-items: center;
   flex-direction: column;
   transition: 0.5s;
 }
-.wrapper main #form-container #form-signup .form-field .caution, .wrapper main #form-container #form-signin .form-field .caution {
+.wrapper main #form-container #sign-wrapper #form-signup .form-field .caution, .wrapper main #form-container #sign-wrapper #form-signin .form-field .caution {
   letter-spacing: 0.1em;
   color: rgb(196, 30, 30);
   opacity: 0;

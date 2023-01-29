@@ -41,6 +41,32 @@ body{
                     font-size: 22px;
                 }
             }
+            .loading{
+                position: absolute;
+                left: 50%;
+                top: 60%;
+                transform: translateX(-50%);
+                z-index: 50;
+                .loading-txt{
+                    font-size: 24px;
+                    letter-spacing: 0.05em;
+                    color: #555;
+                    font-weight: 400;
+                    display: inline-block;
+                }
+                .loading-gif{
+                    width: 65px;
+                    height: 65px;
+                    background-image: url('/public/images/loading.gif');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    display: inline-block;
+                    position: relative;
+                    top: 24px;
+                    margin-left: 10px;
+                }
+            }
             .user-info{
                 position: absolute;
                 left: 50%;
@@ -116,107 +142,111 @@ body{
                     }
                 }
             }
-            .select{
-                display: flex;
-                justify-content: center;
-                h2{
-                    display: inline-block;
-                    margin: 10px 10px;
-                    cursor: pointer;
-                    font-size: 20px;
-                    opacity: 0.1;
-                    transition: 0.4s;
-                    &.devide-line{
-                        cursor: default;
-                        opacity: 0.3;
-                    }
-                    &.show{
-                        opacity: 0.5;
-                    }
-                }
-            }
-            #form-signin{
-                position: absolute;
-                width: 340px;
-                margin-top: 30px;
-            }
-            #form-signup, #form-signin{
+            #sign-wrapper{
                 opacity: 0;
                 visibility: hidden;
-                &.show-block{
-                    opacity: 1;
-                    visibility: visible;
-                }
-                .form-field{
-                    margin: 20px;
-                    label{
-                        font-size: 16px;
-                        line-height: 1.7em;
-                    }
-                    input{
-                        width: 100%;
-                        border: 2px solid rgb(198, 202, 219);
-                        border-radius: 5px;
-                        padding: 10px;
-                        box-sizing: border-box;
+                .select{
+                    display: flex;
+                    justify-content: center;
+                    h2{
+                        display: inline-block;
+                        margin: 10px 10px;
+                        cursor: pointer;
+                        font-size: 20px;
+                        opacity: 0.1;
                         transition: 0.4s;
-                        outline: none;
-                        font-size: 15px;
-                        &::-webkit-input-placeholder {
-                            color: black;
+                        &.devide-line{
+                            cursor: default;
                             opacity: 0.3;
                         }
-                    }
-                    input[type="submit"]{
-                        // position: relative;
-                        // transform: translateX(-50%);
-                        // left: 50%;
-                        width: 100px;
-                        margin-top: 10px;
-                        background-color: rgb(75, 93, 172);
-                        border: none;
-                        color: #fff;
-                        opacity: 0.3;
-                        transition: 0.4s;
-                        pointer-events: none;
-                        cursor: default;
-                    }
-                    &.pwd-role{
-                        transition: 0.4s;
-                        height: 40px;
-                        .role{
-                            margin-top: 10px;
-                            margin-left: 10px;
-                            opacity: 0;
-                            visibility: hidden;
-                            transition: 0.5s;
-                            transform: translateY(-20px);
-                            &.show{
-                                opacity: 1;
-                                visibility: visible;
-                                transform: translateY(0px);
-                            }
-                            h4{
-                                transition: 0.3s;
-                                font-weight: 400;
-                                margin-top: 6px;
-                                font-size: 14px;
-                                opacity: 0.2;
-                            }
+                        &.show{
+                            opacity: 0.5;
                         }
                     }
-                    &.submit{
-                        display: flex;
-                        align-items: center;
-                        flex-direction: column;
-                        transition: 0.5s;
+                }
+                #form-signin{
+                    position: absolute;
+                    width: 340px;
+                    margin-top: 30px;
+                }
+                #form-signup, #form-signin{
+                    opacity: 0;
+                    visibility: hidden;
+                    &.show-block{
+                        opacity: 1;
+                        visibility: visible;
                     }
-                    .caution{
-                        letter-spacing: 0.1em;
-                        color: rgb(196, 30, 30);
-                        opacity: 0;
-                        transition: 0.3s;
-                        height: 0px;
+                    .form-field{
+                        margin: 20px;
+                        label{
+                            font-size: 16px;
+                            line-height: 1.7em;
+                        }
+                        input{
+                            width: 100%;
+                            border: 2px solid rgb(198, 202, 219);
+                            border-radius: 5px;
+                            padding: 10px;
+                            box-sizing: border-box;
+                            transition: 0.4s;
+                            outline: none;
+                            font-size: 15px;
+                            &::-webkit-input-placeholder {
+                                color: black;
+                                opacity: 0.3;
+                            }
+                        }
+                        input[type="submit"]{
+                            // position: relative;
+                            // transform: translateX(-50%);
+                            // left: 50%;
+                            width: 100px;
+                            margin-top: 10px;
+                            background-color: rgb(75, 93, 172);
+                            border: none;
+                            color: #fff;
+                            opacity: 0.3;
+                            transition: 0.4s;
+                            pointer-events: none;
+                            cursor: default;
+                        }
+                        &.pwd-role{
+                            transition: 0.4s;
+                            height: 40px;
+                            .role{
+                                margin-top: 10px;
+                                margin-left: 10px;
+                                opacity: 0;
+                                visibility: hidden;
+                                transition: 0.5s;
+                                transform: translateY(-20px);
+                                &.show{
+                                    opacity: 1;
+                                    visibility: visible;
+                                    transform: translateY(0px);
+                                }
+                                h4{
+                                    transition: 0.3s;
+                                    font-weight: 400;
+                                    margin-top: 6px;
+                                    font-size: 14px;
+                                    opacity: 0.2;
+                                }
+                            }
+                        }
+                        &.submit{
+                            display: flex;
+                            align-items: center;
+                            flex-direction: column;
+                            transition: 0.5s;
+                        }
+                        .caution{
+                            letter-spacing: 0.1em;
+                            color: rgb(196, 30, 30);
+                            opacity: 0;
+                            transition: 0.3s;
+                            height: 0px;
+                        }
                     }
                 }
             }
