@@ -36,6 +36,7 @@ navigator.mediaDevices.getUserMedia({
     addVideoStream(myVideo, stream, true)
     let localId = stream.id
 
+
     // 進房時監聽
 
     myPeer.on('call', call => {
@@ -43,10 +44,9 @@ navigator.mediaDevices.getUserMedia({
         const video = document.createElement("video")
         let remotePeerid = call.peer
         call.on("stream", userVideoStream => {
-            if(localId !== userVideoStream.id)
+            if (localId === userVideoStream.id) return
             // console.log("stream", userVideoStream)
             addVideoStream(video, userVideoStream, false, remotePeerid)
-            // console.log("userVideoStream", userVideoStream)
         })
     })
 
@@ -120,26 +120,31 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
 
-    // stream.getTracks()[1].enabled = false;
-    // stream.getTracks()[0].enabled = false;
 
     if(islocal){
         tempMediaStreamId = stream.id;
 
+        // stream.getTracks()[1].enabled = false;
+        stream.getTracks()[0].enabled = false;
+
         // camera button
         const cameraBtn = document.querySelector("#camera-btn");
         let toggleCamera = async () => {
-            let isOpen = stream.getTracks()[1].enabled;
-            if(isOpen){
+            // let isOpen = stream.getTracks()[1].enabled;
+            if(!document.querySelector(".user-block.local").classList.contains("show")){
                 cameraBtn.classList.add("disable");
                 document.querySelector(".user-block.local").classList.add("show");
-                stream.getTracks()[1].enabled = false;
+                // stream.getTracks()[1].enabled = false;
                 socket.emit("stop-camera", localPeerId);
+
+                setUserStreamStatus(localUuid, "video", false, false);
             }else{
                 cameraBtn.classList.remove("disable");
                 document.querySelector(".user-block.local").classList.remove("show");
-                stream.getTracks()[1].enabled = true;
+                // stream.getTracks()[1].enabled = true;
                 socket.emit("open-camera", localPeerId);
+
+                setUserStreamStatus(localUuid, "video", true, false);
             }
         }
         cameraBtn.onclick = () => {
@@ -155,18 +160,21 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
                 stream.getTracks()[0].enabled = false;
                 document.querySelector(".micro-status-icon.local").classList.add("show");
                 socket.emit("stop-audio", localPeerId);
+
+                setUserStreamStatus(localUuid, "audio", false, false);
+
             }else{
                 audioBtn.classList.remove("disable");
                 stream.getTracks()[0].enabled = true;
                 document.querySelector(".micro-status-icon.local").classList.remove("show");
                 socket.emit("open-audio", localPeerId);
+
+                setUserStreamStatus(localUuid, "audio", true, false);
             }
         }
         audioBtn.onclick = () => {
             toggleAudio();
         }
-        stream.getTracks()[0].enabled = false;
-        stream.getTracks()[1].enabled = false;
 
 
         // leave room
@@ -174,6 +182,8 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         leaveBtn.onclick = async () => {
             let localPeerId = await getLocalPeerId(localUuid)
             socket.emit("leave-room", localPeerId);
+
+            setUserStreamStatus(localUuid, "video", false, true);
             window.location = "/";
         }
 
@@ -237,9 +247,31 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
-        document.querySelector(`#user-${stream.id}`).append(video)
+        document.querySelector(`#user-${stream.id}`).append(video);
+
+        setUserStreamStatus(localUuid, "video", false, true);
+
     }else{
         tempRemoteMediaStreamId = stream.id
+
+        // let remoteVideoStatus = stream.getTracks()[1].enabled;
+        // let remoteAudioStatus = stream.getTracks()[0].enabled;
+
+        let videoTag = null;
+        let audioTag = null;
+
+        // if(remoteVideoStatus){
+        //     videoTag = `<div class="user-block">`;
+        // }else{
+        //     videoTag = `<div class="user-block show">`;
+        // }
+
+
+        // if(remoteAudioStatus){
+        //     audioTag = `<div class="micro-status-icon"></div>`;
+        // }else{
+        //     audioTag = `<div class="micro-status-icon show"></div>`;
+        // }
 
         let player = `
         <div class="video-container" id="wrapper-${remotePeerid}">
@@ -247,7 +279,7 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
                 <span class="user-name"></span>
             </div>
             <div class="video-player" id="user-${remotePeerid}">
-            <div class="micro-status-icon show"></div>
+                <div class="micro-status-icon show"></div>
                 <div class="user-block show">
                     <div class="auto-img">
                         <div class="img-bg">
@@ -268,6 +300,9 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         let data = await getRemoteUser(remotePeerid);
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
+        let remoteVideoStatus = data.videostatus;
+        let remoteAudioStatus = data.audiostatus;
+
         document.querySelector(`#wrapper-${remotePeerid} span`).textContent = remoteName;
         if(remoteImgUrl[0] !== "#"){
             document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `
@@ -280,6 +315,13 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `background-color: ${remoteImgUrl}`;
             document.querySelector(`#wrapper-${remotePeerid} h3`).textContent = remoteName[0];
         }
+        if(remoteVideoStatus){
+            document.querySelector(`#wrapper-${remotePeerid} .user-block`).classList.remove("show");
+        }
+        if(remoteAudioStatus){
+            document.querySelector(`#wrapper-${remotePeerid} .micro-status-icon`).classList.remove("show");
+        }
+
     }
 }
 
@@ -345,6 +387,23 @@ let getLocalPeerId = async (uuid) => {
 }
 
 
+let setUserStreamStatus = async (uuid, status, bool, bothSetFalse) => {
+    let response = await fetch(`/api/setuservideostatustrue`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "uuid": uuid,
+            "status": status,
+            "b": bool,
+            "both": bothSetFalse,
+        })
+    });
+    let data = await response.json();
+}
+
+
 let generateShortLink = async () => {
     let currentUrl = window.location.href;
     const copyIcon = document.querySelector(".fa-copy");
@@ -366,5 +425,6 @@ let copyContent = async (url) => {
         console.error('Failed to copy: ', err);
     }
 }
+
 
 generateShortLink();

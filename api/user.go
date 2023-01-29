@@ -141,7 +141,12 @@ func GetRemoteUser(c *gin.Context) {
 	userData := models.GetUserByPeerId(c, peerId)
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": userData,
+		"data": gin.H{
+			"name":        userData.Name,
+			"imgurl":      userData.ImgUrl,
+			"videostatus": userData.VideoStatus,
+			"audiostatus": userData.AudioStatus,
+		},
 	})
 }
 
@@ -243,6 +248,28 @@ func UploadImg(c *gin.Context) {
 
 	newtoken, _ := utils.MakeToken(payload.Uuid, payload.Name, imgCDN)
 	c.SetCookie("token", newtoken, 0, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func SetUserStreamStatus(c *gin.Context) {
+	req := struct {
+		Uuid   string
+		Status string
+		B      bool
+		Both   bool
+	}{}
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := req.Uuid
+	status := req.Status
+	statusBool := req.B
+	both := req.Both
+
+	models.SetStreamStatus(c, uuid, status, statusBool, both)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})

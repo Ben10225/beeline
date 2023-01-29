@@ -24,5 +24,7 @@ func Routers(router *gin.Engine) {
 		user.POST("/setpeerid", api.SetUserPeerId)
 		user.POST("/getlocalpeerid", api.GetUserPeerId)
 		user.POST("/uploadimg", api.UploadImg)
+
+		user.POST("/setuservideostatustrue", api.SetUserStreamStatus)
 	}
 }

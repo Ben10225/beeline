@@ -25,13 +25,15 @@ type UserResponse struct {
 }
 
 type User struct {
-	Id       primitive.ObjectID `json:"id,omitempty"`
-	Uuid     string             `json:"uuid,omitempty" validate:"required"`
-	PeerId   string             `json:"peerid,omitempty"`
-	Name     string             `json:"name,omitempty" validate:"required"`
-	Email    string             `json:"email,omitempty" validate:"required"`
-	Password string             `json:"password,omitempty" validate:"required"`
-	ImgUrl   string             `json:"imgurl,omitempty"`
+	Id          primitive.ObjectID `json:"id,omitempty"`
+	Uuid        string             `json:"uuid,omitempty" validate:"required"`
+	PeerId      string             `json:"peerid,omitempty"`
+	Name        string             `json:"name,omitempty" validate:"required"`
+	Email       string             `json:"email,omitempty" validate:"required"`
+	Password    string             `json:"password,omitempty" validate:"required"`
+	ImgUrl      string             `json:"imgurl,omitempty"`
+	VideoStatus bool               `json:"videostatus,omitempty"`
+	AudioStatus bool               `json:"audiostatus,omitempty"`
 }
 
 type ImageUpload struct {
