@@ -4,11 +4,19 @@ import (
 	"beeline/models"
 	"beeline/structs"
 	"beeline/utils"
+	"bytes"
+	"encoding/base64"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gin-gonic/gin"
 )
 
@@ -166,5 +174,76 @@ func GetUserPeerId(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": userData.PeerId,
 	})
+}
 
+func UploadImg(c *gin.Context) {
+	token, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"error": true,
+		})
+		return
+	}
+	payload, err := utils.ParseToken(token)
+	if err != nil {
+		c.SetCookie("token", "", -1, "/", "", false, true)
+		c.JSON(http.StatusOK, gin.H{
+			"error": true,
+		})
+		return
+	}
+	var req structs.ImageUpload
+	err = c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	imgData := req.ImgData
+	fileName := req.FileName
+
+	imgFile := strings.Split(imgData, ",")[1]
+	imgDecode, _ := base64.StdEncoding.DecodeString(imgFile)
+
+	prefix := strings.Split(fileName, ".")[0]
+	extension := strings.Split(fileName, ".")[1]
+
+	timeString := utils.GenerateCurrentNumber()
+	newFileName := fmt.Sprintf("%v-%v.%v", prefix, timeString, extension)
+
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("us-west-2"),
+		Credentials: credentials.NewStaticCredentials(
+			utils.EnvValue("AWS_ACCESS_KEY_ID"),
+			utils.EnvValue("AWS_SECRET_ACCESS_KE"),
+			"",
+		),
+	})
+
+	uploader := s3manager.NewUploader(sess)
+	bucket := utils.EnvValue("BUCKET_NAME")
+
+	//upload to the s3 bucket
+	up, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket:      aws.String(bucket),
+		ACL:         aws.String("public-read"),
+		Key:         aws.String(newFileName),
+		Body:        bytes.NewReader(imgDecode),
+		ContentType: aws.String(extension),
+	})
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":    "Failed to upload file",
+			"uploader": up,
+		})
+		return
+	}
+
+	imgCDN := fmt.Sprintf("https://d20v81onua1yrc.cloudfront.net/%v", newFileName)
+	models.UpdateUserImg(c, payload.Uuid, imgCDN)
+
+	newtoken, _ := utils.MakeToken(payload.Uuid, payload.Name, imgCDN)
+	c.SetCookie("token", newtoken, 0, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
 }

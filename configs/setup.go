@@ -6,12 +6,14 @@ import (
 	"log"
 	"time"
 
+	"beeline/utils"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
+	client, err := mongo.NewClient(options.Client().ApplyURI(utils.EnvValue("MONGOURI")))
 	if err != nil {
 		log.Fatal(err)
 	}

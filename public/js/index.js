@@ -23,6 +23,10 @@ const signupBtn = document.querySelector("#signup-btn");
 const signupCaution = document.querySelector(".caution.signup");
 const submitFormField = document.querySelector(".form-field.submit");
 
+const img = document.querySelector(".img-bg");
+const inputImg = document.querySelector(".input_img");
+const waitingImgBlock = document.querySelector(".waiting-img");
+
 
 // regex
 const EmailPattern = /^\S+@\S+$/;
@@ -340,6 +344,55 @@ let signout = async () => {
 }
 
 
+let uploadImg = async () => {
+    let uploadImg = inputImg.files;
+    let name = uploadImg[0].name;
+    waitingImgBlock.classList.add("show");
+  
+    toDataURL(window.URL.createObjectURL(uploadImg[0]), async function (dataUrl) {
+        let response = await fetch(`/api/uploadimg`, {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                "imgData": dataUrl,
+                "fileName": name,
+            })
+        });
+        let data = await response.json();
+        if(data.ok){
+            img.style = `
+            background-image: url('${window.URL.createObjectURL(uploadImg[0])}');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            `
+            if(document.querySelector("#img-first-name")){
+                document.querySelector("#img-first-name").remove();
+            }
+            waitingImgBlock.classList.remove("show");
+        }
+        window.URL.revokeObjectURL(uploadImg[0]);
+    })
+}
+  
+  
+function toDataURL(url, callback) {
+    let xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        let reader = new FileReader();
+        reader.onloadend = function(){
+            callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+}
+
+
 
 utils.auth("index");
 signTwoBlockButtonInit();
@@ -353,3 +406,6 @@ inputEmail.addEventListener("input", checkEmail);
 inputPwd.addEventListener("input", checkPwd);
 inputPwdCertain.addEventListener("input", checkPwdCertain);
 formSignup.addEventListener("submit", signupSubmit);
+
+inputImg.addEventListener("change", uploadImg)
+

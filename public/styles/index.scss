@@ -84,7 +84,43 @@ body{
                 .auto-img{
                     margin-top: 30px;
                     position: relative;
-                    cursor: pointer;
+                    .waiting-img{
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 50%;
+                        background-color: rgba(#111, 0.7);
+                        transition: 0.4s;
+                        opacity: 0;
+                        visibility: hidden;
+                        z-index: 10;
+                        &.show{
+                            opacity: 1;
+                            visibility: visible;
+                        }
+                        h4{
+                            display: inline-block;
+                            position: absolute;
+                            left: 50%;
+                            top: 50%;
+                            transform: translate(-50%, -50%);
+                            font-size: 25px;
+                            font-weight: 350;
+                            color: #fff;
+                        }
+                    }
+                    .input_img{
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 50%;
+                        opacity: 0;
+                        cursor: pointer;
+                    }
                     h3{
                         display: inline-block;
                         position: absolute;
@@ -106,7 +142,7 @@ body{
                 }
                 .username{
                     font-size: 25px;
-                    letter-spacing: 0.1em;
+                    letter-spacing: 0.05em;
                     margin: 20px 0;
                 }
                 .stream{
@@ -126,7 +162,7 @@ body{
                     }
                 }
                 .signout{
-                    margin-top: 20px;
+                    margin-top: 10px;
                     padding: 10px 12px;
                     border-radius: 7px;
                     cursor: pointer;

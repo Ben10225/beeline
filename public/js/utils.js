@@ -12,7 +12,17 @@ let auth = async (page) => {
         }, 600)
         let firstLetter = data.data.name[0];
         document.querySelector(".auto-img h3").textContent = firstLetter;
-        document.querySelector(".img-bg").style = `background-color: ${data.data.imgUrl};`;
+        if(data.data.imgUrl[0] === "#"){
+            document.querySelector(".img-bg").style = `background-color: ${data.data.imgUrl};`;
+        }else{
+            document.querySelector(".img-bg").style = `
+                background-image: url('${data.data.imgUrl}');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            `;
+            document.querySelector("#img-first-name").remove();
+        }
         document.querySelector(".username").textContent = data.data.name;
         document.querySelector(".stream").onclick = () => {
             goStream();

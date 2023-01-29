@@ -201,9 +201,22 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             socket.emit("open-camera", stream.id)
         })
         */
-
+        let imgSetting = "";
         if(localImgUrl[0] !== "#"){
-
+            imgSetting = `
+            <div class="img-bg" style="
+                background-image: url('${localImgUrl}');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            "></div>
+            `;
+        }else{
+            imgSetting = `
+            <div class="img-bg" style="background-color: ${localImgUrl};">
+                <h3>${localName[0]}</h3>
+            </div>
+            `;
         }
         let player = `
         <div class="video-container">
@@ -213,11 +226,8 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             <div class="video-player" id="user-${stream.id}">
                 <div class="micro-status-icon local show"></div>
                 <div class="user-block local show">
-                    <div class="user-img"></div>
                     <div class="auto-img">
-                        <div class="img-bg" style="background-color: ${localImgUrl};">
-                            <h3>${localName[0]}</h3>
-                        </div>
+                        ${imgSetting}
                     </div>
                 </div>
             </div>
@@ -240,7 +250,6 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
             <div class="video-player" id="user-${remotePeerid}">
             <div class="micro-status-icon show"></div>
                 <div class="user-block show">
-                    <div class="user-img"></div>
                     <div class="auto-img">
                         <div class="img-bg">
                             <h3></h3>
@@ -261,8 +270,18 @@ async function addVideoStream(video, stream, islocal, remotePeerid){
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
         document.querySelector(`#wrapper-${remotePeerid} span`).textContent = remoteName;
-        document.querySelector(`#wrapper-${remotePeerid} h3`).textContent = remoteName[0];
-        document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `background-color: ${remoteImgUrl}`;
+        console.log(remoteImgUrl);
+        if(remoteImgUrl[0] !== "#"){
+            document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `
+                background-image: url('${remoteImgUrl}');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            `;
+        }else{
+            document.querySelector(`#wrapper-${remotePeerid} .img-bg`).style = `background-color: ${remoteImgUrl}`;
+            document.querySelector(`#wrapper-${remotePeerid} h3`).textContent = remoteName[0];
+        }
     }
 }
 

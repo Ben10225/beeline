@@ -23,5 +23,6 @@ func Routers(router *gin.Engine) {
 		user.POST("/getremoteuser", api.GetRemoteUser)
 		user.POST("/setpeerid", api.SetUserPeerId)
 		user.POST("/getlocalpeerid", api.GetUserPeerId)
+		user.POST("/uploadimg", api.UploadImg)
 	}
 }

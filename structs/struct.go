@@ -33,3 +33,8 @@ type User struct {
 	Password string             `json:"password,omitempty" validate:"required"`
 	ImgUrl   string             `json:"imgurl,omitempty"`
 }
+
+type ImageUpload struct {
+	ImgData  string
+	FileName string
+}
