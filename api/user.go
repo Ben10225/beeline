@@ -136,9 +136,11 @@ func GetRemoteUser(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	peerId := req.PeerId
+	uuid := req.Uuid
 
-	userData := models.GetUserByPeerId(c, peerId)
+	// fmt.Println("peer", peerId)
+	userData := models.GetUserByUuid(c, uuid)
+	// fmt.Println(userData)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
@@ -173,7 +175,6 @@ func GetUserPeerId(c *gin.Context) {
 		log.Fatal(err)
 	}
 	uuid := req.Uuid
-
 	userData := models.GetPeerIdByUuidAndRemove(c, uuid)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -270,6 +271,25 @@ func SetUserStreamStatus(c *gin.Context) {
 	both := req.Both
 
 	models.SetStreamStatus(c, uuid, status, statusBool, both)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func SetNewUuid(c *gin.Context) {
+	req := struct {
+		OldUuid string
+		NewUuid string
+	}{}
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	oldUuid := req.OldUuid
+	newUuid := req.NewUuid
+
+	models.UpdateUserUuid(c, oldUuid, newUuid)
+
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})

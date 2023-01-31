@@ -40,3 +40,10 @@ type ImageUpload struct {
 	ImgData  string
 	FileName string
 }
+
+type RoomData struct {
+	RoomId      string
+	Uuid        string
+	AudioStatus bool
+	VideoStatus bool
+}

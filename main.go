@@ -3,6 +3,7 @@ package main
 import (
 	"beeline/configs"
 	"beeline/routers"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -36,48 +37,39 @@ func main() {
 	// 	s.Emit("reply", "have "+msg)
 	// })
 
-	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, userId string) {
+	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
 		// s.SetContext(roomId)
 
 		s.Join(roomId)
-		// fmt.Println(userId)
-		server.BroadcastToRoom("/", roomId, "user-connected", userId)
-		// s.Emit("user-connected", userId)
+		// fmt.Println(uuid)
+		server.BroadcastToRoom("/", roomId, "user-connected", uuid)
+		// s.Emit("user-connected", uuid)
 
-		// camera
-		server.OnEvent("/", "stop-camera", func(s socketio.Conn, peerId string) {
-			server.BroadcastToRoom("/", roomId, "close-camera-view", peerId)
+		server.OnDisconnect("", func(s socketio.Conn, msg string) {
+			// s.Emit("user-disconnected", uuid)
+			server.BroadcastToRoom("/", roomId, "user-disconnected", uuid)
+			log.Println("disconnect", s.ID())
 		})
-
-		server.OnEvent("/", "open-camera", func(s socketio.Conn, peerId string) {
-			server.BroadcastToRoom("/", roomId, "open-camera-view", peerId)
-		})
-
-		// audio
-		server.OnEvent("/", "stop-audio", func(s socketio.Conn, peerId string) {
-			server.BroadcastToRoom("/", roomId, "show-unvoice-icon", peerId)
-		})
-
-		server.OnEvent("/", "open-audio", func(s socketio.Conn, peerId string) {
-			server.BroadcastToRoom("/", roomId, "hide-unvoice-icon", peerId)
-		})
-
-		server.OnEvent("/", "leave-room", func(s socketio.Conn, peerId string) {
-			server.BroadcastToRoom("/", roomId, "leave-video-remove", peerId)
-		})
-
-		server.OnDisconnect("/", func(s socketio.Conn, msg string) {
-			s.Emit("user-disconnected", userId)
-			server.BroadcastToRoom("/", roomId, "user-disconnected", userId)
-			server.BroadcastToRoom("/", roomId, "leave-video-remove", userId)
-			log.Println("closed", msg)
-		})
-
-		// s.Leave()
-
-		// return roomId
-		// s.Emit("reply", "have "+msg)
 	})
+
+	// video & audio
+	server.OnEvent("/", "set-option", func(s socketio.Conn, roomId, options, uuid string, b bool) {
+		server.BroadcastToRoom("/", roomId, "set-view", options, uuid, b)
+	})
+
+	// leave room
+	server.OnEvent("/", "leave-room", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/", roomId, "leave-video-remove", uuid)
+	})
+
+	server.OnError("/", func(s socketio.Conn, e error) {
+		fmt.Println("meet error:", e)
+	})
+
+	// s.Leave()
+
+	// return roomId
+	// s.Emit("reply", "have "+msg)
 
 	go func() {
 		if err := server.Serve(); err != nil {

@@ -25,6 +25,14 @@ func Routers(router *gin.Engine) {
 		user.POST("/getlocalpeerid", api.GetUserPeerId)
 		user.POST("/uploadimg", api.UploadImg)
 
-		user.POST("/setuservideostatustrue", api.SetUserStreamStatus)
+		user.POST("/setnewuuid", api.SetNewUuid)
+
+		// user.POST("/setuservideostatustrue", api.SetUserStreamStatus)
+	}
+
+	room := router.Group("/room")
+	{
+		room.POST("/setusertoroom", api.SetUserRoomData)
+		room.POST("/deleteuserfromroom", api.DeleteUserRoomData)
 	}
 }

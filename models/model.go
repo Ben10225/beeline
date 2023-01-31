@@ -56,11 +56,11 @@ func GetUser(c *gin.Context, email string) (*structs.User, bool) {
 	return &user, true
 }
 
-func GetUserByPeerId(c *gin.Context, peerId string) *structs.User {
+func GetUserByUuid(c *gin.Context, uuid string) *structs.User {
 	user := structs.User{
-		PeerId: peerId,
+		Uuid: uuid,
 	}
-	err := userCollection.FindOne(c, bson.M{"peerid": peerId}).Decode(&user)
+	err := userCollection.FindOne(c, bson.M{"uuid": uuid}).Decode(&user)
 	if err != nil {
 		return nil
 	}
@@ -85,14 +85,14 @@ func GetPeerIdByUuidAndRemove(c *gin.Context, uuid string) *structs.User {
 	user := structs.User{}
 	err := userCollection.FindOne(c, bson.M{"uuid": uuid}).Decode(&user)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("find one", err)
 		return nil
 	}
 	filter := bson.D{{"uuid", uuid}}
 	update := bson.D{{"$set", bson.D{{"peerid", ""}}}}
-	_, err = userCollection.UpdateOne(context.TODO(), filter, update)
+	_, err = userCollection.UpdateOne(c, filter, update)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("update none", err)
 		return nil
 	}
 	return &user
@@ -127,6 +127,15 @@ func SetStreamStatus(c *gin.Context, uuid, status string, b, both bool) {
 
 	filter := bson.D{{"uuid", uuid}}
 	update := bson.D{{"$set", bson.D{{s, b}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
+	filter := bson.D{{"uuid", oldUuid}}
+	update := bson.D{{"$set", bson.D{{"uuid", newUuid}}}}
 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		log.Fatal(err)
