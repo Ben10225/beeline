@@ -84,3 +84,26 @@ func CheckRoomExist(c *gin.Context) {
 		})
 	}
 }
+
+func SetUserStreamStatus(c *gin.Context) {
+	req := struct {
+		RoomId string
+		Uuid   string
+		Status string
+		B      bool
+	}{}
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+	status := req.Status
+	b := req.B
+
+	models.SetStreamStatus(c, roomId, uuid, status, b)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}

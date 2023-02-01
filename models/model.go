@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -27,14 +26,12 @@ func CheckEmailExist(c *gin.Context, email string) bool {
 
 func CreateUser(c *gin.Context, uuid, name, email, password, color string) bool {
 	newUser := structs.User{
-		Id:          primitive.NewObjectID(),
-		Uuid:        uuid,
-		Name:        name,
-		Email:       email,
-		Password:    password,
-		ImgUrl:      color,
-		VideoStatus: false,
-		AudioStatus: false,
+		// Id:       primitive.NewObjectID(),
+		Uuid:     uuid,
+		Name:     name,
+		Email:    email,
+		Password: password,
+		ImgUrl:   color,
 	}
 
 	_, err := userCollection.InsertOne(c, newUser)
@@ -67,6 +64,25 @@ func GetUserByUuid(c *gin.Context, uuid string) *structs.User {
 	return &user
 }
 
+func UpdateUserImg(c *gin.Context, uuid, imgUrl string) {
+	filter := bson.D{{"uuid", uuid}}
+	update := bson.D{{"$set", bson.D{{"imgurl", imgUrl}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
+	filter := bson.D{{"uuid", oldUuid}}
+	update := bson.D{{"$set", bson.D{{"uuid", newUuid}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+/*
 func SetPeerIdByUuid(c *gin.Context, uuid, peerId string) {
 	// update := structs.User{
 	// 	PeerId: peerId,
@@ -97,47 +113,4 @@ func GetPeerIdByUuidAndRemove(c *gin.Context, uuid string) *structs.User {
 	}
 	return &user
 }
-
-func UpdateUserImg(c *gin.Context, uuid, imgUrl string) {
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{"imgurl", imgUrl}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func SetStreamStatus(c *gin.Context, uuid, status string, b, both bool) {
-	if both {
-		filter := bson.D{{"uuid", uuid}}
-		update := bson.D{{"$set", bson.D{{"videostatus", false}, {"audiostatus", false}}}}
-		_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-
-	var s string
-	if status == "video" {
-		s = "videostatus"
-	} else {
-		s = "audiostatus"
-	}
-
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{s, b}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
-	filter := bson.D{{"uuid", oldUuid}}
-	update := bson.D{{"$set", bson.D{{"uuid", newUuid}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+*/

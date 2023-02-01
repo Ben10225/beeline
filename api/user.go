@@ -131,54 +131,24 @@ func Signout(c *gin.Context) {
 }
 
 func GetRemoteUser(c *gin.Context) {
-	var req structs.User
+	var req structs.RoomData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
+	roomId := req.RoomId
 	uuid := req.Uuid
 
-	// fmt.Println("peer", peerId)
 	userData := models.GetUserByUuid(c, uuid)
-	// fmt.Println(userData)
+	userStreamStatus := models.GetStatusByUuid(c, roomId, uuid)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"name":        userData.Name,
 			"imgurl":      userData.ImgUrl,
-			"videostatus": userData.VideoStatus,
-			"audiostatus": userData.AudioStatus,
+			"audioStatus": userStreamStatus.AudioStatus,
+			"videoStatus": userStreamStatus.VideoStatus,
 		},
-	})
-}
-
-func SetUserPeerId(c *gin.Context) {
-	var req structs.User
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	uuid := req.Uuid
-	peerId := req.PeerId
-
-	models.SetPeerIdByUuid(c, uuid, peerId)
-
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
-}
-
-func GetUserPeerId(c *gin.Context) {
-	var req structs.User
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	uuid := req.Uuid
-	userData := models.GetPeerIdByUuidAndRemove(c, uuid)
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": userData.PeerId,
 	})
 }
 
@@ -257,28 +227,6 @@ func UploadImg(c *gin.Context) {
 	})
 }
 
-func SetUserStreamStatus(c *gin.Context) {
-	req := struct {
-		Uuid   string
-		Status string
-		B      bool
-		Both   bool
-	}{}
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	uuid := req.Uuid
-	status := req.Status
-	statusBool := req.B
-	both := req.Both
-
-	models.SetStreamStatus(c, uuid, status, statusBool, both)
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
-}
-
 func SetNewUuid(c *gin.Context) {
 	req := struct {
 		OldUuid string
@@ -297,3 +245,36 @@ func SetNewUuid(c *gin.Context) {
 		"ok": true,
 	})
 }
+
+/*
+func SetUserPeerId(c *gin.Context) {
+	var req structs.User
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := req.Uuid
+	peerId := req.PeerId
+
+	models.SetPeerIdByUuid(c, uuid, peerId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+
+func GetUserPeerId(c *gin.Context) {
+	var req structs.User
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := req.Uuid
+	userData := models.GetPeerIdByUuidAndRemove(c, uuid)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": userData.PeerId,
+	})
+}
+*/

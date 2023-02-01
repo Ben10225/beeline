@@ -49,11 +49,11 @@ navigator.mediaDevices.getUserMedia({
     myPeer.on('call', function(call){
         call.answer(stream)
         const video = document.createElement("video")
-        let remotePeerid = call.peer
+        let remoteUuid = call.peer
         call.on("stream", userVideoStream => {
             if (USER_ID === userVideoStream.id) return
             // console.log("stream", userVideoStream)
-            addVideoStream(video, userVideoStream, false, remotePeerid)
+            addVideoStream(video, userVideoStream, false, remoteUuid)
         })
     })
 
@@ -114,9 +114,9 @@ socket.on('set-view', (options, uuid, b) => {
 })
 
 
-socket.on('close-camera-view', (peerId) => {
-    if (peerId === USER_ID) return
-    let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
+socket.on('close-camera-view', (uuid) => {
+    if (uuid === USER_ID) return
+    let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
     // if(remoteDiv && !remoteDiv.classList.contains("show")){
     //     remoteDiv.classList.add("show");
     // }
@@ -126,28 +126,28 @@ socket.on('close-camera-view', (peerId) => {
 })
 
 
-socket.on('open-camera-view', (peerId) => {
-    if (peerId === USER_ID) return
-    let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
+socket.on('open-camera-view', (uuid) => {
+    if (uuid === USER_ID) return
+    let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
     // if(remoteDiv && remoteDiv.classList.contains("show")){
     //     remoteDiv.classList.remove("show");
     // }  
-//     let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
+    // let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
     if(remoteDiv){
         remoteDiv.classList.remove("show");
     }
 })
 
 // audio
-socket.on('show-unvoice-icon', (peerId) => {
-    let remoteVoiceIcon = document.querySelector(`#user-${peerId} .micro-status-icon`);
+socket.on('show-unvoice-icon', (uuid) => {
+    let remoteVoiceIcon = document.querySelector(`#user-${uuid} .micro-status-icon`);
     if(remoteVoiceIcon){
         remoteVoiceIcon.classList.add("show");
     }
 })
 
-socket.on('hide-unvoice-icon', (peerId) => {
-    let remoteVoiceIcon = document.querySelector(`#user-${peerId} .micro-status-icon`);
+socket.on('hide-unvoice-icon', (uuid) => {
+    let remoteVoiceIcon = document.querySelector(`#user-${uuid} .micro-status-icon`);
     if(remoteVoiceIcon){
         remoteVoiceIcon.classList.remove("show");
     }
@@ -155,10 +155,10 @@ socket.on('hide-unvoice-icon', (peerId) => {
 
 
 
-socket.on('leave-video-remove', (peerId) => {
-    let remoteUserWrapper =  document.querySelector(`#wrapper-${peerId}`);
+socket.on('leave-video-remove', (uuid) => {
+    let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
     if(remoteUserWrapper){
-        document.querySelector(`#wrapper-${peerId}`).remove();
+        document.querySelector(`#wrapper-${uuid}`).remove();
     }
 })
 
@@ -180,32 +180,19 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         const cameraBtn = document.querySelector("#camera-btn");
         let toggleCamera = async () => {
             // let isOpen = stream.getTracks()[1].enabled;
-            let oldLocalUuid = USER_ID;
             if(!document.querySelector(".user-block.local").classList.contains("show")){
                 cameraBtn.classList.add("disable");
                 document.querySelector(".user-block.local").classList.add("show");
                 // stream.getTracks()[1].enabled = false;
                 socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
-                // if(localUuid.split("-")[1] === undefined){
-                //     localUuid = localUuid + "-0";
-                // }else{
-                //     localUuid = localUuid.split("-")[0] + "-0" + localUuid.split("-")[1].slice(1);
-                // }
-                // await setUserStreamStatus(localUuid, "video", false, false);
+                setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
             }else{
                 cameraBtn.classList.remove("disable");
                 document.querySelector(".user-block.local").classList.remove("show");
                 // stream.getTracks()[1].enabled = true;
                 socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
-                // localUuid = localUuid + "-1";
-                // if(localUuid.split("-")[1] === undefined){
-                //     localUuid = localUuid + "-1";
-                // }else{
-                //     localUuid = localUuid.split("-")[0] + "-1" + localUuid.split("-")[1].slice(1);
-                // }
-                // await setUserStreamStatus(localUuid, "video", true, false);
+                setUserStreamStatus(ROOM_ID, USER_ID, "video", true)
             }
-            // await setUuid(oldLocalUuid, localUuid);
 
         }
         cameraBtn.onclick = () => {
@@ -221,16 +208,14 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
                 stream.getTracks()[0].enabled = false;
                 document.querySelector(".micro-status-icon.local").classList.add("show");
                 socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
-
-                // await setUserStreamStatus(localUuid, "audio", false, false);
+                setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
             }else{
                 audioBtn.classList.remove("disable");
                 stream.getTracks()[0].enabled = true;
                 document.querySelector(".micro-status-icon.local").classList.remove("show");
                 socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
-
-                // await setUserStreamStatus(localUuid, "audio", true, false);
+                setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
             }
         }
         audioBtn.onclick = () => {
@@ -358,11 +343,11 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         })
         document.querySelector(`#user-${remoteUuid}`).append(video)
 
-        let data = await getRemoteUser(remoteUuid);
+        let data = await getRemoteUser(ROOM_ID, remoteUuid);
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
-        // let remoteVideoStatus = data.videostatus;
-        // let remoteAudioStatus = data.audiostatus;
+        let remoteAudioStatus = data.audioStatus;
+        let remoteVideoStatus = data.videoStatus;
 
         document.querySelector(`#wrapper-${remoteUuid} span`).textContent = remoteName;
         if(remoteImgUrl[0] !== "#"){
@@ -376,21 +361,22 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
             document.querySelector(`#wrapper-${remoteUuid} .img-bg`).style = `background-color: ${remoteImgUrl}`;
             document.querySelector(`#wrapper-${remoteUuid} h3`).textContent = remoteName[0];
         }
-        // if(remoteVideoStatus){
-        //     document.querySelector(`#wrapper-${remotePeerid} .user-block`).classList.remove("show");
-        // }
-        // if(remoteAudioStatus){
-        //     document.querySelector(`#wrapper-${remotePeerid} .micro-status-icon`).classList.remove("show");
-        // }
+        if(!remoteAudioStatus){
+            document.querySelector(`#wrapper-${remoteUuid} .micro-status-icon`).classList.add("show");
+        }
+        if(!remoteVideoStatus){
+            document.querySelector(`#wrapper-${remoteUuid} .user-block`).classList.add("show");
+        }
+
     }
 }
 
 function connectToNewUser(userId, stream){
     const call = myPeer.call(userId, stream)
     let video = document.createElement("video")
-    let remotePeerid = call.peer
+    let remoteUuid = call.peer
     call.on("stream", userVideoStream => {
-        addVideoStream(video, userVideoStream, false, remotePeerid)
+        addVideoStream(video, userVideoStream, false, remoteUuid)
     })
     call.on("close", () => {
         video.remove()
@@ -400,13 +386,14 @@ function connectToNewUser(userId, stream){
 }
 
 
-let getRemoteUser = async (remoteUuid) => {
+let getRemoteUser = async (roomId, remoteUuid) => {
     let response = await fetch(`/api/getremoteuser`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
+            "roomId": roomId,
             "uuid": remoteUuid
         })
     });
@@ -415,70 +402,6 @@ let getRemoteUser = async (remoteUuid) => {
         return data.data
     }
 }
-
-let setPeerid = async (uuid, peerId) => {
-    let response = await fetch(`/api/setpeerid`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "uuid": uuid,
-            "peerId": peerId
-        })
-    });
-    let data = await response.json();
-}
-
-let getLocalPeerId = async (uuid) => {
-    let response = await fetch(`/api/getlocalpeerid`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "uuid": uuid
-        })
-    });
-    let data = await response.json();
-    if(data.data){
-        return data.data
-    }
-}
-
-/*
-let setUserStreamStatus = async (uuid, status, bool, bothSetFalse) => {
-    let response = await fetch(`/api/setuservideostatustrue`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "uuid": uuid,
-            "status": status,
-            "b": bool,
-            "both": bothSetFalse,
-        })
-    });
-    let data = await response.json();
-}
-
-
-let setUuid = async (oldUuid, newUuid) => {
-    let response = await fetch(`/api/setnewuuid`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "oldUuid": oldUuid,
-            "newUuid": newUuid,
-        })
-    });
-    let data = await response.json();
-}
-*/
-
 
 let generateShortLink = async () => {
     let currentUrl = window.location.href;
@@ -532,8 +455,6 @@ let removeMongoRoomData = async (roomId, uuid) => {
     let data = await response.json();
 }
 
-
-
 let checkNeedReconnect = async (roomId, uuid) => {
     let response = await fetch(`/room/checkneedreconnect`, {
         method: "POST",
@@ -552,8 +473,70 @@ let checkNeedReconnect = async (roomId, uuid) => {
     }
 }
 
+let setUserStreamStatus = async (roomId, uuid, status, bool) => {
+    let response = await fetch(`/room/streamstatus`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "uuid": uuid,
+            "status": status,
+            "b": bool,
+        })
+    });
+    let data = await response.json();
+}
+
 
 generateShortLink();
 
 
+/*
+let setPeerid = async (uuid, peerId) => {
+    let response = await fetch(`/api/setpeerid`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "uuid": uuid,
+            "peerId": peerId
+        })
+    });
+    let data = await response.json();
+}
 
+let getLocalPeerId = async (uuid) => {
+    let response = await fetch(`/api/getlocalpeerid`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "uuid": uuid
+        })
+    });
+    let data = await response.json();
+    if(data.data){
+        return data.data
+    }
+}
+
+
+
+let setUuid = async (oldUuid, newUuid) => {
+    let response = await fetch(`/api/setnewuuid`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "oldUuid": oldUuid,
+            "newUuid": newUuid,
+        })
+    });
+    let data = await response.json();
+}
+*/

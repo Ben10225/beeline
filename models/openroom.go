@@ -95,7 +95,9 @@ func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
 func CheckOrInsertRoom(c *gin.Context, roomId string) bool {
 	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
 
-	var room structs.RoomData
+	room := gin.H{
+		"roomId": roomId,
+	}
 	cur := roomCollection.FindOne(c, bson.M{
 		"roomId": roomId,
 	})
@@ -110,4 +112,46 @@ func CheckOrInsertRoom(c *gin.Context, roomId string) bool {
 
 	roomCollection.InsertOne(c, newRoom)
 	return false
+}
+
+func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
+	/*
+		if both {
+			filter := bson.D{{"uuid", uuid}}
+			update := bson.D{{"$set", bson.D{{"videostatus", false}, {"audiostatus", false}}}}
+			_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+	*/
+	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
+	var s string
+	if status == "video" {
+		s = "videoStatus"
+	} else {
+		s = "audioStatus"
+	}
+
+	filter := bson.D{{"uuid", uuid}}
+	update := bson.D{{"$set", bson.D{{s, b}}}}
+	_, err := roomCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GetStatusByUuid(c *gin.Context, roomId, uuid string) *structs.RoomData {
+	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
+	var userStatus structs.RoomData
+	cur := roomCollection.FindOne(c, bson.M{
+		"uuid": uuid,
+	})
+	err := cur.Decode(&userStatus)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return &userStatus
 }
