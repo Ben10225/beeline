@@ -73,3 +73,17 @@ func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
 	}
 	return true
 }
+
+func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
+	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
+	var userInRoom structs.RoomData
+	cur := roomCollection.FindOne(c, bson.M{
+		"uuid": uuid,
+	})
+	err := cur.Decode(&userInRoom)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return true
+}

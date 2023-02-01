@@ -223,6 +223,9 @@ func UploadImg(c *gin.Context) {
 			"",
 		),
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	uploader := s3manager.NewUploader(sess)
 	bucket := utils.EnvValue("BUCKET_NAME")

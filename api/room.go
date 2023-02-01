@@ -42,3 +42,24 @@ func DeleteUserRoomData(c *gin.Context) {
 		"ok": true,
 	})
 }
+
+func CheckUserStillInRoom(c *gin.Context) {
+	var req structs.RoomData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	roomId := req.RoomId
+	uuid := req.Uuid
+
+	needReconnect := models.GetUserInRoom(c, roomId, uuid)
+	if needReconnect {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "needReconnect",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "userLeft",
+		})
+	}
+}

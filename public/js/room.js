@@ -9,17 +9,20 @@ let localName = userData.name;
 let localImgUrl = userData.imgUrl;
 
 let enterRoom = false;
-if(localUuid){
-    let timer = setInterval(() => {
-        if(!enterRoom){
-            connectPeer();
-        }else{
-            console.log("enter");
-            clearInterval(timer);
-        }
-    }, 5000);
+
+let tryEnterRoom = (uuid) => {
+    if(uuid){
+        let timer = setInterval(() => {
+            if(!enterRoom){
+                connectPeer();
+            }else{
+                clearInterval(timer);
+            }
+        }, 5000);
+    }
 }
 
+tryEnterRoom(localUuid)
 
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
@@ -59,7 +62,8 @@ navigator.mediaDevices.getUserMedia({
     })
 
     socket.on('user-connected', async uuid => {
-        console.log("User connected: ", uuid);
+        // console.log("User connected: ", uuid);
+        console.log(`user ${uuid} enter room ${ROOM_ID}`)
         connectToNewUser(uuid, stream);
         if(localUuid === uuid){
             insertMongoRoomData(ROOM_ID, uuid, true, true);
@@ -70,6 +74,7 @@ navigator.mediaDevices.getUserMedia({
     
     socket.on('user-disconnected', uuid => {
         console.log("out meeting: ", uuid)
+        checkNeedReconnect(ROOM_ID, localUuid);
         // let outUserDiv = document.querySelector(`#wrapper-${userId}`);
         // if(outUserDiv){
         //     outUserDiv.remove();
@@ -528,6 +533,26 @@ let removeMongoRoomData = async (roomId, uuid) => {
         })
     });
     let data = response.json();
+}
+
+
+
+let checkNeedReconnect = async (roomId, uuid) => {
+    let response = await fetch(`/room/checkneedreconnect`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "uuid": uuid,
+        })
+    });
+    let data = response.json();
+    if(data.message == "needReconnect"){
+        console.log(`user ${uuid} connection break, try reconnect.`)
+        tryEnterRoom(uuid);
+    }
 }
 
 
