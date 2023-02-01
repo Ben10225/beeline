@@ -35,5 +35,6 @@ func Routers(router *gin.Engine) {
 		room.POST("/setusertoroom", api.SetUserRoomData)
 		room.POST("/deleteuserfromroom", api.DeleteUserRoomData)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
+		room.POST("/checkroomexist", api.CheckRoomExist)
 	}
 }

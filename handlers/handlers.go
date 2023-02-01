@@ -26,7 +26,9 @@ func Room(c *gin.Context) {
 
 	room := c.Param("room")
 	c.HTML(http.StatusOK, "room.html", gin.H{
-		"roomId": room,
-		"userId": payload.Uuid,
+		"roomId":     room,
+		"userId":     payload.Uuid,
+		"userName":   payload.Name,
+		"userImgUrl": payload.ImgUrl,
 	})
 }

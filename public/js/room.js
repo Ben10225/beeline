@@ -2,11 +2,7 @@ import utils from "./utils.js"
 
 let userData = null;
 
-userData = await utils.auth("room");
-
-let localUuid = userData.uuid;
-let localName = userData.name;
-let localImgUrl = userData.imgUrl;
+// userData = await utils.auth("room");
 
 let enterRoom = false;
 
@@ -22,7 +18,7 @@ let tryEnterRoom = (uuid) => {
     }
 }
 
-tryEnterRoom(localUuid)
+tryEnterRoom(USER_ID)
 
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
@@ -33,7 +29,7 @@ const remoteContainer = document.querySelector(".remote-container")
 
 
 // const myPeer = new Peer()
-const myPeer = new Peer(localUuid)
+const myPeer = new Peer(USER_ID)
 
 const myVideo = document.createElement("video")
 myVideo.muted = true
@@ -55,7 +51,7 @@ navigator.mediaDevices.getUserMedia({
         const video = document.createElement("video")
         let remotePeerid = call.peer
         call.on("stream", userVideoStream => {
-            if (localUuid === userVideoStream.id) return
+            if (USER_ID === userVideoStream.id) return
             // console.log("stream", userVideoStream)
             addVideoStream(video, userVideoStream, false, remotePeerid)
         })
@@ -65,7 +61,7 @@ navigator.mediaDevices.getUserMedia({
         // console.log("User connected: ", uuid);
         console.log(`user ${uuid} enter room ${ROOM_ID}`)
         connectToNewUser(uuid, stream);
-        if(localUuid === uuid){
+        if(USER_ID === uuid){
             insertMongoRoomData(ROOM_ID, uuid, true, true);
             enterRoom = true;
         }
@@ -74,7 +70,7 @@ navigator.mediaDevices.getUserMedia({
     
     socket.on('user-disconnected', uuid => {
         console.log("out meeting: ", uuid)
-        checkNeedReconnect(ROOM_ID, localUuid);
+        checkNeedReconnect(ROOM_ID, USER_ID);
         // let outUserDiv = document.querySelector(`#wrapper-${userId}`);
         // if(outUserDiv){
         //     outUserDiv.remove();
@@ -99,7 +95,7 @@ connectPeer()
 
 // camera
 socket.on('set-view', (options, uuid, b) => {
-    if (uuid === localUuid) return
+    if (uuid === USER_ID) return
     if(options === "video"){
         let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
         if(remoteDiv && b){
@@ -119,7 +115,7 @@ socket.on('set-view', (options, uuid, b) => {
 
 
 socket.on('close-camera-view', (peerId) => {
-    if (peerId === localUuid) return
+    if (peerId === USER_ID) return
     let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
     // if(remoteDiv && !remoteDiv.classList.contains("show")){
     //     remoteDiv.classList.add("show");
@@ -131,7 +127,7 @@ socket.on('close-camera-view', (peerId) => {
 
 
 socket.on('open-camera-view', (peerId) => {
-    if (peerId === localUuid) return
+    if (peerId === USER_ID) return
     let remoteDiv = document.querySelector(`#user-${peerId} .user-block`);
     // if(remoteDiv && remoteDiv.classList.contains("show")){
     //     remoteDiv.classList.remove("show");
@@ -184,12 +180,12 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         const cameraBtn = document.querySelector("#camera-btn");
         let toggleCamera = async () => {
             // let isOpen = stream.getTracks()[1].enabled;
-            let oldLocalUuid = localUuid;
+            let oldLocalUuid = USER_ID;
             if(!document.querySelector(".user-block.local").classList.contains("show")){
                 cameraBtn.classList.add("disable");
                 document.querySelector(".user-block.local").classList.add("show");
                 // stream.getTracks()[1].enabled = false;
-                socket.emit("set-option", ROOM_ID, "video", localUuid, false);
+                socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
                 // if(localUuid.split("-")[1] === undefined){
                 //     localUuid = localUuid + "-0";
                 // }else{
@@ -200,7 +196,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
                 cameraBtn.classList.remove("disable");
                 document.querySelector(".user-block.local").classList.remove("show");
                 // stream.getTracks()[1].enabled = true;
-                socket.emit("set-option", ROOM_ID, "video", localUuid, true);
+                socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
                 // localUuid = localUuid + "-1";
                 // if(localUuid.split("-")[1] === undefined){
                 //     localUuid = localUuid + "-1";
@@ -224,7 +220,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
                 audioBtn.classList.add("disable");
                 stream.getTracks()[0].enabled = false;
                 document.querySelector(".micro-status-icon.local").classList.add("show");
-                socket.emit("set-option", ROOM_ID, "audio", localUuid, false);
+                socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
 
                 // await setUserStreamStatus(localUuid, "audio", false, false);
 
@@ -232,7 +228,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
                 audioBtn.classList.remove("disable");
                 stream.getTracks()[0].enabled = true;
                 document.querySelector(".micro-status-icon.local").classList.remove("show");
-                socket.emit("set-option", ROOM_ID, "audio", localUuid, true);
+                socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
 
                 // await setUserStreamStatus(localUuid, "audio", true, false);
             }
@@ -245,9 +241,9 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         const leaveBtn = document.querySelector("#leave-btn");
         leaveBtn.onclick = async () => {
             // let localPeerId = await getLocalPeerId(localUuid)
-            socket.emit("leave-room", ROOM_ID, localUuid);
+            socket.emit("leave-room", ROOM_ID, USER_ID);
             socket.disconnect();
-            removeMongoRoomData(ROOM_ID, localUuid);
+            removeMongoRoomData(ROOM_ID, USER_ID);
             // setUserStreamStatus(localUuid, "video", false, true);
             window.location = "/";
         }
@@ -276,10 +272,10 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         })
         */
         let imgSetting = "";
-        if(localImgUrl[0] !== "#"){
+        if(USER_IMG[0] !== "#"){
             imgSetting = `
             <div class="img-bg" style="
-                background-image: url('${localImgUrl}');
+                background-image: url('${USER_IMG}');
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -287,17 +283,17 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
             `;
         }else{
             imgSetting = `
-            <div class="img-bg" style="background-color: ${localImgUrl};">
-                <h3>${localName[0]}</h3>
+            <div class="img-bg" style="background-color: ${USER_IMG};">
+                <h3>${USER_NAME[0]}</h3>
             </div>
             `;
         }
         let player = `
         <div class="video-container">
             <div class="username-wrapper">
-                <span class="user-name">${localName}</span>
+                <span class="user-name">${USER_NAME}</span>
             </div>
-            <div class="video-player" id="user-${localUuid}">
+            <div class="video-player" id="user-${USER_ID}">
                 <div class="micro-status-icon local"></div>
                 <div class="user-block local">
                     <div class="auto-img">
@@ -312,7 +308,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
-        document.querySelector(`#user-${localUuid}`).append(video);
+        document.querySelector(`#user-${USER_ID}`).append(video);
 
         // setUserStreamStatus(localUuid, "video", false, true);
 
@@ -450,7 +446,7 @@ let getLocalPeerId = async (uuid) => {
     }
 }
 
-
+/*
 let setUserStreamStatus = async (uuid, status, bool, bothSetFalse) => {
     let response = await fetch(`/api/setuservideostatustrue`, {
         method: "POST",
@@ -479,8 +475,9 @@ let setUuid = async (oldUuid, newUuid) => {
             "newUuid": newUuid,
         })
     });
-    let data = response.json();
+    let data = await response.json();
 }
+*/
 
 
 let generateShortLink = async () => {
@@ -518,7 +515,7 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus) => {
             "videoStatus": videoStatus,
         })
     });
-    let data = response.json();
+    let data = await response.json();
 }
 
 let removeMongoRoomData = async (roomId, uuid) => {
@@ -532,7 +529,7 @@ let removeMongoRoomData = async (roomId, uuid) => {
             "uuid": uuid,
         })
     });
-    let data = response.json();
+    let data = await response.json();
 }
 
 

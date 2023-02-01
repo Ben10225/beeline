@@ -63,3 +63,24 @@ func CheckUserStillInRoom(c *gin.Context) {
 		})
 	}
 }
+
+func CheckRoomExist(c *gin.Context) {
+	var req structs.RoomData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	roomId := req.RoomId
+
+	exist := models.CheckOrInsertRoom(c, roomId)
+
+	if exist {
+		c.JSON(http.StatusOK, gin.H{
+			"exist": true,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"exist": false,
+		})
+	}
+}

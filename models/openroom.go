@@ -55,14 +55,13 @@ func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
 	filter := bson.D{{}}
 	cursor, err := roomCollection.Find(context.TODO(), filter)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false
 	}
 
 	cursor.All(context.TODO(), &roomDatas)
 	if err != nil {
 		log.Fatal(err)
-		return false
 	}
 	// for _, result := range roomDatas {
 	// 	fmt.Printf("%+v\n", result)
@@ -70,6 +69,11 @@ func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
 
 	if len(roomDatas) == 0 {
 		roomCollection.Drop(c)
+		var collection *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
+		_, err := collection.DeleteOne(c, bson.M{"roomId": roomId})
+		if err != nil {
+			log.Println(err)
+		}
 	}
 	return true
 }
@@ -86,4 +90,24 @@ func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
 		return false
 	}
 	return true
+}
+
+func CheckOrInsertRoom(c *gin.Context, roomId string) bool {
+	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
+
+	var room structs.RoomData
+	cur := roomCollection.FindOne(c, bson.M{
+		"roomId": roomId,
+	})
+	err := cur.Decode(&room)
+	if err == nil {
+		return true
+	}
+
+	newRoom := gin.H{
+		"roomId": roomId,
+	}
+
+	roomCollection.InsertOne(c, newRoom)
+	return false
 }

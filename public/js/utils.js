@@ -42,8 +42,13 @@ let auth = async (page) => {
 }
 
 let goStream = async () => {
-    let room = makeRoomId()
-    window.open(`/${room}`, '_self');
+    let roomId
+    while(true){
+        roomId = makeRoomId();
+        let roomExist = await checkRoomExist(roomId);
+        if (!roomExist) break;
+    }
+    window.open(`/${roomId}`, '_self');
 }
 
 let makeRoomId = () => {
@@ -60,6 +65,20 @@ let makeRoomId = () => {
     }
     result = result.slice(0,-1);
     return result;
+}
+
+let checkRoomExist = async (roomId) => {
+    let response = await fetch(`/room/checkroomexist`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+        })
+    });
+    let data = await response.json();
+    return data.exist;
 }
 
 export default {

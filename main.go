@@ -32,11 +32,6 @@ func main() {
 		return nil
 	})
 
-	// server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-	// 	log.Println("notice:", msg)
-	// 	s.Emit("reply", "have "+msg)
-	// })
-
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
 		// s.SetContext(roomId)
 
@@ -59,17 +54,13 @@ func main() {
 
 	// leave room
 	server.OnEvent("/", "leave-room", func(s socketio.Conn, roomId, uuid string) {
+		s.Leave(roomId)
 		server.BroadcastToRoom("/", roomId, "leave-video-remove", uuid)
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
 	})
-
-	// s.Leave()
-
-	// return roomId
-	// s.Emit("reply", "have "+msg)
 
 	go func() {
 		if err := server.Serve(); err != nil {
