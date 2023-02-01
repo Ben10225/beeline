@@ -8,13 +8,18 @@ let enterRoom = false;
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
+        console.log("enterRoom:", enterRoom);
         let timer = setInterval(() => {
             if(!enterRoom){
+                console.log("try");
                 connectPeer();
             }else{
+                console.log("ok");
                 clearInterval(timer);
             }
         }, 5000);
+    }else{
+        console.log("loading error");
     }
 }
 
@@ -69,8 +74,11 @@ navigator.mediaDevices.getUserMedia({
     
     
     socket.on('user-disconnected', uuid => {
-        console.log("out meeting: ", uuid)
-        checkNeedReconnect(ROOM_ID, USER_ID);
+        console.log("out meeting: ", uuid);
+        if(uuid === USER_ID){
+            enterRoom = false;
+            checkNeedReconnect(ROOM_ID, USER_ID);
+        }
         // let outUserDiv = document.querySelector(`#wrapper-${userId}`);
         // if(outUserDiv){
         //     outUserDiv.remove();
@@ -169,7 +177,6 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
 
-
     if(islocal){
         tempMediaStreamId = stream.id;
 
@@ -183,13 +190,13 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
             if(!document.querySelector(".user-block.local").classList.contains("show")){
                 cameraBtn.classList.add("disable");
                 document.querySelector(".user-block.local").classList.add("show");
-                // stream.getTracks()[1].enabled = false;
+                stream.getTracks()[1].enabled = false;
                 socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
                 setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
             }else{
                 cameraBtn.classList.remove("disable");
                 document.querySelector(".user-block.local").classList.remove("show");
-                // stream.getTracks()[1].enabled = true;
+                stream.getTracks()[1].enabled = true;
                 socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
                 setUserStreamStatus(ROOM_ID, USER_ID, "video", true)
             }
@@ -344,6 +351,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         document.querySelector(`#user-${remoteUuid}`).append(video)
 
         let data = await getRemoteUser(ROOM_ID, remoteUuid);
+
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
         let remoteAudioStatus = data.audioStatus;
@@ -466,7 +474,8 @@ let checkNeedReconnect = async (roomId, uuid) => {
             "uuid": uuid,
         })
     });
-    let data = response.json();
+    let data = await response.json();
+    console.log(data);
     if(data.message == "needReconnect"){
         console.log(`user ${uuid} connection break, try reconnect.`)
         tryEnterRoom(uuid);

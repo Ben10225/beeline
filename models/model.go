@@ -54,9 +54,7 @@ func GetUser(c *gin.Context, email string) (*structs.User, bool) {
 }
 
 func GetUserByUuid(c *gin.Context, uuid string) *structs.User {
-	user := structs.User{
-		Uuid: uuid,
-	}
+	var user structs.User
 	err := userCollection.FindOne(c, bson.M{"uuid": uuid}).Decode(&user)
 	if err != nil {
 		return nil
