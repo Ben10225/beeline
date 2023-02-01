@@ -11,8 +11,8 @@ let tryEnterRoom = (uuid) => {
         console.log("enterRoom:", enterRoom);
         let timer = setInterval(() => {
             if(!enterRoom){
-                console.log("try");
-                connectPeer();
+                history.go(0);
+                // connectPeer();
             }else{
                 console.log("ok");
                 clearInterval(timer);
@@ -29,8 +29,7 @@ tryEnterRoom(USER_ID)
 // const socket = io({upgrade: true});
 const socket = io({upgrade: true});
 
-const localContainer = document.querySelector(".local-container")
-const remoteContainer = document.querySelector(".remote-container")
+const userContainer = document.querySelector(".user-container")
 
 
 // const myPeer = new Peer()
@@ -296,7 +295,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         </div>
         `
     
-        remoteContainer.insertAdjacentHTML("beforeend", player);
+        userContainer.insertAdjacentHTML("beforeend", player);
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
@@ -305,6 +304,9 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         // setUserStreamStatus(localUuid, "video", false, true);
 
     }else{
+        if(document.querySelector(`#wrapper-${remoteUuid}`)){
+            document.querySelector(`#wrapper-${remoteUuid}`).remove();
+        }
         tempRemoteMediaStreamId = stream.id
 
         // let remoteVideoStatus = stream.getTracks()[1].enabled;
@@ -344,7 +346,7 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         </div>
         `
     
-        remoteContainer.insertAdjacentHTML("afterbegin", player);
+        userContainer.insertAdjacentHTML("afterbegin", player);
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
@@ -375,7 +377,6 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         if(!remoteVideoStatus){
             document.querySelector(`#wrapper-${remoteUuid} .user-block`).classList.add("show");
         }
-
     }
 }
 
@@ -389,8 +390,7 @@ function connectToNewUser(userId, stream){
     call.on("close", () => {
         video.remove()
     })
-
-    peers[userId] = call
+    peers[userId] = call;
 }
 
 
