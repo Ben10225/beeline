@@ -13,14 +13,14 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 ct ++;
                 if(disconnect){
-                    if(ct > 800){
+                    if(ct > 600){
                         history.go(0);
                     }
                 }else{
                     console.log("conn establish");
                     document.querySelector("#waiting-block").remove();
                     clearInterval(timer);
-                    new Audio("/public/audio/enter-room.mp3").play()
+                    new Audio("/public/audio/enter-room.mp3").play();
                 }
             }, 1);
         }else{
