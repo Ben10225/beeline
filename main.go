@@ -56,6 +56,7 @@ func main() {
 	server.OnEvent("/", "leave-room", func(s socketio.Conn, roomId, uuid string) {
 		s.Leave(roomId)
 		server.BroadcastToRoom("/", roomId, "leave-video-remove", uuid)
+		s.Close()
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {

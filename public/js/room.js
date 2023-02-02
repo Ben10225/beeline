@@ -13,8 +13,8 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 ct ++;
                 if(disconnect){
-                    if(ct > 700){
-                        window.location = "/";
+                    if(ct > 500){
+                        history.go(0);
                     }
                 }else{
                     console.log("conn establish");
