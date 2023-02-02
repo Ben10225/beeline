@@ -40,9 +40,10 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "user-connected", uuid)
 		// s.Emit("user-connected", uuid)
 
-		server.OnDisconnect("", func(s socketio.Conn, msg string) {
+		server.OnDisconnect("", func(ss socketio.Conn, msg string) {
 			// s.Emit("user-disconnected", uuid)
 			server.BroadcastToRoom("/", roomId, "user-disconnected", uuid)
+			ss.Close()
 			log.Println("disconnect", s.ID())
 		})
 	})
@@ -60,6 +61,12 @@ func main() {
 
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
+	})
+
+	server.OnDisconnect("", func(s socketio.Conn, msg string) {
+		// s.Emit("user-disconnected", uuid)
+		// server.BroadcastToRoom("/", roomId, "user-disconnected", uuid)
+		log.Println("disconnect", s.ID())
 	})
 
 	go func() {

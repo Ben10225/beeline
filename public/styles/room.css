@@ -11,6 +11,33 @@ body {
 }
 
 /* --------    ROOM STYLING    -------- */
+#waiting-block {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: #333;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#waiting-block h4 {
+  color: #e8e8e8;
+  font-size: 50px;
+  font-weight: 400;
+}
+#waiting-block .waiting-gif {
+  width: 70px;
+  height: 70px;
+  background-image: url("/public/images/loading.gif");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  left: 10px;
+  top: 2px;
+}
+
 .wrapper {
   display: flex;
   flex-direction: column;

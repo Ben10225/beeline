@@ -22,15 +22,19 @@
     </style> -->
 </head>
 <body>
+    <div id="waiting-block">
+        <h4>Room entering</h4>
+        <div class="waiting-gif"></div>
+    </div>
     <div class="wrapper">
         <section id="video-streams">
             <div class="user-container"></div>
         </section>
 
         <section id="controls-wrapper">
-            <div id="room-url-wrapper">
+            <!-- <div id="room-url-wrapper">
                 <span id="room-url"></span><i class="fa-regular fa-copy"></i>
-            </div>
+            </div> -->
 
             <div class="icon-wrapper">
                 <div class="control-icon" id="audio-btn"></div>
@@ -54,6 +58,6 @@
 
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.0/socket.io.js"></script>
-     <script type="module" src="/public/js/room.js" defer></script>
+    <script type="module" src="/public/js/room.js" defer></script>
 </body>
 </html>

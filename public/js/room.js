@@ -9,19 +9,24 @@ let disconnect = true;
 let tryEnterRoom = (uuid) => {
     if(uuid){
         if(!enterRoom){
-            setTimeout(() => {
-                let timer = setInterval(() => {
-                    if(disconnect){
-                        history.go(0);
-                    }else{
-                        console.log("conn establish");
-                        clearInterval(timer);
+            let ct = 0
+            let timer = setInterval(() => {
+                ct ++;
+                if(disconnect){
+                    if(ct > 700){
+                        window.location = "/";
                     }
-                }, 4000);
-            }, 5000)
+                }else{
+                    console.log("conn establish");
+                    document.querySelector("#waiting-block").remove();
+                    clearInterval(timer);
+                    new Audio("/public/audio/enter-room.mp3").play()
+                }
+            }, 1);
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
+                    console("try");
                     connectPeer();
                 }else{
                     console.log("conn establish");
@@ -73,7 +78,6 @@ navigator.mediaDevices.getUserMedia({
     })
 
     socket.on('user-connected', async uuid => {
-        // console.log("User connected: ", uuid);
         console.log(`user ${uuid} enter room ${ROOM_ID}`)
         connectToNewUser(uuid, stream);
         if(USER_ID === uuid){
@@ -101,11 +105,9 @@ navigator.mediaDevices.getUserMedia({
 })
 
 
-function connectPeer(){
+let connectPeer = () => {
     myPeer.on('open', async id => {
         socket.emit('join-room', ROOM_ID, id);
-        // localPeerId = id;
-        // await setPeerid(localUuid, id);
     })
 }
 
@@ -487,7 +489,6 @@ let checkNeedReconnect = async (roomId, uuid) => {
         })
     });
     let data = await response.json();
-    console.log(data);
     if(data.message == "needReconnect"){
         console.log(`user ${uuid} connection break, try reconnect.`)
         tryEnterRoom(uuid);
@@ -511,7 +512,7 @@ let setUserStreamStatus = async (roomId, uuid, status, bool) => {
 }
 
 
-generateShortLink();
+// generateShortLink();
 
 
 /*
