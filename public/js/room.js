@@ -9,14 +9,16 @@ let disconnect = true;
 let tryEnterRoom = (uuid) => {
     if(uuid){
         if(!enterRoom){
-            let timer = setInterval(() => {
-                if(disconnect){
-                    history.go(0);
-                }else{
-                    console.log("conn establish");
-                    clearInterval(timer);
-                }
-            }, 5000);
+            setTimeout(() => {
+                let timer = setInterval(() => {
+                    if(disconnect){
+                        history.go(0);
+                    }else{
+                        console.log("conn establish");
+                        clearInterval(timer);
+                    }
+                }, 4000);
+            }, 2000)
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
@@ -25,7 +27,7 @@ let tryEnterRoom = (uuid) => {
                     console.log("conn establish");
                     clearInterval(timer);
                 }
-            }, 5000);
+            }, 4000);
         }
     }else{
         console.log("loading error");
