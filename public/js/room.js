@@ -28,7 +28,7 @@ let tryEnterRoom = (uuid) => {
                 if(disconnect){
                     console.log("try")
                     let socket = io({upgrade: true});
-                    socket.emit('join-room', ROOM_ID, id);
+                    socket.emit('join-room', ROOM_ID, USER_ID);
                 }else{
                     console.log("conn establish");
                     clearInterval(timer);
