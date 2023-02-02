@@ -18,7 +18,7 @@ let tryEnterRoom = (uuid) => {
                         clearInterval(timer);
                     }
                 }, 4000);
-            }, 2000)
+            }, 5000)
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
