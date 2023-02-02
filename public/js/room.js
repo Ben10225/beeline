@@ -13,7 +13,7 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 ct ++;
                 if(disconnect){
-                    if(ct > 500){
+                    if(ct > 800){
                         history.go(0);
                     }
                 }else{
@@ -26,7 +26,7 @@ let tryEnterRoom = (uuid) => {
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
-                    console("try");
+                    console.log("try");
                     connectPeer();
                 }else{
                     console.log("conn establish");
