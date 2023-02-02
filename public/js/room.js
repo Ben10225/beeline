@@ -1,23 +1,32 @@
 import utils from "./utils.js" 
 
-let userData = null;
-
+// let userData = null
 // userData = await utils.auth("room");
 
 let enterRoom = false;
+let disconnect = true;
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
-        console.log("enterRoom:", enterRoom);
-        let timer = setInterval(() => {
-            if(!enterRoom){
-                history.go(0);
-                // connectPeer();
-            }else{
-                console.log("ok");
-                clearInterval(timer);
-            }
-        }, 5000);
+        if(!enterRoom){
+            let timer = setInterval(() => {
+                if(disconnect){
+                    history.go(0);
+                }else{
+                    console.log("conn establish");
+                    clearInterval(timer);
+                }
+            }, 5000);
+        }else{
+            let timer = setInterval(() => {
+                if(disconnect){
+                    connectPeer();
+                }else{
+                    console.log("conn establish");
+                    clearInterval(timer);
+                }
+            }, 5000);
+        }
     }else{
         console.log("loading error");
     }
@@ -68,6 +77,7 @@ navigator.mediaDevices.getUserMedia({
         if(USER_ID === uuid){
             insertMongoRoomData(ROOM_ID, uuid, true, true);
             enterRoom = true;
+            disconnect = false;
         }
     })
     
@@ -75,7 +85,7 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-disconnected', uuid => {
         console.log("out meeting: ", uuid);
         if(uuid === USER_ID){
-            enterRoom = false;
+            disconnect = true;
             checkNeedReconnect(ROOM_ID, USER_ID);
         }
         // let outUserDiv = document.querySelector(`#wrapper-${userId}`);
