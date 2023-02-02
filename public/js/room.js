@@ -26,8 +26,9 @@ let tryEnterRoom = (uuid) => {
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
-                    console.log("try");
-                    socket.emit("reconnect", ROOM_ID, USER_ID);
+                    console.log("try")
+                    let socket = io({upgrade: true});
+                    socket.emit('join-room', ROOM_ID, id);
                 }else{
                     console.log("conn establish");
                     clearInterval(timer);
@@ -183,11 +184,11 @@ socket.on('leave-video-remove', (uuid) => {
     }
 })
 
-// reconnect
-socket.on('user-reconnect', (uuid) => {
-    console.log(`user ${uuid} enter room ${ROOM_ID}`);
-    disconnect = false;
-})
+// // reconnect
+// socket.on('user-reconnect', (uuid) => {
+//     console.log(`user ${uuid} enter room ${ROOM_ID}`);
+//     disconnect = false;
+// })
 
 
 async function addVideoStream(video, stream, islocal, remoteUuid){
