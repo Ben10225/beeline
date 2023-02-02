@@ -59,6 +59,17 @@ func main() {
 		s.Close()
 	})
 
+	// enter room
+	server.OnEvent("/", "send-enter-request", func(s socketio.Conn, roomId, clientName string) {
+		server.BroadcastToRoom("/", roomId, "sent-to-auth", clientName)
+	})
+
+	server.OnEvent("/", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
+		// server.BroadcastToRoom("/", roomId, "client-action", clientName, b)
+		server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
+		// s.Emit("client-action", clientName, b)
+	})
+
 	// reconnect
 	// server.OnEvent("/", "reconnect", func(s socketio.Conn, roomId, uuid string) {
 	// 	server.BroadcastToRoom("/", roomId, "user-reconnect", uuid)
@@ -68,11 +79,7 @@ func main() {
 		fmt.Println("meet error:", e)
 	})
 
-	go func() {
-		if err := server.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
-		}
-	}()
+	go server.Serve()
 	defer server.Close()
 
 	// r.Use(utils.GinMiddleware("http://localhost:4000"))

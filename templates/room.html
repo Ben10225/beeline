@@ -27,6 +27,8 @@
         <div class="waiting-gif"></div>
     </div>
     <div class="wrapper">
+        <div class="client-alert"></div>
+        <div id="user-setup"></div>
         <section id="video-streams">
             <div class="user-container"></div>
         </section>
@@ -54,6 +56,8 @@
         const USER_ID = "{{ .userId }}"
         const USER_NAME = "{{ .userName }}"
         const USER_IMG = "{{ .userImgUrl }}"
+        const ENTER = "{{ .enterRoom }}"
+        const CLIENT = "{{ .client }}"
     </script>
 
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js" defer></script>

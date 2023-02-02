@@ -8,6 +8,8 @@ type MyClaims struct {
 	Uuid   string `json:"uuid"`
 	Name   string `json:"name"`
 	ImgUrl string `json:"imgUrl"`
+	RoomId string `json:"roomId"`
+	Client bool   `json:"client"`
 	jwt.RegisteredClaims
 }
 

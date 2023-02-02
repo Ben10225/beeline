@@ -34,5 +34,6 @@ func Routers(router *gin.Engine) {
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		room.POST("/streamstatus", api.SetUserStreamStatus)
+		room.POST("/entertoken", api.SetEnterToken)
 	}
 }

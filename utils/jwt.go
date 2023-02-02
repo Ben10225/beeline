@@ -32,6 +32,21 @@ func MakeToken(uuid, name, imgUrl string) (string, error) {
 	return tokenString, err
 }
 
+func MakeRoomToken(roomId string) (string, error) {
+	claim := structs.MyClaims{
+		RoomId: roomId,
+		Client: true,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Hour * time.Duration(1))),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	tokenString, err := token.SignedString(MySecret)
+	return tokenString, err
+}
+
 func ParseToken(jwtToken string) (*structs.MyClaims, error) {
 	token, err := jwt.ParseWithClaims(jwtToken, &structs.MyClaims{}, Secret())
 	if err != nil {

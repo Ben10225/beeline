@@ -3,6 +3,7 @@ package api
 import (
 	"beeline/models"
 	"beeline/structs"
+	"beeline/utils"
 	"log"
 	"net/http"
 
@@ -103,6 +104,22 @@ func SetUserStreamStatus(c *gin.Context) {
 	b := req.B
 
 	models.SetStreamStatus(c, roomId, uuid, status, b)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func SetEnterToken(c *gin.Context) {
+	var req structs.RoomData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roomId := req.RoomId
+
+	token, _ := utils.MakeRoomToken(roomId)
+	c.SetCookie("roomT", token, 0, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
 	})

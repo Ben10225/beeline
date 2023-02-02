@@ -1,7 +1,13 @@
-import utils from "./utils.js" 
 
-// let userData = null
-// userData = await utils.auth("room");
+const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+});
+
+const auth = params.auth == 0;
+const cameraBtn = document.querySelector("#camera-btn");
+const audioBtn = document.querySelector("#audio-btn");
+const leaveBtn = document.querySelector("#leave-btn");
+
 
 let enterRoom = false;
 let disconnect = true;
@@ -13,7 +19,7 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 ct ++;
                 if(disconnect){
-                    if(ct > 600){
+                    if(ct > 700){
                         history.go(0);
                     }
                 }else{
@@ -40,20 +46,20 @@ let tryEnterRoom = (uuid) => {
     }
 }
 
-tryEnterRoom(USER_ID)
+tryEnterRoom(USER_ID);
 
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
 const socket = io({upgrade: true});
 
-const userContainer = document.querySelector(".user-container")
+const userContainer = document.querySelector(".user-container");
 
 
 // const myPeer = new Peer()
 const myPeer = new Peer(USER_ID)
 
 const myVideo = document.createElement("video")
-myVideo.muted = true
+myVideo.muted = true;
 
 let tempMediaStreamId = null;
 let tempRemoteMediaStreamId = null;
@@ -64,19 +70,93 @@ navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( stream => {
-    addVideoStream(myVideo, stream, true)
-
-    // 進房時監聽
-    myPeer.on('call', function(call){
-        call.answer(stream)
-        const video = document.createElement("video")
-        let remoteUuid = call.peer
-        call.on("stream", userVideoStream => {
-            if (USER_ID === userVideoStream.id) return
-            // console.log("stream", userVideoStream)
-            addVideoStream(video, userVideoStream, false, remoteUuid)
+    if(auth || (CLIENT && ENTER === ROOM_ID)){
+        // 進房時監聽
+        addVideoStream(myVideo, stream, true);
+        myPeer.on('call', function(call){
+            call.answer(stream)
+            const video = document.createElement("video")
+            let remoteUuid = call.peer
+            call.on("stream", userVideoStream => {
+                if (USER_ID === userVideoStream.id) return
+                // console.log("stream", userVideoStream)
+                addVideoStream(video, userVideoStream, false, remoteUuid)
+            })
         })
-    })
+
+        let connectPeer = () => {
+            myPeer.on('open', async id => {
+                socket.emit('join-room', ROOM_ID, id);
+            })
+        }
+        connectPeer();
+    }else if(!auth){
+        const video = document.createElement("video");
+        video.muted = true;
+        video.srcObject = stream;
+        let imgSetting = "";
+        if(USER_IMG[0] !== "#"){
+            imgSetting = `
+            <div class="img-bg" style="
+                background-image: url('${USER_IMG}');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            "></div>
+            `;
+        }else{
+            imgSetting = `
+            <div class="img-bg" style="background-color: ${USER_IMG};">
+                <h3>${USER_NAME[0]}</h3>
+            </div>
+            `;
+        }
+        let player = `
+        <h2>Grooming yourself</h2>
+        <div class="setup-container">
+            <div class="username-wrapper">
+                <span class="user-name">${USER_NAME}</span>
+            </div>
+            <div class="setup-player" id="user-${USER_ID}">
+                <div class="micro-status-icon local"></div>
+                <div class="user-block local">
+                    <div class="auto-img">
+                        ${imgSetting}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="enter-request">Enter Room</button>
+        `
+    
+        document.querySelector("#user-setup").insertAdjacentHTML("beforeend", player);
+        video.addEventListener("loadedmetadata", () => {
+            video.play();
+        })
+
+        document.querySelector(`#user-${USER_ID}`).append(video);
+        const btn = document.querySelector("#enter-request");
+
+        btn.onclick = () => {
+            socket.emit('send-enter-request', ROOM_ID, USER_NAME);
+        }
+
+        cameraBtn.onclick = () => {
+            toggleCamera(stream);
+        }
+
+        audioBtn.onclick = () => {
+            toggleAudio(stream);
+        }
+
+        leaveBtn.onclick = () => {
+            window.location = "/";
+        }
+        disconnect = false;
+
+        return;
+    }
+
 
     socket.on('user-connected', async uuid => {
         console.log(`user ${uuid} enter room ${ROOM_ID}`);
@@ -100,20 +180,8 @@ navigator.mediaDevices.getUserMedia({
         //     outUserDiv.remove();
         // }
         // if (peers[userId]) peers[userId].close();
-        // if (userId === localPeerId) window.location = "/";
     })
-
 })
-
-
-let connectPeer = () => {
-    myPeer.on('open', async id => {
-        socket.emit('join-room', ROOM_ID, id);
-    })
-}
-
-connectPeer()
-
 
 // camera
 socket.on('set-view', (options, uuid, b) => {
@@ -135,7 +203,43 @@ socket.on('set-view', (options, uuid, b) => {
     }
 })
 
+// leave room
+socket.on('leave-video-remove', (uuid) => {
+    let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
+    if(remoteUserWrapper){
+        document.querySelector(`#wrapper-${uuid}`).remove();
+    }
+})
 
+// get enter request
+socket.on('sent-to-auth', (clientName) => {
+    if(auth){
+        let html = `
+        <div class="alert-block">
+            <h3><span>${clientName}</span> 想進入聊天室</h3>
+            <button class="allow">准許</button>
+            <button class="refuse">拒絕</button>
+        </div>
+        `;
+        document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
+        new Audio("/public/audio/client-request.mp3").play();
+
+        document.querySelector(".allow").onclick = () => {
+            document.querySelector(".alert-block").remove();
+            socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
+        }
+    }
+})
+
+
+socket.on('client-action', async (roomId, clientName, b) => {
+    if(clientName === USER_NAME && b){
+        await SetRoomEnterToken(roomId);
+        history.go(0);
+    }
+})
+
+/*
 socket.on('close-camera-view', (uuid) => {
     if (uuid === USER_ID) return
     let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
@@ -175,23 +279,14 @@ socket.on('hide-unvoice-icon', (uuid) => {
     }
 })
 
-
-// leave room
-socket.on('leave-video-remove', (uuid) => {
-    let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
-    if(remoteUserWrapper){
-        document.querySelector(`#wrapper-${uuid}`).remove();
-    }
+// reconnect
+socket.on('user-reconnect', (uuid) => {
+    console.log(`user ${uuid} enter room ${ROOM_ID}`);
+    disconnect = false;
 })
+*/
 
-// // reconnect
-// socket.on('user-reconnect', (uuid) => {
-//     console.log(`user ${uuid} enter room ${ROOM_ID}`);
-//     disconnect = false;
-// })
-
-
-async function addVideoStream(video, stream, islocal, remoteUuid){
+let addVideoStream = async (video, stream, islocal, remoteUuid) => {
     video.srcObject = stream
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
@@ -202,54 +297,16 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
         // stream.getTracks()[1].enabled = false;
         // stream.getTracks()[0].enabled = false;
 
-        // camera button
-        const cameraBtn = document.querySelector("#camera-btn");
-        let toggleCamera = async () => {
-            // let isOpen = stream.getTracks()[1].enabled;
-            if(!document.querySelector(".user-block.local").classList.contains("show")){
-                cameraBtn.classList.add("disable");
-                document.querySelector(".user-block.local").classList.add("show");
-                stream.getTracks()[1].enabled = false;
-                socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
-                setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
-            }else{
-                cameraBtn.classList.remove("disable");
-                document.querySelector(".user-block.local").classList.remove("show");
-                stream.getTracks()[1].enabled = true;
-                socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
-                setUserStreamStatus(ROOM_ID, USER_ID, "video", true)
-            }
 
-        }
         cameraBtn.onclick = () => {
-            toggleCamera();
+            toggleCamera(stream);
         }
 
-        // audio button
-        const audioBtn = document.querySelector("#audio-btn");
-        let toggleAudio = async () => {
-            let isVolumn = stream.getTracks()[0].enabled;
-            if(isVolumn){
-                audioBtn.classList.add("disable");
-                stream.getTracks()[0].enabled = false;
-                document.querySelector(".micro-status-icon.local").classList.add("show");
-                socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
-                setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
-
-            }else{
-                audioBtn.classList.remove("disable");
-                stream.getTracks()[0].enabled = true;
-                document.querySelector(".micro-status-icon.local").classList.remove("show");
-                socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
-                setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
-            }
-        }
         audioBtn.onclick = () => {
-            toggleAudio();
+            toggleAudio(stream);
         }
 
         // leave room
-        const leaveBtn = document.querySelector("#leave-btn");
         leaveBtn.onclick = async () => {
             // let localPeerId = await getLocalPeerId(localUuid)
             socket.emit("leave-room", ROOM_ID, USER_ID);
@@ -259,29 +316,6 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
             window.location = "/";
         }
 
-
-        /*
-
-        document.querySelector(".close-audio").addEventListener("click", ()=>{
-            stream.getTracks()[0].enabled = false
-        })
-
-        document.querySelector(".open-audio").addEventListener("click", ()=>{
-            stream.getTracks()[0].enabled = true
-            // socket.emit("open-camera", "user")
-        })
-
-        document.querySelector(".close-video").addEventListener("click", ()=>{
-            stream.getTracks()[1].enabled = false
-            socket.emit("stop-camera", stream.id)
-            // MediaStream.enabled = false
-        })
-    
-        document.querySelector(".open-video").addEventListener("click", ()=>{
-            stream.getTracks()[1].enabled = true
-            socket.emit("open-camera", stream.id)
-        })
-        */
         let imgSetting = "";
         if(USER_IMG[0] !== "#"){
             imgSetting = `
@@ -400,7 +434,44 @@ async function addVideoStream(video, stream, islocal, remoteUuid){
     }
 }
 
-function connectToNewUser(userId, stream){
+// camera button
+let toggleCamera = async (stream) => {
+    // let isOpen = stream.getTracks()[1].enabled;
+    if(!document.querySelector(".user-block.local").classList.contains("show")){
+        cameraBtn.classList.add("disable");
+        document.querySelector(".user-block.local").classList.add("show");
+        stream.getTracks()[1].enabled = false;
+        socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
+        setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
+    }else{
+        cameraBtn.classList.remove("disable");
+        document.querySelector(".user-block.local").classList.remove("show");
+        stream.getTracks()[1].enabled = true;
+        socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
+        setUserStreamStatus(ROOM_ID, USER_ID, "video", true)
+    }
+}
+
+// audio button
+let toggleAudio = async (stream) => {
+    let isVolumn = stream.getTracks()[0].enabled;
+    if(isVolumn){
+        audioBtn.classList.add("disable");
+        stream.getTracks()[0].enabled = false;
+        document.querySelector(".micro-status-icon.local").classList.add("show");
+        socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
+        setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
+
+    }else{
+        audioBtn.classList.remove("disable");
+        stream.getTracks()[0].enabled = true;
+        document.querySelector(".micro-status-icon.local").classList.remove("show");
+        socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
+        setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
+    }
+}
+
+let connectToNewUser = (userId, stream) => {
     const call = myPeer.call(userId, stream)
     let video = document.createElement("video")
     let remoteUuid = call.peer
@@ -512,6 +583,19 @@ let setUserStreamStatus = async (roomId, uuid, status, bool) => {
             "uuid": uuid,
             "status": status,
             "b": bool,
+        })
+    });
+    let data = await response.json();
+}
+
+let SetRoomEnterToken = async (roomId) => {
+    let response = await fetch(`/room/entertoken`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
         })
     });
     let data = await response.json();

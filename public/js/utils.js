@@ -48,7 +48,7 @@ let goStream = async () => {
         let roomExist = await checkRoomExist(roomId);
         if (!roomExist) break;
     }
-    window.open(`/${roomId}`, '_self');
+    window.open(`/${roomId}?auth=0`, '_self');
 }
 
 let makeRoomId = () => {
