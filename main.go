@@ -59,6 +59,11 @@ func main() {
 		s.Close()
 	})
 
+	// reconnect
+	server.OnEvent("/", "reconnect", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/", roomId, "user-reconnect", uuid)
+	})
+
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
 	})

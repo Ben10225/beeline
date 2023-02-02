@@ -27,7 +27,7 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 if(disconnect){
                     console.log("try");
-                    connectPeer();
+                    socket.emit("reconnect", ROOM_ID, USER_ID);
                 }else{
                     console.log("conn establish");
                     clearInterval(timer);
@@ -78,7 +78,7 @@ navigator.mediaDevices.getUserMedia({
     })
 
     socket.on('user-connected', async uuid => {
-        console.log(`user ${uuid} enter room ${ROOM_ID}`)
+        console.log(`user ${uuid} enter room ${ROOM_ID}`);
         connectToNewUser(uuid, stream);
         if(USER_ID === uuid){
             insertMongoRoomData(ROOM_ID, uuid, true, true);
@@ -175,7 +175,7 @@ socket.on('hide-unvoice-icon', (uuid) => {
 })
 
 
-
+// leave room
 socket.on('leave-video-remove', (uuid) => {
     let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
     if(remoteUserWrapper){
@@ -183,6 +183,11 @@ socket.on('leave-video-remove', (uuid) => {
     }
 })
 
+// reconnect
+socket.on('user-reconnect', (uuid) => {
+    console.log(`user ${uuid} enter room ${ROOM_ID}`);
+    disconnect = false;
+})
 
 
 async function addVideoStream(video, stream, islocal, remoteUuid){
