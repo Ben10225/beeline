@@ -26,13 +26,15 @@ let tryEnterRoom = (uuid) => {
                     console.log("conn establish");
                     document.querySelector("#waiting-block").remove();
                     clearInterval(timer);
-                    new Audio("/public/audio/enter-room.mp3").play();
+                    if(auth || (CLIENT && ENTER === ROOM_ID)){
+                        new Audio("/public/audio/enter-room.mp3").play();
+                    }
                 }
             }, 1);
         }else{
             let timer = setInterval(() => {
                 if(disconnect){
-                    console.log("try")
+                    console.log("try");
                     let socket = io({upgrade: true});
                     socket.emit('join-room', ROOM_ID, USER_ID);
                 }else{
@@ -138,7 +140,7 @@ navigator.mediaDevices.getUserMedia({
         const btn = document.querySelector("#enter-request");
 
         btn.onclick = () => {
-            socket.emit('send-enter-request', ROOM_ID, USER_NAME);
+            socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
         }
 
         cameraBtn.onclick = () => {
@@ -150,10 +152,12 @@ navigator.mediaDevices.getUserMedia({
         }
 
         leaveBtn.onclick = () => {
+            removeMongoRoomData(ROOM_ID, USER_ID);
             window.location = "/";
         }
         disconnect = false;
 
+        insertMongoRoomData(ROOM_ID, USER_ID, true, true);
         return;
     }
 
@@ -212,21 +216,59 @@ socket.on('leave-video-remove', (uuid) => {
 })
 
 // get enter request
-socket.on('sent-to-auth', (clientName) => {
+socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
     if(auth){
+        let imgSetting = "";
+        if(clientImg[0] !== "#"){
+            imgSetting = `
+            <div class="alert-user-img" style="
+                background-image: url('${clientImg}');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            "></div>
+            `;
+        }else{
+            imgSetting = `
+            <div class="alert-user-img" style="background-color: ${clientImg};">
+                <h3>${clientName[0]}</h3>
+            </div>
+            `;
+        }
         let html = `
-        <div class="alert-block">
-            <h3><span>${clientName}</span> 想進入聊天室</h3>
-            <button class="allow">准許</button>
-            <button class="refuse">拒絕</button>
+        <div class="alert-block" id="alert-user-${clientUuid}">
+            ${imgSetting}
+            <h3><span>${clientName}</span>想進入聊天室</h3>
+            <h3 class="allow">准許</h3>
+            <h3 class="refuse">拒絕</h3>
         </div>
         `;
         document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
         new Audio("/public/audio/client-request.mp3").play();
 
-        document.querySelector(".allow").onclick = () => {
-            document.querySelector(".alert-block").remove();
+        let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
+        clientAllow.onclick = () => {
+            document.querySelector(`#alert-user-${clientUuid}`).remove();
             socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
+        }
+
+        let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
+        clientRefuse.onclick = () => {
+            document.querySelector(`#alert-user-${clientUuid}`).remove();
+            socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
+        }
+
+        clientAllow.onmouseover = () => {
+            clientAllow.classList.add("hover");
+        }
+        clientAllow.onmouseout = () => {
+            clientAllow.classList.remove("hover");
+        }
+        clientRefuse.onmouseover = () => {
+            clientRefuse.classList.add("hover");
+        }
+        clientRefuse.onmouseout = () => {
+            clientRefuse.classList.remove("hover");
         }
     }
 })
@@ -236,6 +278,8 @@ socket.on('client-action', async (roomId, clientName, b) => {
     if(clientName === USER_NAME && b){
         await SetRoomEnterToken(roomId);
         history.go(0);
+    }else if(clientName === USER_NAME && !b){
+        window.location = "/";
     }
 })
 

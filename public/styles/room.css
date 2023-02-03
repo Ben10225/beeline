@@ -48,17 +48,73 @@ body {
   align-items: center;
   padding: 10px;
 }
-.wrapper .allow {
-  padding: 5px;
-  cursor: pointer;
-}
-.wrapper .refuse {
-  padding: 5px;
-  cursor: pointer;
-}
 
 .client-alert {
-  background-color: #DBA39A;
+  margin-top: 10px;
+}
+.client-alert .alert-block {
+  padding: 5px 10px;
+  background-color: rgba(219, 163, 154, 0.6);
+  border-radius: 7px;
+  vertical-align: middle;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.client-alert .alert-block .alert-user-img {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+  position: relative;
+}
+.client-alert .alert-block .alert-user-img h3 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: #fff;
+  font-weight: 300;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.client-alert .alert-block h3 {
+  font-weight: 300;
+  display: inline-block;
+  margin-right: 60px;
+  color: #444;
+  letter-spacing: 0.04em;
+  font-size: 18px;
+  vertical-align: middle;
+}
+.client-alert .alert-block h3 span {
+  font-weight: 400;
+  margin-right: 14px;
+  letter-spacing: 0.1em;
+}
+.client-alert .alert-block .allow, .client-alert .alert-block .refuse {
+  cursor: pointer;
+  opacity: 0.4;
+  font-size: 15px;
+  transition: 0.3s;
+}
+.client-alert .alert-block .allow {
+  margin-right: 8px;
+}
+.client-alert .alert-block .allow.hover {
+  color: rgb(30, 144, 26);
+  opacity: 1;
+}
+.client-alert .alert-block .refuse {
+  margin-right: 0;
+}
+.client-alert .alert-block .refuse.hover {
+  color: rgb(211, 38, 26);
+  opacity: 1;
 }
 
 #user-setup {

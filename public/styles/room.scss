@@ -50,18 +50,71 @@ body{
     justify-content: center;
     align-items: center;
     padding: 10px;
-    .allow{
-        padding: 5px;
-        cursor: pointer;
-    }
-    .refuse{
-        padding: 5px;
-        cursor: pointer;
-    }
 }
 
 .client-alert{
-    background-color: #DBA39A;
+    margin-top: 10px;
+    .alert-block{
+        padding: 5px 10px;
+        background-color: rgba(#DBA39A, 0.6);
+        border-radius: 7px;
+        vertical-align: middle;
+        box-shadow: 2px 2px 4px rgba(#000000, 0.3);
+        .alert-user-img{
+            width: 23px;
+            height: 23px;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 4px;
+            position: relative;
+            h3{
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 14px;
+                color: #fff;
+                font-weight: 300;
+                pointer-events: none;
+                user-select: none;
+            }
+        }
+        h3{
+            font-weight: 300;
+            display: inline-block;
+            margin-right: 60px;
+            color: #444;
+            letter-spacing: 0.04em;
+            font-size: 18px;
+            vertical-align: middle;
+            span{
+                font-weight: 400;
+                margin-right: 14px;
+                letter-spacing: 0.1em;
+            }
+        }
+        .allow, .refuse{
+            cursor: pointer;
+            opacity: 0.4;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .allow{
+            margin-right: 8px;
+            &.hover{
+                color: rgb(30, 144, 26);
+                opacity: 1;
+            }
+        }
+        .refuse{
+            margin-right: 0;
+            &.hover{
+                color: rgb(211, 38, 26);
+                opacity: 1;
+            }
+        }
+    }
 }
 
 #user-setup{

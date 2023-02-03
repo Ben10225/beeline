@@ -14,11 +14,6 @@ import (
 
 const portNumber = ":3000"
 
-// router := gin.Default()
-
-// router.LoadHTMLGlob("templates/*")
-// router.Static("/public", "./public")
-
 func main() {
 	r := gin.New()
 	// r := gin.Default()
@@ -60,8 +55,8 @@ func main() {
 	})
 
 	// enter room
-	server.OnEvent("/", "send-enter-request", func(s socketio.Conn, roomId, clientName string) {
-		server.BroadcastToRoom("/", roomId, "sent-to-auth", clientName)
+	server.OnEvent("/", "send-enter-request", func(s socketio.Conn, roomId, clientUuid, clientName, clientImg string) {
+		server.BroadcastToRoom("/", roomId, "sent-to-auth", clientUuid, clientName, clientImg)
 	})
 
 	server.OnEvent("/", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
