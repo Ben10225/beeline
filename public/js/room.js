@@ -398,19 +398,21 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
 
-        let data = await getRemoteUser(ROOM_ID, USER_ID);
+        if(!auth){
+            let data = await getRemoteUser(ROOM_ID, USER_ID);
 
-        let localAudioStatus = data.audioStatus;
-        let localVideoStatus = data.videoStatus;
-        if(!localAudioStatus){
-            stream.getTracks()[0].enabled = false;
-            document.querySelector(`#wrapper-${USER_ID} .micro-status-icon`).classList.add("show");
-            audioBtn.classList.add("disable");
-        }
-        if(!localVideoStatus){
-            stream.getTracks()[1].enabled = false;
-            document.querySelector(`#wrapper-${USER_ID} .user-block`).classList.add("show");
-            cameraBtn.classList.add("disable");
+            let localAudioStatus = data.audioStatus;
+            let localVideoStatus = data.videoStatus;
+            if(!localAudioStatus){
+                stream.getTracks()[0].enabled = false;
+                document.querySelector(`#wrapper-${USER_ID} .micro-status-icon`).classList.add("show");
+                audioBtn.classList.add("disable");
+            }
+            if(!localVideoStatus){
+                stream.getTracks()[1].enabled = false;
+                document.querySelector(`#wrapper-${USER_ID} .user-block`).classList.add("show");
+                cameraBtn.classList.add("disable");
+            }
         }
 
     }else{

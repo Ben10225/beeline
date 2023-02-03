@@ -142,6 +142,7 @@ func GetRemoteUser(c *gin.Context) {
 	userData := models.GetUserByUuid(c, uuid)
 
 	userStreamStatus := models.GetStatusByUuid(c, roomId, uuid)
+	fmt.Println(userStreamStatus)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
