@@ -52,7 +52,7 @@ tryEnterRoom(USER_ID);
 
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
-const socket = io({upgrade: true});
+const socket = io({transports: ['websocket']});
 
 const userContainer = document.querySelector(".user-container");
 
