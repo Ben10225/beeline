@@ -256,6 +256,7 @@ socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
         clientRefuse.onclick = () => {
             document.querySelector(`#alert-user-${clientUuid}`).remove();
             socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
+            removeMongoRoomData(ROOM_ID, clientUuid);
         }
 
         clientAllow.onmouseover = () => {
