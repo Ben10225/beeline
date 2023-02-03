@@ -405,12 +405,12 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             let localVideoStatus = data.videoStatus;
             if(!localAudioStatus){
                 stream.getTracks()[0].enabled = false;
-                document.querySelector(`#wrapper-${USER_ID} .micro-status-icon`).classList.add("show");
+                document.querySelector(`#user-${USER_ID} .micro-status-icon`).classList.add("show");
                 audioBtn.classList.add("disable");
             }
             if(!localVideoStatus){
                 stream.getTracks()[1].enabled = false;
-                document.querySelector(`#wrapper-${USER_ID} .user-block`).classList.add("show");
+                document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 cameraBtn.classList.add("disable");
             }
         }
