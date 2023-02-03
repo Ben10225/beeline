@@ -9,7 +9,7 @@
 
 body{
     background-color: #e8e8e8;
-    font-family: 'Roboto', sans-serif
+    font-family: 'Roboto', sans-serif;
 }
 
 /* --------    ROOM STYLING    -------- */
@@ -175,9 +175,6 @@ body{
                 &.show{
                     display: block;
                 }
-                .user-img{
-        
-                }
                 .auto-img{
                     position: relative;
                     cursor: pointer;
@@ -219,8 +216,25 @@ body{
         color: #e8e8e8;
         opacity: 0.5;
         transition: 0.4s;
+        display: inline-block;
         &:hover{
             opacity: 1;
+        }
+    }
+    .button-block{
+        position: relative;
+        .request-gif{
+            width: 40px;
+            height: 40px;
+            margin-left: 20px;
+            background-image: url('/public/images/wait-inroom.gif');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: inline-block;
+            position: absolute;
+            left: 120px;
+            top: 39px;
         }
     }
 }
@@ -240,9 +254,6 @@ body{
         // width: 1200px;
         display: grid;
         grid-template-columns: 1fr 1fr;
-    }
-    .local-container{
-        // display: flex;
     }
 }
 
@@ -296,9 +307,6 @@ body{
         display: none;
         &.show{
             display: block;
-        }
-        .user-img{
-
         }
         .auto-img{
             position: relative;

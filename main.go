@@ -61,8 +61,8 @@ func main() {
 	})
 
 	server.OnEvent("/", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
-		// server.BroadcastToRoom("/", roomId, "client-action", clientName, b)
-		server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
+		server.BroadcastToRoom("/", roomId, "client-action", roomId, clientName, b)
+		// server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
 		// s.Emit("client-action", clientName, b)
 	})
 

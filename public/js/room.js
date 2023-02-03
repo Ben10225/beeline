@@ -86,12 +86,12 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
-        let connectPeer = () => {
-            myPeer.on('open', async id => {
-                socket.emit('join-room', ROOM_ID, id);
-            })
-        }
-        connectPeer();
+        // let connectPeer = () => {
+        //     myPeer.on('open', async id => {
+        //         socket.emit('join-room', ROOM_ID, id);
+        //     })
+        // }
+        // connectPeer();
     }else if(!auth){
         const video = document.createElement("video");
         video.muted = true;
@@ -128,7 +128,7 @@ navigator.mediaDevices.getUserMedia({
                 </div>
             </div>
         </div>
-        <button id="enter-request">Enter Room</button>
+        <div class="button-block"><button id="enter-request">Enter Room</button></div>
         `
     
         document.querySelector("#user-setup").insertAdjacentHTML("beforeend", player);
@@ -141,6 +141,9 @@ navigator.mediaDevices.getUserMedia({
 
         btn.onclick = () => {
             socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
+            btn.style = `pointer-events: none; opacity: 0.3;`;
+            let imgTag = `<div class="request-gif"></div>`;
+            document.querySelector(".button-block").insertAdjacentHTML("beforeend", imgTag);
         }
 
         cameraBtn.onclick = () => {
@@ -155,23 +158,22 @@ navigator.mediaDevices.getUserMedia({
             removeMongoRoomData(ROOM_ID, USER_ID);
             window.location = "/";
         }
-        disconnect = false;
+        // disconnect = false;
 
         insertMongoRoomData(ROOM_ID, USER_ID, true, true);
-        return;
+        // return;
     }
-
 
     socket.on('user-connected', async uuid => {
         console.log(`user ${uuid} enter room ${ROOM_ID}`);
         connectToNewUser(uuid, stream);
+
         if(USER_ID === uuid){
             insertMongoRoomData(ROOM_ID, uuid, true, true);
             enterRoom = true;
             disconnect = false;
         }
     })
-    
     
     socket.on('user-disconnected', uuid => {
         console.log("out meeting: ", uuid);
@@ -186,6 +188,15 @@ navigator.mediaDevices.getUserMedia({
         // if (peers[userId]) peers[userId].close();
     })
 })
+
+
+let connectPeer = () => {
+    myPeer.on('open', async id => {
+        socket.emit('join-room', ROOM_ID, id);
+    })
+}
+connectPeer();
+
 
 // camera
 socket.on('set-view', (options, uuid, b) => {

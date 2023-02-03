@@ -220,9 +220,26 @@ body {
   color: #e8e8e8;
   opacity: 0.5;
   transition: 0.4s;
+  display: inline-block;
 }
 #user-setup #enter-request:hover {
   opacity: 1;
+}
+#user-setup .button-block {
+  position: relative;
+}
+#user-setup .button-block .request-gif {
+  width: 40px;
+  height: 40px;
+  margin-left: 20px;
+  background-image: url("/public/images/wait-inroom.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: inline-block;
+  position: absolute;
+  left: 120px;
+  top: 39px;
 }
 
 #video-streams {
@@ -234,6 +251,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
+
 .video-container {
   border: 3px solid rgb(227, 138, 162);
   border-radius: 8px;
