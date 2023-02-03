@@ -340,8 +340,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         tempMediaStreamId = stream.id;
 
         // stream.getTracks()[1].enabled = false;
-        // stream.getTracks()[0].enabled = false;
-
 
         cameraBtn.onclick = () => {
             toggleCamera(stream);
@@ -400,9 +398,23 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
 
-        // setUserStreamStatus(localUuid, "video", false, true);
+        let data = await getRemoteUser(ROOM_ID, USER_ID);
+
+        let localAudioStatus = data.audioStatus;
+        let localVideoStatus = data.videoStatus;
+        if(!localAudioStatus){
+            stream.getTracks()[0].enabled = false;
+            document.querySelector(`#wrapper-${USER_ID} .micro-status-icon`).classList.add("show");
+            audioBtn.classList.add("disable");
+        }
+        if(!localVideoStatus){
+            stream.getTracks()[1].enabled = false;
+            document.querySelector(`#wrapper-${USER_ID} .user-block`).classList.add("show");
+            cameraBtn.classList.add("disable");
+        }
 
     }else{
+        // create remote container
         if(document.querySelector(`#wrapper-${remoteUuid}`)){
             document.querySelector(`#wrapper-${remoteUuid}`).remove();
         }
