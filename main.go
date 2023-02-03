@@ -3,6 +3,7 @@ package main
 import (
 	"beeline/configs"
 	"beeline/routers"
+	"beeline/utils"
 	"fmt"
 	"log"
 
@@ -77,7 +78,7 @@ func main() {
 	go server.Serve()
 	defer server.Close()
 
-	// r.Use(utils.GinMiddleware("http://localhost:4000"))
+	r.Use(utils.GinMiddleware("http://localhost:4000"))
 	// router.Use(gin.Recovery())
 
 	r.GET("/socket.io/*any", gin.WrapH(server))
