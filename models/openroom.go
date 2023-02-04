@@ -10,9 +10,165 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var coll *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
+
+func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bool) bool {
+	var result structs.RoomInfo
+	findFilter := bson.D{{"roomId", roomId}}
+	resError := coll.FindOne(context.TODO(), findFilter).Decode(&result)
+	if resError != nil {
+		docs := []interface{}{
+			gin.H{
+				"roomId": roomId,
+				"user":   []structs.RoomUserData{},
+				// User:   []interface{}{uuid, audio, video, true},
+			},
+		}
+		_, err := coll.InsertMany(context.TODO(), docs)
+		if err != nil {
+			log.Println(err)
+			return false
+		}
+	}
+
+	user := result.User
+	for _, v := range user {
+		if v.Uuid == uuid {
+			return false
+		}
+	}
+
+	filter := bson.D{{"roomId", roomId}}
+	userInfo := bson.M{
+		"$push": bson.M{
+			"user": bson.D{
+				{"uuid", uuid},
+				{"audioStatus", audio},
+				{"videoStatus", video},
+				{"auth", auth},
+			},
+		},
+	}
+	_, err := coll.UpdateOne(context.TODO(), filter, userInfo)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
+}
+
+func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
+	filter := bson.D{{"roomId", roomId}}
+	userInfo := bson.M{
+		"$pull": bson.M{
+			"user": bson.D{
+				{"uuid", uuid},
+			},
+		},
+	}
+	_, err := coll.UpdateOne(context.TODO(), filter, userInfo)
+	if err != nil {
+		log.Println(err)
+	}
+
+	var result structs.RoomInfo
+	err = coll.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		log.Println(err)
+	}
+	userArray := len(result.User)
+	if userArray == 0 {
+		_, err := coll.DeleteOne(context.TODO(), bson.M{"roomId": roomId})
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	return true
+}
+
+func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	user := room.User
+	for _, v := range user {
+		if v.Uuid == uuid {
+			return true
+		}
+	}
+	return false
+}
+
+func FindRoom(c *gin.Context, roomId string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	return err == nil
+}
+
+func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
+	filter := bson.D{{"roomId", roomId}}
+
+	var s string
+	if status == "video" {
+		s = "videoStatus"
+	} else {
+		s = "audioStatus"
+	}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{fmt.Sprintf("user.$[elem].%s", s): b}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
+func GetStatusByUuid(c *gin.Context, roomId, uuid string) *structs.RoomUserData {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
+	user := room.User
+	for _, v := range user {
+		if v.Uuid == uuid {
+			return &v
+		}
+	}
+	return nil
+}
+
+func CheckAuthAlready(c *gin.Context, roomId string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	coll.FindOne(context.TODO(), filter).Decode(&room)
+
+	user := room.User
+	for _, v := range user {
+		if v.Auth {
+			return true
+		}
+	}
+	return false
+}
+
+/*
 func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
+
 	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
 
 	var user []*structs.RoomData
@@ -41,6 +197,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bo
 
 	roomCollection.InsertOne(c, newData)
 	return true
+
 }
 
 func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
@@ -93,39 +250,28 @@ func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
 }
 
 func CheckOrInsertRoom(c *gin.Context, roomId string) bool {
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
+	var coll *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
 
-	room := gin.H{
-		"roomId": roomId,
-	}
-	cur := roomCollection.FindOne(c, bson.M{
-		"roomId": roomId,
-	})
-	err := cur.Decode(&room)
+	var result structs.DataInfo
+	filter := bson.D{{"roomid", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&result)
 	if err == nil {
 		return true
 	}
-
-	newRoom := gin.H{
-		"roomId": roomId,
-	}
-
-	roomCollection.InsertOne(c, newRoom)
 	return false
 }
 
 func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
-	/*
-		if both {
-			filter := bson.D{{"uuid", uuid}}
-			update := bson.D{{"$set", bson.D{{"videostatus", false}, {"audiostatus", false}}}}
-			_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return
-		}
-	*/
+	// if both {
+	// 	filter := bson.D{{"uuid", uuid}}
+	// 	update := bson.D{{"$set", bson.D{{"videostatus", false}, {"audiostatus", false}}}}
+	// 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	return
+	// }
+
 	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
 	var s string
 	if status == "video" {
@@ -142,16 +288,4 @@ func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
 	}
 }
 
-func GetStatusByUuid(c *gin.Context, roomId, uuid string) *structs.RoomData {
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
-	var userStatus structs.RoomData
-	cur := roomCollection.FindOne(c, bson.M{
-		"uuid": uuid,
-	})
-	err := cur.Decode(&userStatus)
-	if err != nil {
-		fmt.Println(err)
-		return nil
-	}
-	return &userStatus
-}
+*/

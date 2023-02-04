@@ -11,7 +11,7 @@ import (
 )
 
 func SetUserRoomData(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
@@ -20,8 +20,9 @@ func SetUserRoomData(c *gin.Context) {
 	uuid := req.Uuid
 	audioStatus := req.AudioStatus
 	videoStatus := req.VideoStatus
+	auth := req.Auth
 
-	models.InsertUserToRoom(c, roomId, uuid, audioStatus, videoStatus)
+	models.InsertUserToRoom(c, roomId, uuid, audioStatus, videoStatus, auth)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -29,7 +30,7 @@ func SetUserRoomData(c *gin.Context) {
 }
 
 func DeleteUserRoomData(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
@@ -45,7 +46,7 @@ func DeleteUserRoomData(c *gin.Context) {
 }
 
 func CheckUserStillInRoom(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
@@ -66,14 +67,14 @@ func CheckUserStillInRoom(c *gin.Context) {
 }
 
 func CheckRoomExist(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	roomId := req.RoomId
 
-	exist := models.CheckOrInsertRoom(c, roomId)
+	exist := models.FindRoom(c, roomId)
 
 	if exist {
 		c.JSON(http.StatusOK, gin.H{
@@ -109,8 +110,31 @@ func SetUserStreamStatus(c *gin.Context) {
 	})
 }
 
+func CheckAuth(c *gin.Context) {
+	var req structs.RoomUserData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roomId := req.RoomId
+	result := models.CheckAuthAlready(c, roomId)
+
+	var msg string
+
+	if result {
+		msg = "exist"
+	} else {
+		msg = "not exist"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": msg,
+	})
+}
+
 func SetEnterToken(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)

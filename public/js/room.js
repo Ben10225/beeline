@@ -1,13 +1,22 @@
+import utils from "./utils.js";
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
-const auth = params.auth == 0;
+let auth;
+
+let authExist = await utils.checkIfAuthAlready(ROOM_ID);
+
+if(authExist === "exist"){
+    auth = false;
+}else{
+    auth = (parseInt(params.auth) === 0);
+}
+
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
-
 
 let enterRoom = false;
 let disconnect = true;
@@ -35,13 +44,13 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 if(disconnect){
                     console.log("try");
-                    let socket = io({upgrade: true});
+                    let socket = io({transports: ['websocket']});
                     socket.emit('join-room', ROOM_ID, USER_ID);
                 }else{
                     console.log("conn establish");
                     clearInterval(timer);
                 }
-            }, 4000);
+            }, 10000);
         }
     }else{
         console.log("loading error");
@@ -158,10 +167,8 @@ navigator.mediaDevices.getUserMedia({
             removeMongoRoomData(ROOM_ID, USER_ID);
             window.location = "/";
         }
-        // disconnect = false;
 
-        insertMongoRoomData(ROOM_ID, USER_ID, true, true);
-        // return;
+        insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
     }
 
     socket.on('user-connected', async uuid => {
@@ -169,7 +176,7 @@ navigator.mediaDevices.getUserMedia({
         connectToNewUser(uuid, stream);
 
         if(USER_ID === uuid){
-            insertMongoRoomData(ROOM_ID, uuid, true, true);
+            insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
             enterRoom = true;
             disconnect = false;
         }
@@ -195,6 +202,7 @@ let connectPeer = () => {
         socket.emit('join-room', ROOM_ID, id);
     })
 }
+
 connectPeer();
 
 
@@ -594,7 +602,7 @@ let copyContent = async (url) => {
     }
 }
 
-let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus) => {
+let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth) => {
     let response = await fetch(`/room/setusertoroom`, {
         method: "POST",
         headers: {
@@ -605,6 +613,7 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus) => {
             "uuid": uuid,
             "audioStatus": audioStatus,
             "videoStatus": videoStatus,
+            "auth": auth,
         })
     });
     let data = await response.json();
@@ -705,8 +714,6 @@ let getLocalPeerId = async (uuid) => {
         return data.data
     }
 }
-
-
 
 let setUuid = async (oldUuid, newUuid) => {
     let response = await fetch(`/api/setnewuuid`, {

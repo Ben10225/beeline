@@ -131,7 +131,7 @@ func Signout(c *gin.Context) {
 }
 
 func GetRemoteUser(c *gin.Context) {
-	var req structs.RoomData
+	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
@@ -142,7 +142,6 @@ func GetRemoteUser(c *gin.Context) {
 	userData := models.GetUserByUuid(c, uuid)
 
 	userStreamStatus := models.GetStatusByUuid(c, roomId, uuid)
-	fmt.Println(userStreamStatus)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
@@ -229,25 +228,6 @@ func UploadImg(c *gin.Context) {
 	})
 }
 
-func SetNewUuid(c *gin.Context) {
-	req := struct {
-		OldUuid string
-		NewUuid string
-	}{}
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	oldUuid := req.OldUuid
-	newUuid := req.NewUuid
-
-	models.UpdateUserUuid(c, oldUuid, newUuid)
-
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
-}
-
 /*
 func SetUserPeerId(c *gin.Context) {
 	var req structs.User
@@ -277,6 +257,25 @@ func GetUserPeerId(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": userData.PeerId,
+	})
+}
+
+func SetNewUuid(c *gin.Context) {
+	req := struct {
+		OldUuid string
+		NewUuid string
+	}{}
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	oldUuid := req.OldUuid
+	newUuid := req.NewUuid
+
+	models.UpdateUserUuid(c, oldUuid, newUuid)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
 	})
 }
 */

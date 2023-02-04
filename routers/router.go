@@ -22,7 +22,7 @@ func Routers(router *gin.Engine) {
 		user.GET("/signout", api.Signout)
 		user.POST("/getremoteuser", api.GetRemoteUser)
 		user.POST("/uploadimg", api.UploadImg)
-		user.POST("/setnewuuid", api.SetNewUuid)
+		// user.POST("/setnewuuid", api.SetNewUuid)
 		// user.POST("/setpeerid", api.SetUserPeerId)
 		// user.POST("/getlocalpeerid", api.GetUserPeerId)
 	}
@@ -35,5 +35,6 @@ func Routers(router *gin.Engine) {
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		room.POST("/streamstatus", api.SetUserStreamStatus)
 		room.POST("/entertoken", api.SetEnterToken)
+		room.POST("/checkAuth", api.CheckAuth)
 	}
 }

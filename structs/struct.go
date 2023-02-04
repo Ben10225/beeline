@@ -39,9 +39,15 @@ type ImageUpload struct {
 	FileName string
 }
 
-type RoomData struct {
+type RoomUserData struct {
 	RoomId      string
 	Uuid        string
 	AudioStatus bool
 	VideoStatus bool
+	Auth        bool
+}
+
+type RoomInfo struct {
+	RoomId string
+	User   []RoomUserData
 }

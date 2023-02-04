@@ -81,6 +81,24 @@ let checkRoomExist = async (roomId) => {
     return data.exist;
 }
 
+let checkIfAuthAlready = async (roomId) => {
+    let response = await fetch(`/room/checkAuth`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+        })
+    });
+    let data = await response.json();
+    if(data){
+        return data.message
+    }
+}
+
+
 export default {
     auth,
+    checkIfAuthAlready
 }
