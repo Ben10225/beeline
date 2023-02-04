@@ -168,6 +168,10 @@ navigator.mediaDevices.getUserMedia({
             window.location = "/";
         }
 
+        window.onunload = () => {
+            removeMongoRoomData(ROOM_ID, USER_ID);
+        }
+
         insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
     }
 
@@ -370,12 +374,16 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
 
         // leave room
         leaveBtn.onclick = async () => {
-            // let localPeerId = await getLocalPeerId(localUuid)
             socket.emit("leave-room", ROOM_ID, USER_ID);
-            socket.disconnect();
+            // socket.disconnect();
             removeMongoRoomData(ROOM_ID, USER_ID);
-            // setUserStreamStatus(localUuid, "video", false, true);
             window.location = "/";
+        }
+
+        // close broswer
+        window.onunload = () => {
+            socket.emit("leave-room", ROOM_ID, USER_ID);
+            removeMongoRoomData(ROOM_ID, USER_ID);
         }
 
         let imgSetting = "";
