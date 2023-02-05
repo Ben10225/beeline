@@ -364,13 +364,16 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         leaveBtn.onclick = async () => {
             // socket.disconnect();
             await removeMongoRoomData(ROOM_ID, USER_ID, auth);
+            await SetRoomEnterToken(ROOM_ID);
             socket.emit("leave-room", ROOM_ID, USER_ID);
             window.location = "/";
         }
 
         // close broswer
         window.onunload = async () => {
-            // await removeMongoRoomData(ROOM_ID, USER_ID, auth);
+            // broswer 關閉不要 await 反而會壞掉
+            removeMongoRoomData(ROOM_ID, USER_ID, auth);
+            SetRoomEnterToken(ROOM_ID);
             socket.emit("leave-room", ROOM_ID, USER_ID);
         }
 
