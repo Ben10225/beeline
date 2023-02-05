@@ -93,7 +93,7 @@ let checkIfAuthAlready = async (roomId) => {
     });
     let data = await response.json();
     if(data){
-        return data.message
+        return [data.message, data.authUuid]
     }
 }
 

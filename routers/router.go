@@ -30,11 +30,13 @@ func Routers(router *gin.Engine) {
 	room := router.Group("/room")
 	{
 		room.POST("/setusertoroom", api.SetUserRoomData)
-		room.POST("/deleteuserfromroom", api.DeleteUserRoomData)
+		room.POST("/deleteuserfromroom", api.SetUserLeaveTrue)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		room.POST("/streamstatus", api.SetUserStreamStatus)
 		room.POST("/entertoken", api.SetEnterToken)
 		room.POST("/checkAuth", api.CheckAuth)
+		room.POST("/setLeaveFalse", api.SetUserLeaveFalse)
+		room.POST("/checkAuthChange", api.GetUserAuth)
 	}
 }

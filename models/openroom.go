@@ -49,6 +49,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 				{"audioStatus", audio},
 				{"videoStatus", video},
 				{"auth", auth},
+				{"leave", false},
 			},
 		},
 	}
@@ -60,33 +61,85 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 	return true
 }
 
-func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
+func UserLeaveTrue(c *gin.Context, roomId, uuid string, auth bool) bool {
 	filter := bson.D{{"roomId", roomId}}
-	userInfo := bson.M{
-		"$pull": bson.M{
-			"user": bson.D{
-				{"uuid", uuid},
-			},
-		},
-	}
-	_, err := coll.UpdateOne(context.TODO(), filter, userInfo)
-	if err != nil {
-		log.Println(err)
+	if !auth {
+		coll.FindOneAndUpdate(
+			context.Background(),
+			filter,
+			bson.M{"$set": bson.M{"user.$[elem].leave": true}},
+			options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+				Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+			}),
+		)
+	} else {
+		coll.FindOneAndUpdate(
+			context.Background(),
+			filter,
+			bson.M{"$set": bson.M{"user.$[elem].auth": false, "user.$[elem].leave": true}},
+			options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+				Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+			}),
+		)
 	}
 
 	var result structs.RoomInfo
-	err = coll.FindOne(context.TODO(), filter).Decode(&result)
-	if err != nil {
-		log.Println(err)
+	er := coll.FindOne(context.TODO(), filter).Decode(&result)
+	if er != nil {
+		log.Println(er)
 	}
-	userArray := len(result.User)
-	if userArray == 0 {
-		_, err := coll.DeleteOne(context.TODO(), bson.M{"roomId": roomId})
-		if err != nil {
-			fmt.Println(err)
+	user := result.User
+
+	stillUserInRoom := false
+	stillAuthInRoom := false
+	newAuth := ""
+
+	for _, v := range user {
+		if !v.Leave {
+			stillUserInRoom = true
+			// return false
+		}
+		if v.Auth {
+			stillAuthInRoom = true
+		}
+		if !v.Auth && newAuth == "" && !v.Leave {
+			newAuth = v.Uuid
 		}
 	}
+
+	if !stillAuthInRoom {
+		coll.FindOneAndUpdate(
+			context.Background(),
+			filter,
+			bson.M{"$set": bson.M{"user.$[elem].auth": true}},
+			options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+				Filters: []interface{}{bson.M{"elem.uuid": newAuth}},
+			}),
+		)
+	}
+
+	if stillUserInRoom {
+		return false
+	}
+
+	_, err := coll.DeleteOne(context.TODO(), bson.M{"roomId": roomId})
+	if err != nil {
+		fmt.Println(err)
+	}
 	return true
+
+	// filter := bson.D{{"roomId", roomId}}
+	// userInfo := bson.M{
+	// 	"$pull": bson.M{
+	// 		"user": bson.D{
+	// 			{"uuid", uuid},
+	// 		},
+	// 	},
+	// }
+	// _, err := coll.UpdateOne(context.TODO(), filter, userInfo)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 }
 
 func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
@@ -152,7 +205,7 @@ func GetStatusByUuid(c *gin.Context, roomId, uuid string) *structs.RoomUserData 
 	return nil
 }
 
-func CheckAuthAlready(c *gin.Context, roomId string) bool {
+func CheckAuthAlready(c *gin.Context, roomId string) (bool, string) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	coll.FindOne(context.TODO(), filter).Decode(&room)
@@ -160,10 +213,39 @@ func CheckAuthAlready(c *gin.Context, roomId string) bool {
 	user := room.User
 	for _, v := range user {
 		if v.Auth {
-			return true
+			return true, v.Uuid
 		}
 	}
-	return false
+	return false, ""
+}
+
+func UserBackToRoomLeaveStatus(c *gin.Context, roomId, uuid string) {
+	filter := bson.D{{"roomId", roomId}}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{"user.$[elem].leave": false}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
+func GetUserNewAuth(c *gin.Context, roomId, uuid string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	coll.FindOne(context.TODO(), filter).Decode(&room)
+
+	user := room.User
+	var result bool
+
+	for _, v := range user {
+		if v.Uuid == uuid {
+			result = v.Auth
+		}
+	}
+	return result
 }
 
 /*

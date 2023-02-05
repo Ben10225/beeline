@@ -63,17 +63,8 @@ func GetUserByUuid(c *gin.Context, uuid string) *structs.User {
 }
 
 func UpdateUserImg(c *gin.Context, uuid, imgUrl string) {
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{"imgurl", imgUrl}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
-	filter := bson.D{{"uuid", oldUuid}}
-	update := bson.D{{"$set", bson.D{{"uuid", newUuid}}}}
+	filter := bson.D{{Key: "uuid", Value: uuid}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "imgurl", Value: imgUrl}}}}
 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		log.Fatal(err)
@@ -110,5 +101,14 @@ func GetPeerIdByUuidAndRemove(c *gin.Context, uuid string) *structs.User {
 		return nil
 	}
 	return &user
+}
+
+func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
+	filter := bson.D{{Key: "uuid", Value: oldUuid}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "uuid", Value: newUuid}}}}
+	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 */

@@ -29,7 +29,7 @@ func SetUserRoomData(c *gin.Context) {
 	})
 }
 
-func DeleteUserRoomData(c *gin.Context) {
+func SetUserLeaveTrue(c *gin.Context) {
 	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -37,8 +37,9 @@ func DeleteUserRoomData(c *gin.Context) {
 	}
 	roomId := req.RoomId
 	uuid := req.Uuid
+	auth := req.Auth
 
-	models.DeleteUserToRoom(c, roomId, uuid)
+	models.UserLeaveTrue(c, roomId, uuid, auth)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -118,7 +119,7 @@ func CheckAuth(c *gin.Context) {
 	}
 
 	roomId := req.RoomId
-	result := models.CheckAuthAlready(c, roomId)
+	result, authUuid := models.CheckAuthAlready(c, roomId)
 
 	var msg string
 
@@ -129,8 +130,42 @@ func CheckAuth(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": msg,
+		"message":  msg,
+		"authUuid": authUuid,
 	})
+}
+
+func SetUserLeaveFalse(c *gin.Context) {
+	var req structs.RoomUserData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+
+	models.UserBackToRoomLeaveStatus(c, roomId, uuid)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func GetUserAuth(c *gin.Context) {
+	var req structs.RoomUserData
+	err := c.BindJSON(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+
+	auth := models.GetUserNewAuth(c, roomId, uuid)
+	c.JSON(http.StatusOK, gin.H{
+		"auth": auth,
+	})
+
 }
 
 func SetEnterToken(c *gin.Context) {

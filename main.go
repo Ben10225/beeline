@@ -28,17 +28,18 @@ func main() {
 		return nil
 	})
 
+	uuidMap := map[string]string{}
+
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
 		// s.SetContext(roomId)
-
 		s.Join(roomId)
-		// fmt.Println(uuid)
+		uuidMap[s.ID()] = uuid
 		server.BroadcastToRoom("/", roomId, "user-connected", uuid)
 		// s.Emit("user-connected", uuid)
 
 		server.OnDisconnect("", func(s socketio.Conn, msg string) {
 			// s.Emit("user-disconnected", uuid)
-			server.BroadcastToRoom("/", roomId, "user-disconnected", uuid)
+			server.BroadcastToRoom("/", roomId, "user-disconnected", uuidMap[s.ID()])
 			log.Println("disconnect", s.ID())
 		})
 	})

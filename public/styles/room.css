@@ -6,8 +6,19 @@
 }
 
 body {
-  background-color: #e8e8e8;
+  background-color: #fff;
   font-family: "Roboto", sans-serif;
+}
+body .bg {
+  background-image: url("/public/images/yellow_hexagonal_pattern.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 1000px;
+  opacity: 0.05;
+  position: fixed;
+  z-index: -1;
 }
 
 /* --------    ROOM STYLING    -------- */
@@ -43,10 +54,9 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 10px;
+  width: 100%;
+  height: 100vh;
 }
 
 .client-alert {
@@ -119,26 +129,23 @@ body {
 
 #user-setup {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-#user-setup h2 {
-  margin-top: 50px;
-  margin-bottom: 40px;
-  font-size: 28px;
+  flex-direction: row;
+  position: relative;
+  top: -7%;
 }
 #user-setup .setup-container {
-  border: 3px solid rgb(227, 138, 162);
+  border: 3px solid rgb(219, 154, 172);
   border-radius: 8px;
-  margin: 2px;
   background-color: #777;
   height: 100%;
   position: relative;
 }
+#user-setup .setup-container .username-wrapper {
+  font-size: 22px;
+}
 #user-setup .setup-container .setup-player {
-  width: 700px;
-  height: 500px;
+  width: 600px;
+  height: 400px;
   position: relative;
 }
 #user-setup .setup-container .setup-player video {
@@ -190,8 +197,8 @@ body {
   align-items: center;
 }
 #user-setup .setup-container .setup-player .user-block .auto-img .img-bg {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   border: 2px solid #fff;
 }
@@ -200,46 +207,95 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 70px;
+  font-size: 80px;
   color: #fff;
-  font-weight: 500;
+  font-weight: 400;
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
-#user-setup #enter-request {
-  margin-top: 40px;
+#user-setup .setup-container .setup-player .icon-wrapper {
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  top: 115%;
+  transform: translateX(-50%);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+#user-setup .setup-container .setup-player .icon-wrapper .control-icon {
+  display: inline-block;
+}
+#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-audio-btn {
+  position: relative;
+  left: -15px;
+  background-image: url("/public/images/setting_micro_icon.svg");
+}
+#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-audio-btn.disable {
+  background-image: url("/public/images/micro_disable_icon.svg");
+}
+#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-camera-btn {
+  position: relative;
+  left: 15px;
+  background-image: url("/public/images/setting_camera_icon.svg");
+}
+#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-camera-btn.disable {
+  background-image: url("/public/images/camera_disable_icon.svg");
+}
+#user-setup .setting-options {
+  position: relative;
+  padding: 100px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+#user-setup .setting-options h2 {
+  margin-top: 30px;
+  margin-bottom: 40px;
+  font-size: 28px;
+  color: #555;
+}
+#user-setup .setting-options p {
+  color: #666;
+  font-size: 17px;
+}
+#user-setup .setting-options .button-block {
+  position: relative;
+}
+#user-setup .setting-options .button-block #enter-request {
+  margin-top: 20px;
   padding: 8px 10px;
   cursor: pointer;
   font-size: 18px;
   border-radius: 7px;
   border: none;
   background-color: #DBA39A;
-  color: #e8e8e8;
+  color: #fff;
   opacity: 0.5;
   transition: 0.4s;
   display: inline-block;
 }
-#user-setup #enter-request:hover {
+#user-setup .setting-options .button-block #enter-request:hover {
   opacity: 1;
 }
-#user-setup .button-block {
-  position: relative;
-}
-#user-setup .button-block .request-gif {
+#user-setup .setting-options .button-block .request-gif {
   width: 40px;
   height: 40px;
-  margin-left: 20px;
+  margin-left: 0;
   background-image: url("/public/images/wait-inroom.gif");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   display: inline-block;
   position: absolute;
-  left: 120px;
-  top: 39px;
+  left: 100px;
+  top: 20px;
+  opacity: 0.8;
+  transform: scale(0.8);
 }
 
 #video-streams {
@@ -396,11 +452,11 @@ body {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0.8;
+  opacity: 1;
   transition: 0.3s;
 }
 .control-icon:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 
 #audio-btn {
@@ -420,7 +476,7 @@ body {
 #leave-btn {
   width: 75px;
   height: 75px;
-  opacity: 0.5;
+  opacity: 0.7;
   background-size: contain;
   background-image: url("/public/images/leave_icon.svg");
 }

@@ -23,9 +23,10 @@ func Room(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
+	room := c.Param("room")
+
 	roomT, err := c.Cookie("roomT")
 	if err != nil {
-		room := c.Param("room")
 		c.HTML(http.StatusOK, "room.html", gin.H{
 			"roomId":     room,
 			"userId":     payload.Uuid,
@@ -37,17 +38,21 @@ func Room(c *gin.Context) {
 	roomPayload, err := utils.ParseToken(roomT)
 	if err != nil {
 		c.SetCookie("roomT", "", -1, "/", "", false, true)
+		c.HTML(http.StatusOK, "room.html", gin.H{
+			"roomId":     room,
+			"userId":     payload.Uuid,
+			"userName":   payload.Name,
+			"userImgUrl": payload.ImgUrl,
+		})
 		return
 	}
 
-	room := c.Param("room")
-
 	c.HTML(http.StatusOK, "room.html", gin.H{
-		"roomId":     room,
-		"userId":     payload.Uuid,
-		"userName":   payload.Name,
-		"userImgUrl": payload.ImgUrl,
-		"enterRoom":  roomPayload.RoomId,
-		"client":     roomPayload.Client,
+		"roomId":      room,
+		"userId":      payload.Uuid,
+		"userName":    payload.Name,
+		"userImgUrl":  payload.ImgUrl,
+		"enterRoomId": roomPayload.RoomId,
+		"client":      roomPayload.Client,
 	})
 }

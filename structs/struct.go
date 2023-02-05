@@ -45,6 +45,7 @@ type RoomUserData struct {
 	AudioStatus bool
 	VideoStatus bool
 	Auth        bool
+	Leave       bool
 }
 
 type RoomInfo struct {
