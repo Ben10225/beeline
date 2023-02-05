@@ -7,8 +7,8 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 let auth;
 
 let authData = await utils.checkIfAuthAlready(ROOM_ID);
-let authExist = authData[0]
-let authUuid = authData[1]
+let authExist = authData[0];
+let authUuid = authData[1];
 
 if(authExist === "exist"){
     auth = false;
@@ -22,6 +22,9 @@ if(authExist === "exist"){
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
+const body = document.querySelector("body");
+const bg = document.querySelector(".bg");
+const wrapper = document.querySelector(".wrapper");
 
 let enterRoom = false;
 let disconnect = true;
@@ -87,6 +90,11 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then( stream => {
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+        body.style.backgroundColor = "#000";
+        bg.style.backgroundImage = "url('/public/images/roombg2.svg')";;
+        bg.style.opacity = "0.15";
+        wrapper.style.justifyContent = "flex-start";
+
         // 進房時監聽
         addVideoStream(myVideo, stream, true);
         myPeer.on('call', function(call){
