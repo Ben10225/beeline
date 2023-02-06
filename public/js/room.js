@@ -115,6 +115,8 @@ navigator.mediaDevices.getUserMedia({
         // }
         // connectPeer();
     }else if(!auth){
+        document.querySelector("#video-streams").remove();
+
         const video = document.createElement("video");
         video.muted = true;
         video.srcObject = stream;
@@ -252,13 +254,16 @@ socket.on('set-view', (options, uuid, b) => {
     if (uuid === USER_ID) return
     if(options === "video"){
         let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
+        let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
         if(remoteDiv && b){
             remoteDiv.classList.remove("show");
+            remoteNameBg.classList.remove("bg-none");
         }else if(remoteDiv && !b){
             remoteDiv.classList.add("show");
+            remoteNameBg.classList.add("bg-none");
         }
     }else if(options === "audio"){
-        let remoteDiv = document.querySelector(`#user-${uuid} .micro-status-icon`)
+        let remoteDiv = document.querySelector(`#wrapper-${uuid} .micro-status-icon`)
         if(remoteDiv && b){
             remoteDiv.classList.remove("show");
         }else if(remoteDiv && !b){
@@ -278,6 +283,7 @@ socket.on('leave-video-remove', async (uuid) => {
     if(remoteUserWrapper){
         document.querySelector(`#wrapper-${uuid}`).remove();
     }
+    settingVideoSize();
 })
 
 // get enter request
@@ -404,8 +410,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         }
         let player = `
         <div class="video-container">
-            <div class="username-wrapper">
-                <span class="user-name">${USER_NAME}</span>
+            <div class="username-wrapper-room local">
+                <span class="user-name">你</span>
             </div>
             <div class="video-player" id="user-${USER_ID}">
                 <div class="micro-status-icon local"></div>
@@ -423,6 +429,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             video.play()
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
+        // const videoContainer = document.querySelector(".video-container");
+        // videoContainer.style.height = `calc(${videoContainer.offsetWidth}px * 3 / 4);`;
 
         if(!auth){
             let data = await getRemoteUser(ROOM_ID, USER_ID);
@@ -437,6 +445,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             if(!localVideoStatus){
                 stream.getTracks()[1].enabled = false;
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
+                document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
             }
         }
@@ -453,7 +462,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
 
         let player = `
         <div class="video-container" id="wrapper-${remoteUuid}">
-            <div class="username-wrapper">
+            <div class="username-wrapper-room">
                 <span class="user-name"></span>
             </div>
             <div class="video-player" id="user-${remoteUuid}">
@@ -473,10 +482,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         video.addEventListener("loadedmetadata", () => {
             video.play()
         })
-        document.querySelector(`#user-${remoteUuid}`).append(video)
+        document.querySelector(`#user-${remoteUuid}`).append(video);
+        // const videoContainer = document.querySelector(".video-container");
+        // videoContainer.style.height = `calc(${videoContainer.offsetWidth}px * 3 / 4);`;
 
         let data = await getRemoteUser(ROOM_ID, remoteUuid);
-
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
         let remoteAudioStatus = data.audioStatus;
@@ -499,8 +509,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         }
         if(!remoteVideoStatus){
             document.querySelector(`#wrapper-${remoteUuid} .user-block`).classList.add("show");
+            document.querySelector(`#wrapper-${remoteUuid} .username-wrapper-room`).classList.add("bg-none");
         }
     }
+    
+    settingVideoSize();
 }
 
 // camera button
@@ -512,12 +525,21 @@ let toggleCamera = async (stream, dom) => {
         stream.getTracks()[1].enabled = false;
         socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
+
+        if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+            document.querySelector(".username-wrapper-room.local").classList.add("bg-none");
+        }
+
     }else{
         dom.classList.remove("disable");
         document.querySelector(".user-block.local").classList.remove("show");
         stream.getTracks()[1].enabled = true;
         socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true)
+
+        if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+            document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
+        }
     }
 }
 
@@ -701,6 +723,59 @@ let resetAuthData = async (roomId, uuid) => {
     let data = await response.json();
     if(data){
         return data.auth;
+    }
+}
+
+let settingVideoSize = () => {
+    let videoContainerS = document.querySelectorAll(".video-container");
+
+    if(videoContainerS.length == 1){
+        document.querySelector(".user-container").style.flexWrap = "nowrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 80%;
+                height: 600px;
+            `;
+        })
+    }else if(videoContainerS.length == 2){
+        document.querySelector(".user-container").style.flexWrap = "nowrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 50%;
+                height: 440px;
+            `;
+        })
+    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
+        document.querySelector(".user-container").style.flexWrap = "wrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 35%;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 300px;
+            `;
+        })
+        let imgBgS = document.querySelectorAll(".img-bg");
+        imgBgS.forEach(img => {
+            img.classList.remove("smaller");
+        })
+    }
+    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
+        document.querySelector(".user-container").style.flexWrap = "wrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+            width: 30%;
+            max-height: 270px;
+            `;
+        })
+        let imgBgS = document.querySelectorAll(".img-bg");
+        imgBgS.forEach(img => {
+            img.classList.add("smaller");
+        })
     }
 }
 
