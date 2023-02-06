@@ -1,4 +1,5 @@
 import utils from "./utils.js";
+// import extension from "./extension.js";
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -25,9 +26,20 @@ const leaveBtn = document.querySelector("#leave-btn");
 const body = document.querySelector("body");
 const bg = document.querySelector(".bg");
 const wrapper = document.querySelector(".wrapper");
+const msgSubmit = document.querySelector("#form-message-submit");
+const messageWrapper = document.querySelector(".message-wrapper");
+const chat = document.querySelector(".chat");
+const sendMessageInput = document.querySelector("#send-message");
+const sendImg =  document.querySelector(".send-img");
+const messageIcon =  document.querySelector(".fa-message");
+const extensionBox = document.querySelector(".extension-box");
 
 let enterRoom = false;
 let disconnect = true;
+
+let tmpMessageClock = null;
+let tmpMessageTime = null;
+let tmpMessageName = null;
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
@@ -354,6 +366,40 @@ socket.on('client-action', async (roomId, clientName, b) => {
         history.go(0);
     }else if(clientName === USER_NAME && !b){
         window.location = "/";
+    }
+})
+
+// chat room
+socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
+    if(ROOM_ID === roomId){
+        if(tmpMessageName === clientName 
+          && tmpMessageTime === timeSlice[0]
+          && tmpMessageClock === timeSlice[1]){
+            let tag = `<div class="message-content">${message}</div>`
+            let messageBlockS = document.querySelectorAll(".message-block");
+            messageBlockS.forEach((block, i) => {
+                if(i === messageBlockS.length-1){
+                    block.insertAdjacentHTML("beforeend", tag);
+                }
+            })
+        }else{
+            let html = `
+            <div class="message-block">
+                <div class="message-title">
+                    <span class="message-name">${clientName}</span>
+                    <span class="message-time">${timeSlice[0]}</span>
+                    <span class="message-clock">${timeSlice[1]}</span>
+                </div>
+                <div class="message-content">${message}</div>
+            </div> 
+            `;
+            messageWrapper.insertAdjacentHTML("beforeend", html);
+        }
+        tmpMessageName = clientName;
+        tmpMessageTime = timeSlice[0];
+        tmpMessageClock = timeSlice[1];
+
+        chat.scrollTo(0, chat.scrollHeight);
     }
 })
 
@@ -777,6 +823,36 @@ let settingVideoSize = () => {
             img.classList.add("smaller");
         })
     }
+}
+
+let messageSubmit = async (e) => {
+    e.preventDefault();
+    let input = document.querySelector("#send-message");
+    let message = input.value;
+    // let currentdate = new Date().toLocaleTimeString();
+    // let time = currentdate.slice(0,2);
+    // let clock = currentdate.slice(2,-3)
+    // if (time === "下午") time = "晚上"
+    input.value = "";
+    socket.emit('chat', ROOM_ID, USER_NAME, message);
+    sendImg.classList.remove("entering");
+}
+
+msgSubmit.addEventListener("submit", messageSubmit);
+
+sendMessageInput.addEventListener("input", ()=>{
+    sendImg.classList.add("entering");
+    if(!sendMessageInput.value){
+        sendImg.classList.remove("entering");
+    }
+})
+
+messageIcon.onclick = () => {
+    messageIcon.classList.toggle("clicked");
+    extensionBox.classList.toggle("show");
+    setTimeout(() => {
+        userContainer.classList.toggle("go-left");
+    }, 100);
 }
 
 // generateShortLink();

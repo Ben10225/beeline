@@ -64,7 +64,12 @@ func main() {
 	server.OnEvent("/", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
 		server.BroadcastToRoom("/", roomId, "client-action", roomId, clientName, b)
 		// server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
-		// s.Emit("client-action", clientName, b)
+	})
+
+	// chat
+	server.OnEvent("/", "chat", func(s socketio.Conn, roomId, clientName, message string) {
+		current := utils.GetCurrentTime()
+		server.BroadcastToRoom("/", roomId, "chat-room", roomId, clientName, current, message)
 	})
 
 	// reconnect

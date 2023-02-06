@@ -306,6 +306,7 @@ body .bg {
   width: 80vw;
   margin-top: 80px;
   min-width: -webkit-min-content;
+  position: relative;
 }
 #video-streams .user-container {
   display: flex;
@@ -315,6 +316,10 @@ body .bg {
   gap: 20px;
   width: 100%;
   height: calc(100vh - 265px);
+  transition: 0.6s;
+}
+#video-streams .user-container.go-left {
+  transform: translateX(-158px);
 }
 #video-streams .user-container .video-container {
   border-radius: 8px;
@@ -428,6 +433,106 @@ body .bg {
   border-radius: 8px;
 }
 
+/* --------    ROOM STYLING | Extension    -------- */
+.extension-wrapper {
+  position: absolute;
+  right: 15px;
+  z-index: 100;
+  position: fixed;
+}
+.extension-wrapper .extension-box {
+  background-color: #ffffff;
+  width: 300px;
+  height: 600px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  transition: 0.4s;
+  transform: translateX(320px);
+  opacity: 0;
+  visibility: hidden;
+}
+.extension-wrapper .extension-box.show {
+  transform: translateX(0);
+  visibility: visible;
+  opacity: 1;
+}
+.extension-wrapper .extension-box .chat {
+  margin-top: 70px;
+  width: 270px;
+  height: 467px;
+  overflow-y: scroll;
+}
+.extension-wrapper .extension-box .chat .message-wrapper {
+  padding-left: 10px;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block {
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title {
+  margin-bottom: 5px;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title .message-time {
+  margin-left: 5px;
+  font-size: 9px;
+  font-weight: 200;
+  margin-right: -3px;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title .message-clock {
+  font-size: 9px;
+  font-weight: 200;
+  letter-spacing: 0.05em;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-content {
+  font-weight: 200;
+  margin-bottom: 10px;
+}
+.extension-wrapper .extension-box .chat .send-wrapper {
+  position: absolute;
+  bottom: 10px;
+}
+.extension-wrapper .extension-box .chat .send-wrapper #send-message {
+  outline: none;
+  background-color: transparent;
+  padding: 12px;
+  border-radius: 40px;
+  border: none;
+  width: 240px;
+  position: absolute;
+}
+.extension-wrapper .extension-box .chat .send-wrapper #send-messagebg {
+  outline: none;
+  background-color: rgb(235, 235, 235);
+  padding: 12px;
+  border-radius: 40px;
+  border: none;
+  width: 270px;
+}
+.extension-wrapper .extension-box .chat .send-wrapper .send-button {
+  border: none;
+  background-color: transparent;
+  position: absolute;
+  transform: scale(0.4);
+  right: 0px;
+  top: -5px;
+}
+.extension-wrapper .extension-box .chat .send-wrapper .send-button .send-img {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  background-image: url(/public/images/message-submit.svg);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 1;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.extension-wrapper .extension-box .chat .send-wrapper .send-button .send-img.entering {
+  background-image: url(/public/images/message-submit-color.svg);
+}
+
 /* --------    ROOM STYLING | Controls    -------- */
 #controls-wrapper {
   display: flex;
@@ -439,6 +544,7 @@ body .bg {
   bottom: 0;
   background-color: #DBA39A;
   height: 90px;
+  z-index: 100;
 }
 #controls-wrapper #room-url-wrapper {
   position: absolute;
@@ -498,4 +604,34 @@ body .bg {
 }
 #leave-btn:hover {
   opacity: 1;
+}
+
+.icon-right-block {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 130px;
+}
+.icon-right-block .fa-message {
+  font-size: 23px;
+  color: rgba(82, 75, 75, 0.5);
+  cursor: pointer;
+  transition: 0.4s;
+}
+.icon-right-block .fa-message.clicked {
+  color: rgb(48, 48, 48);
+}
+
+::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 20px;
 }/*# sourceMappingURL=room.css.map */
