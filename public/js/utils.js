@@ -1,9 +1,18 @@
+const userContainer = document.querySelector(".user-container");
+const infoIcon =  document.querySelector(".fa-circle-info");
+const infoIconBlock = document.querySelector(".icon-right-solo.ic-info");
+const messageIcon =  document.querySelector(".fa-message");
+const messageIconBlock = document.querySelector(".icon-right-solo.ic-message");
+const extensionBox = document.querySelector(".extension-box");
+const chat = document.querySelector(".chat");
+const info = document.querySelector(".info");
+const exitIcon = document.querySelector(".exit");
+
+const iconLst = [infoIcon, messageIcon];
+
 let auth = async (page) => {
     let response = await fetch(`/api/auth`);
     let data = await response.json();
-    // if(page === "index"){
-
-    // }
     if(page === "index" && data.ok){
         setTimeout(() => {
             document.querySelector(".loading").remove();
@@ -119,9 +128,76 @@ let copyContent = async (url) => {
     }
 }
 
+let rightIconsInit = () => {
+
+    infoIconBlock.onclick = () => {
+        if(!infoIcon.classList.contains("clicked")){
+            infoIcon.classList.add("clicked");
+            messageIcon.classList.remove("clicked");
+            info.classList.add("info-show");
+            chat.classList.remove("chat-show");
+            if(!extensionBox.classList.contains("show")){
+                extensionBox.classList.add("show");
+                setTimeout(() => {
+                    userContainer.classList.add("go-left");
+                }, 100);
+            }
+        }else{
+            infoIcon.classList.remove("clicked");
+            setTimeout(() => {
+                info.classList.remove("info-show");
+            }, 300)
+            if(extensionBox.classList.contains("show")){
+                extensionBox.classList.remove("show");
+                setTimeout(() => {
+                    userContainer.classList.remove("go-left");
+                }, 100);
+            }
+        }
+    }
+    
+    messageIconBlock.onclick = () => {
+        if(!messageIcon.classList.contains("clicked")){
+            messageIcon.classList.add("clicked");
+            infoIcon.classList.remove("clicked");
+            chat.classList.add("chat-show");
+            info.classList.remove("info-show");
+            if(!extensionBox.classList.contains("show")){
+                extensionBox.classList.add("show");
+                setTimeout(() => {
+                    userContainer.classList.add("go-left");
+                }, 100);
+            }
+        }else{
+            messageIcon.classList.remove("clicked");
+            setTimeout(() => {
+                chat.classList.remove("chat-show");
+            }, 300)
+            if(extensionBox.classList.contains("show")){
+                extensionBox.classList.remove("show");
+                setTimeout(() => {
+                    userContainer.classList.remove("go-left");
+                }, 100);
+            }
+        }
+    }
+
+    exitIcon.onclick = () => {
+        iconLst.forEach(dom => {
+            dom.classList.remove("clicked");
+        })
+        extensionBox.classList.remove("show");
+        setTimeout(() => {
+            userContainer.classList.remove("go-left");
+        }, 100);
+
+    }
+}
+
 
 export default {
     auth,
     checkIfAuthAlready,
-    generateShortLink
+    generateShortLink,
+    rightIconsInit,
 }

@@ -12,13 +12,16 @@ body{
     // background-color: #E6D9C1;
     font-family: 'Roboto', sans-serif;
     .bg{
-        background-image: url('/public/images/yellow_hexagonal_pattern.svg');
+        background-image: url('/public/images/waiting-bg.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
+        position: fixed;
         width: 100%;
-        height: 1000px;
-        opacity: 0.05;
+        height: 100vh;
+        // height: 1000px;
+        opacity: 1;
+        // opacity: 0.05;
         position: fixed;
         z-index: -1;
     }
@@ -75,6 +78,30 @@ body{
         vertical-align: middle;
         box-shadow: 2px 2px 4px rgba(#000000, 0.3);
         margin-top: 10px;
+        animation: alertIn 0.4s both;
+        &.alert-click{
+            animation: alertOut 0.4s both;
+        }
+        @keyframes alertIn {
+            0%{
+                transform: translateY(-10px);
+                opacity: 0;    
+            }
+            100%{
+                transform: translateY(0px);
+                opacity: 1;    
+            }
+        }
+        @keyframes alertOut {
+            0%{
+                transform: translateY(0px);
+                opacity: 1;   
+            }
+            100%{
+                transform: translateY(-10px);
+                opacity: 0;   
+            }
+        }
         .alert-user-img{
             width: 23px;
             height: 23px;
@@ -137,8 +164,30 @@ body{
     flex-direction: row;
     position: relative;
     top: -7%;
+    background-color: #fff;
+    padding: 70px;
+    border-radius: 15px;
+    box-shadow: 5px 5px 10px rgba(#000, 0.4);
+    .waiting-exit{
+        width: 30px;
+        height: 30px;
+        background-image: url('/public/images/extension-x.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        position: absolute;
+        right: 25px;
+        top: 25px;
+        opacity: 0.2;
+        transition: 0.3s;
+        z-index: 100;
+        cursor: pointer;
+        &:hover{
+            opacity: 0.6;
+        }
+    }
     .setup-container{
-        border: 3px solid rgb(219, 154, 172);
+        // border: 3px solid rgb(219, 154, 172);
         border-radius: 8px;
         background-color: #777;
         height: 100%;
@@ -218,14 +267,25 @@ body{
                 position: absolute;
                 z-index: 100;
                 left: 50%;
-                top: 115%;
+                top: 103%;
                 transform: translateX(-50%);
                 user-select: none;
-                .control-icon{
+                .setup-control-icon{
+                    width: 43px;
+                    height: 43px;
+                    cursor: pointer;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    opacity: 0.8;
+                    transition: 0.3s;
                     display: inline-block;
+                    &:hover{
+                        opacity: 0.7;
+                    }
                     &#setting-audio-btn{
                         position: relative;
-                        left: -15px;
+                        left: -7px;
                         background-image: url('/public/images/setting_micro_icon.svg');
                         &.disable{
                             background-image: url('/public/images/micro_disable_icon.svg');
@@ -233,7 +293,7 @@ body{
                     }
                     &#setting-camera-btn{
                         position: relative;
-                        left: 15px;
+                        left: 7px;
                         background-image: url('/public/images/setting_camera_icon.svg');
                         &.disable{
                             background-image: url('/public/images/camera_disable_icon.svg');
@@ -249,9 +309,10 @@ body{
         display: flex;
         justify-content: center;
         flex-direction: column;
+        margin-left: 20px;
         h2{
-            margin-top: 30px;
-            margin-bottom: 40px;
+            margin-top: 20px;
+            margin-bottom: 50px;
             font-size: 28px;
             color: #555;
         }
@@ -268,13 +329,13 @@ body{
                 font-size: 18px;
                 border-radius: 7px;
                 border: none;
-                background-color: #DBA39A;
+                background-color: #df9c4a;
                 color: #fff;
-                opacity: 0.5;
+                opacity: 0.4;
                 transition: 0.4s;
                 display: inline-block;
                 &:hover{
-                    opacity: 1;
+                    opacity: 0.9;
                 }
             }
             .request-gif{
@@ -489,6 +550,24 @@ body{
             transform: translateX(0);
             visibility: visible;
             opacity: 1;
+        }
+        .exit{
+            width: 20px;
+            height: 20px;
+            background-image: url('/public/images/extension-x.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            position: absolute;
+            right: 17px;
+            top: 17px;
+            opacity: 0.2;
+            transition: 0.3s;
+            z-index: 100;
+            cursor: pointer;
+            &:hover{
+                opacity: 0.6;
+            }
         }
         .info{
             position: absolute;
@@ -820,26 +899,39 @@ body{
     align-items: center;
     position: absolute;
     right: 130px;
-    .fa-circle-info{
-        position: relative;
-        top: -1px;
-        margin-right: 15px;
-        font-size: 25px;
-        color: rgba(82, 75, 75, 0.5);
+    .icon-right-solo{
+        width: 50px;
+        height: 50px;
+        background-color: rgba(#999, 0);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 5px;
+        transition: 0.3s;
         cursor: pointer;
-        transition: 0.4s;
-        &.clicked{
-            color: rgb(48, 48, 48);
+        &:hover{
+            background-color: rgba(#cfcfcf, 0.2);
         }
-    }
-    .fa-message{
-        margin-right: 15px;
-        font-size: 23px;
-        color: rgba(82, 75, 75, 0.5);
-        cursor: pointer;
-        transition: 0.4s;
-        &.clicked{
-            color: rgb(48, 48, 48);
+        .fa-circle-info{
+            position: relative;
+            top: -1px;
+            font-size: 25px;
+            color: rgba(82, 75, 75, 0.5);
+            cursor: pointer;
+            transition: 0.4s;
+            &.clicked{
+                color: rgb(48, 48, 48);
+            }
+        }
+        .fa-message{
+            font-size: 23px;
+            color: rgba(82, 75, 75, 0.5);
+            cursor: pointer;
+            transition: 0.4s;
+            &.clicked{
+                color: rgb(48, 48, 48);
+            }
         }
     }
 }

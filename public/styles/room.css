@@ -10,13 +10,14 @@ body {
   font-family: "Roboto", sans-serif;
 }
 body .bg {
-  background-image: url("/public/images/yellow_hexagonal_pattern.svg");
+  background-image: url("/public/images/waiting-bg.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  position: fixed;
   width: 100%;
-  height: 1000px;
-  opacity: 0.05;
+  height: 100vh;
+  opacity: 1;
   position: fixed;
   z-index: -1;
 }
@@ -71,6 +72,52 @@ body .bg {
   vertical-align: middle;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   margin-top: 10px;
+  -webkit-animation: alertIn 0.4s both;
+          animation: alertIn 0.4s both;
+}
+.client-alert .alert-block.alert-click {
+  -webkit-animation: alertOut 0.4s both;
+          animation: alertOut 0.4s both;
+}
+@-webkit-keyframes alertIn {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@keyframes alertIn {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@-webkit-keyframes alertOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}
+@keyframes alertOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
 }
 .client-alert .alert-block .alert-user-img {
   width: 23px;
@@ -135,9 +182,30 @@ body .bg {
   flex-direction: row;
   position: relative;
   top: -7%;
+  background-color: #fff;
+  padding: 70px;
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
+}
+#user-setup .waiting-exit {
+  width: 30px;
+  height: 30px;
+  background-image: url("/public/images/extension-x.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  opacity: 0.2;
+  transition: 0.3s;
+  z-index: 100;
+  cursor: pointer;
+}
+#user-setup .waiting-exit:hover {
+  opacity: 0.6;
 }
 #user-setup .setup-container {
-  border: 3px solid rgb(219, 154, 172);
   border-radius: 8px;
   background-color: #777;
   height: 100%;
@@ -223,30 +291,41 @@ body .bg {
   position: absolute;
   z-index: 100;
   left: 50%;
-  top: 115%;
+  top: 103%;
   transform: translateX(-50%);
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
-#user-setup .setup-container .setup-player .icon-wrapper .control-icon {
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon {
+  width: 43px;
+  height: 43px;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.8;
+  transition: 0.3s;
   display: inline-block;
 }
-#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-audio-btn {
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon:hover {
+  opacity: 0.7;
+}
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-audio-btn {
   position: relative;
-  left: -15px;
+  left: -7px;
   background-image: url("/public/images/setting_micro_icon.svg");
 }
-#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-audio-btn.disable {
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-audio-btn.disable {
   background-image: url("/public/images/micro_disable_icon.svg");
 }
-#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-camera-btn {
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-camera-btn {
   position: relative;
-  left: 15px;
+  left: 7px;
   background-image: url("/public/images/setting_camera_icon.svg");
 }
-#user-setup .setup-container .setup-player .icon-wrapper .control-icon#setting-camera-btn.disable {
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-camera-btn.disable {
   background-image: url("/public/images/camera_disable_icon.svg");
 }
 #user-setup .setting-options {
@@ -255,10 +334,11 @@ body .bg {
   display: flex;
   justify-content: center;
   flex-direction: column;
+  margin-left: 20px;
 }
 #user-setup .setting-options h2 {
-  margin-top: 30px;
-  margin-bottom: 40px;
+  margin-top: 20px;
+  margin-bottom: 50px;
   font-size: 28px;
   color: #555;
 }
@@ -276,14 +356,14 @@ body .bg {
   font-size: 18px;
   border-radius: 7px;
   border: none;
-  background-color: #DBA39A;
+  background-color: #df9c4a;
   color: #fff;
-  opacity: 0.5;
+  opacity: 0.4;
   transition: 0.4s;
   display: inline-block;
 }
 #user-setup .setting-options .button-block #enter-request:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 #user-setup .setting-options .button-block .request-gif {
   width: 40px;
@@ -456,6 +536,24 @@ body .bg {
   transform: translateX(0);
   visibility: visible;
   opacity: 1;
+}
+.extension-wrapper .extension-box .exit {
+  width: 20px;
+  height: 20px;
+  background-image: url("/public/images/extension-x.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  right: 17px;
+  top: 17px;
+  opacity: 0.2;
+  transition: 0.3s;
+  z-index: 100;
+  cursor: pointer;
+}
+.extension-wrapper .extension-box .exit:hover {
+  opacity: 0.6;
 }
 .extension-wrapper .extension-box .info {
   position: absolute;
@@ -783,26 +881,39 @@ body .bg {
   position: absolute;
   right: 130px;
 }
-.icon-right-block .fa-circle-info {
+.icon-right-block .icon-right-solo {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(153, 153, 153, 0);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.icon-right-block .icon-right-solo:hover {
+  background-color: rgba(207, 207, 207, 0.2);
+}
+.icon-right-block .icon-right-solo .fa-circle-info {
   position: relative;
   top: -1px;
-  margin-right: 15px;
   font-size: 25px;
   color: rgba(82, 75, 75, 0.5);
   cursor: pointer;
   transition: 0.4s;
 }
-.icon-right-block .fa-circle-info.clicked {
+.icon-right-block .icon-right-solo .fa-circle-info.clicked {
   color: rgb(48, 48, 48);
 }
-.icon-right-block .fa-message {
-  margin-right: 15px;
+.icon-right-block .icon-right-solo .fa-message {
   font-size: 23px;
   color: rgba(82, 75, 75, 0.5);
   cursor: pointer;
   transition: 0.4s;
 }
-.icon-right-block .fa-message.clicked {
+.icon-right-block .icon-right-solo .fa-message.clicked {
   color: rgb(48, 48, 48);
 }
 

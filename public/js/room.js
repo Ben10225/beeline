@@ -31,11 +31,13 @@ const messageWrapper = document.querySelector(".message-wrapper");
 const sendWrapper = document.querySelector(".send-wrapper");
 const sendMessageInput = document.querySelector("#send-message");
 const sendImg =  document.querySelector(".send-img");
-const infoIcon =  document.querySelector(".fa-circle-info");
-const messageIcon =  document.querySelector(".fa-message");
-const extensionBox = document.querySelector(".extension-box");
-const chat = document.querySelector(".chat");
-const info = document.querySelector(".info");
+// const infoIcon =  document.querySelector(".fa-circle-info");
+// const infoIconBlock = document.querySelector(".icon-right-solo.ic-info");
+// const messageIcon =  document.querySelector(".fa-message");
+// const messageIconBlock = document.querySelector(".icon-right-solo.ic-message");
+// const extensionBox = document.querySelector(".extension-box");
+// const chat = document.querySelector(".chat");
+// const info = document.querySelector(".info");
 
 
 let enterRoom = false;
@@ -112,6 +114,7 @@ navigator.mediaDevices.getUserMedia({
         bg.style.backgroundImage = "url('/public/images/roombg2.svg')";;
         bg.style.opacity = "0.15";
         wrapper.style.justifyContent = "flex-start";
+        document.querySelector("#user-setup").remove();
 
         utils.generateShortLink();
         // 進房時監聽
@@ -129,6 +132,7 @@ navigator.mediaDevices.getUserMedia({
 
     }else if(!auth){
         document.querySelector("#video-streams").remove();
+        document.querySelector("#controls-wrapper").remove();
 
         const video = document.createElement("video");
         video.muted = true;
@@ -151,10 +155,8 @@ navigator.mediaDevices.getUserMedia({
             `;
         }
         let player = `
+        <div class="waiting-exit"></div>
         <div class="setup-container">
-            <div class="username-wrapper">
-                <span class="user-name">${USER_NAME}</span>
-            </div>
             <div class="setup-player" id="user-${USER_ID}">
                 <div class="micro-status-icon local"></div>
                 <div class="user-block local">
@@ -163,8 +165,8 @@ navigator.mediaDevices.getUserMedia({
                     </div>
                 </div>
                 <div class="icon-wrapper">
-                    <div class="control-icon" id="setting-audio-btn"></div>
-                    <div class="control-icon" id="setting-camera-btn"></div>
+                    <div class="setup-control-icon" id="setting-audio-btn"></div>
+                    <div class="setup-control-icon" id="setting-camera-btn"></div>
                 </div>
             </div>
         </div>
@@ -182,10 +184,7 @@ navigator.mediaDevices.getUserMedia({
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
 
-        audioBtn.remove();
-        cameraBtn.remove();
         const btn = document.querySelector("#enter-request");
-
         btn.onclick = () => {
             socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
             btn.style = `pointer-events: none; opacity: 0.3;`;
@@ -203,13 +202,15 @@ navigator.mediaDevices.getUserMedia({
             toggleCamera(stream, settingCameraBtn);
         }
 
-        leaveBtn.onclick = () => {
-            removeMongoRoomData(ROOM_ID, USER_ID, auth);
+
+        document.querySelector(".waiting-exit").onclick = () => {
+            // removeMongoRoomData(ROOM_ID, USER_ID, auth);
+            refuseUserInRoom(ROOM_ID, USER_ID);
             window.location = "/";
         }
 
         window.onunload = () => {
-            removeMongoRoomData(ROOM_ID, USER_ID, auth);
+            refuseUserInRoom(ROOM_ID, USER_ID);
         }
 
         insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
@@ -352,15 +353,22 @@ socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
         document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
         new Audio("/public/audio/client-request.mp3").play();
 
+        let alert = document.querySelector(`#alert-user-${clientUuid}`);
         let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
         clientAllow.onclick = () => {
-            document.querySelector(`#alert-user-${clientUuid}`).remove();
+            alert.classList.add("alert-click");
+            setTimeout(() => {
+                alert.remove();
+            } ,500)
             socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
         }
 
         let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
         clientRefuse.onclick = () => {
-            document.querySelector(`#alert-user-${clientUuid}`).remove();
+            alert.classList.add("alert-click");
+            setTimeout(() => {
+                alert.remove();
+            } ,500)
             socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
             // 需要改成 delete 不只設 leave
@@ -885,6 +893,8 @@ let messageSubmit = async (e) => {
     // if (time === "下午") time = "晚上"
 }
 
+utils.rightIconsInit();
+
 msgSubmit.addEventListener("submit", messageSubmit);
 
 sendMessageInput.addEventListener("input", ()=>{
@@ -893,58 +903,6 @@ sendMessageInput.addEventListener("input", ()=>{
         sendImg.classList.remove("entering");
     }
 })
-
-infoIcon.onclick = () => {
-    if(!infoIcon.classList.contains("clicked")){
-        infoIcon.classList.add("clicked");
-        messageIcon.classList.remove("clicked");
-        info.classList.add("info-show");
-        chat.classList.remove("chat-show");
-        if(!extensionBox.classList.contains("show")){
-            extensionBox.classList.add("show");
-            setTimeout(() => {
-                userContainer.classList.add("go-left");
-            }, 100);
-        }
-    }else{
-        infoIcon.classList.remove("clicked");
-        setTimeout(() => {
-            info.classList.remove("info-show");
-        }, 300)
-        if(extensionBox.classList.contains("show")){
-            extensionBox.classList.remove("show");
-            setTimeout(() => {
-                userContainer.classList.remove("go-left");
-            }, 100);
-        }
-    }
-}
-
-messageIcon.onclick = () => {
-    if(!messageIcon.classList.contains("clicked")){
-        messageIcon.classList.add("clicked");
-        infoIcon.classList.remove("clicked");
-        chat.classList.add("chat-show");
-        info.classList.remove("info-show");
-        if(!extensionBox.classList.contains("show")){
-            extensionBox.classList.toggle("show");
-            setTimeout(() => {
-                userContainer.classList.toggle("go-left");
-            }, 100);
-        }
-    }else{
-        messageIcon.classList.remove("clicked");
-        setTimeout(() => {
-            chat.classList.remove("chat-show");
-        }, 300)
-        if(extensionBox.classList.contains("show")){
-            extensionBox.classList.remove("show");
-            setTimeout(() => {
-                userContainer.classList.remove("go-left");
-            }, 100);
-        }
-    }
-}
 
 
 let switchInputInit = () => {
