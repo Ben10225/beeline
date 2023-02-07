@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beeline</title>
 
+    <link rel="icon" type = "image/png" href = "/public/images/browser_logo.png">
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.css' integrity='sha512-FA9cIbtlP61W0PRtX36P6CGRy0vZs0C2Uw26Q1cMmj3xwhftftymr0sj8/YeezDnRwL9wtWw8ZwtCiTDXlXGjQ==' crossorigin='anonymous'/>
     <link rel="stylesheet" href="/public/styles/room.css">
     <!-- <style>
@@ -30,46 +31,70 @@
     <div class="wrapper">
         <div class="client-alert"></div>
 
-
-
-        <div id="user-setup"></div>
-        <section id="video-streams">
-            <div class="extension-wrapper">
-                <div class="extension-box">
-                    <div class="chat">
-                        <div class="message-wrapper">
-                            <!-- <div class="message-block">
-                                <div class="message-title">
-                                    <span class="message-name">ben peng</span>
-                                    <span class="message-time">晚上</span>
-                                    <span class="message-clock">9:43</span>
-                                </div>
-                                <div class="message-content">早安早安</div>
-                                <div class="message-content">早安早安</div>
+        <div class="extension-wrapper">
+            <div class="extension-box">
+                <div class="info">
+                    <h2>Room's information</h2>
+                    <div class="info-details">
+                        <p class="info-p">Joining info</p>
+                        <p class="copy-link-txt"></p>
+                        <div class="copy-block">
+                            <i class="fa-regular fa-copy"></i>
+                            <p>Copy joining info</p>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+                <div class="chat">
+                    <h2>In-call messages</h2>
+                    <div class="allow-click">
+                        <p>Let everyone send messages</p>
+                        <div class="switch-button">
+                            <input type="checkbox" id="switch" />
+                            <label for="switch">
+                                <span class="switch-txt" turnOn="On" turnOff="Off"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="chat-caution">
+                        <p>Message can only be seen by people in the call and are deleted when the call ends</p>
+                    </div>
+                    <div class="message-wrapper">
+                        <!-- <div class="message-block">
+                            <div class="message-title">
+                                <span class="message-name">ben peng</span>
+                                <span class="message-time">晚上</span>
+                                <span class="message-clock">9:43</span>
                             </div>
-
-                            <div class="message-block">
-                                <div class="message-title">
-                                    <span class="message-name">ben peng</span>
-                                    <span class="message-time">晚上</span>
-                                    <span class="message-clock">9:43</span>
-                                </div>
-                                <div class="message-content">早安早安</div>
-                            </div> -->
+                            <div class="message-content">早安早安</div>
+                            <div class="message-content">早安早安</div>
                         </div>
 
-                        <div class="send-wrapper">
-                            <form id="form-message-submit">
-                                <input id="send-message" type="text" placeholder="傳送訊息給所有人" autocomplete="off">
-                                <input id="send-messagebg" autocomplete="off" disabled>
-                                <button class="send-button">
-                                    <div class="send-img"></div>
-                                </button>
-                            </form>
-                        </div>
+                        <div class="message-block">
+                            <div class="message-title">
+                                <span class="message-name">ben peng</span>
+                                <span class="message-time">晚上</span>
+                                <span class="message-clock">9:43</span>
+                            </div>
+                            <div class="message-content">早安早安</div>
+                        </div> -->
+                    </div>
+
+                    <div class="send-wrapper">
+                        <form id="form-message-submit">
+                            <input id="send-message" type="text" placeholder="Send a message to everyone" autocomplete="off">
+                            <input id="send-messagebg" autocomplete="off" disabled>
+                            <button class="send-button">
+                                <div class="send-img"></div>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div id="user-setup"></div>
+        <section id="video-streams">
             <div class="user-container"></div>
         </section>
 
@@ -92,6 +117,7 @@
             </div>
 
             <div class="icon-right-block">
+                <i class="fa-solid fa-circle-info"></i>
                 <i class="fa-solid fa-message"></i>
             </div>
         </section>

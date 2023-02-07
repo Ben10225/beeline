@@ -15,17 +15,23 @@ func GetCurrentTime() []string {
 	}
 
 	var ti string
-	if hour <= 5 {
-		ti = "凌晨"
-	} else if hour <= 11 {
-		ti = "上午"
-	} else if hour <= 17 {
-		ti = "下午"
+	// if hour <= 5 {
+	// 	ti = "凌晨"
+	// } else if hour <= 11 {
+	// 	ti = "上午"
+	// } else if hour <= 17 {
+	// 	ti = "下午"
+	// } else {
+	// 	ti = "晚上"
+	// }
+
+	if hour <= 11 {
+		ti = "AM"
 	} else {
-		ti = "晚上"
+		ti = "PM"
 	}
 	hourStr := strconv.Itoa(hour)
-	result := []string{ti, fmt.Sprintf("%v:%v", hourStr, minute)}
+	result := []string{fmt.Sprintf("%v:%v", hourStr, minute), ti}
 
 	return result
 }

@@ -443,7 +443,7 @@ body .bg {
 .extension-wrapper .extension-box {
   background-color: #ffffff;
   width: 300px;
-  height: 600px;
+  height: calc(100vh - 115px);
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -457,14 +457,166 @@ body .bg {
   visibility: visible;
   opacity: 1;
 }
-.extension-wrapper .extension-box .chat {
-  margin-top: 70px;
+.extension-wrapper .extension-box .info {
+  position: absolute;
   width: 270px;
-  height: 467px;
-  overflow-y: scroll;
+  opacity: 0;
+  visibility: hidden;
+}
+.extension-wrapper .extension-box .info.info-show {
+  opacity: 1;
+  visibility: visible;
+}
+.extension-wrapper .extension-box .info h2 {
+  margin-top: 20px;
+  font-size: 18px;
+  margin-left: 10px;
+}
+.extension-wrapper .extension-box .info .info-details {
+  margin-top: 45px;
+}
+.extension-wrapper .extension-box .info .info-details .info-p {
+  margin-left: 10px;
+  font-size: 15px;
+  font-weight: 400;
+  margin-top: 10px;
+  color: #777;
+  margin-bottom: 15px;
+}
+.extension-wrapper .extension-box .info .info-details .copy-link-txt {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #777;
+  margin-bottom: 15px;
+}
+.extension-wrapper .extension-box .info .info-details .copy-block {
+  cursor: pointer;
+  margin-bottom: 40px;
+  margin-left: 10px;
+  transition: 0.4s;
+}
+.extension-wrapper .extension-box .info .info-details .copy-block .fa-copy {
+  display: inline-block;
+  margin-right: 6px;
+  position: relative;
+  top: 2px;
+  color: #367cea;
+}
+.extension-wrapper .extension-box .info .info-details .copy-block p {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 400;
+  color: #367cea;
+}
+.extension-wrapper .extension-box .info .info-details hr {
+  width: 80%;
+  margin: auto;
+}
+.extension-wrapper .extension-box .chat {
+  width: 270px;
+  opacity: 0;
+  visibility: hidden;
+}
+.extension-wrapper .extension-box .chat.chat-show {
+  opacity: 1;
+  visibility: visible;
+}
+.extension-wrapper .extension-box .chat h2 {
+  margin-top: 20px;
+  margin-left: 10px;
+  font-size: 18px;
+}
+.extension-wrapper .extension-box .chat .allow-click {
+  margin-top: 15px;
+  background-color: rgb(235, 235, 235);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: relative;
+}
+.extension-wrapper .extension-box .chat .allow-click p {
+  font-weight: 300;
+  font-size: 10px;
+  text-align: left;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button {
+  position: absolute;
+  right: 15px;
+  top: -12px;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button input[type=checkbox] {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button label {
+  cursor: pointer;
+  width: 35px;
+  height: 21px;
+  background: #999;
+  display: block;
+  border-radius: 100px;
+  position: relative;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button label:after {
+  content: "";
+  position: absolute;
+  top: 2.5px;
+  left: 2.5px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button .switch-txt::before, .extension-wrapper .extension-box .chat .allow-click .switch-button .switch-txt::after {
+  display: block;
+  color: #fff;
+  font-weight: bold;
+  box-sizing: border-box;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button .switch-txt::before {
+  content: "";
+  color: #fff;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button .switch-txt::after {
+  content: "";
+  color: #ccc;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button input:checked + label {
+  background: #e6968a;
+}
+.extension-wrapper .extension-box .chat .allow-click .switch-button input:checked + label:after {
+  left: calc(100% - 2.5px);
+  transform: translateX(-100%);
+}
+.extension-wrapper .extension-box .chat .chat-caution {
+  margin-top: 15px;
+  background-color: rgb(235, 235, 235);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.extension-wrapper .extension-box .chat .chat-caution p {
+  font-weight: 300;
+  font-size: 10px;
+  text-align: center;
+  line-height: 16px;
 }
 .extension-wrapper .extension-box .chat .message-wrapper {
   padding-left: 10px;
+  margin-top: 20px;
+  height: calc(100vh - 353px);
+  overflow-y: scroll;
+}
+.extension-wrapper .extension-box .chat .message-wrapper.add-disabled {
+  opacity: 0.4;
 }
 .extension-wrapper .extension-box .chat .message-wrapper .message-block {
   font-size: 13px;
@@ -473,15 +625,18 @@ body .bg {
 .extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title {
   margin-bottom: 5px;
 }
-.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title .message-time {
-  margin-left: 5px;
-  font-size: 9px;
-  font-weight: 200;
-  margin-right: -3px;
-}
 .extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title .message-clock {
-  font-size: 9px;
+  margin-left: 5px;
+  font-size: 6px;
   font-weight: 200;
+  letter-spacing: 0.05em;
+  margin-right: 0px;
+  color: #444;
+}
+.extension-wrapper .extension-box .chat .message-wrapper .message-block .message-title .message-time {
+  font-size: 6px;
+  font-weight: 200;
+  color: #444;
   letter-spacing: 0.05em;
 }
 .extension-wrapper .extension-box .chat .message-wrapper .message-block .message-content {
@@ -491,6 +646,9 @@ body .bg {
 .extension-wrapper .extension-box .chat .send-wrapper {
   position: absolute;
   bottom: 10px;
+}
+.extension-wrapper .extension-box .chat .send-wrapper.add-disabled {
+  opacity: 0.4;
 }
 .extension-wrapper .extension-box .chat .send-wrapper #send-message {
   outline: none;
@@ -613,7 +771,20 @@ body .bg {
   position: absolute;
   right: 130px;
 }
+.icon-right-block .fa-circle-info {
+  position: relative;
+  top: -1px;
+  margin-right: 15px;
+  font-size: 25px;
+  color: rgba(82, 75, 75, 0.5);
+  cursor: pointer;
+  transition: 0.4s;
+}
+.icon-right-block .fa-circle-info.clicked {
+  color: rgb(48, 48, 48);
+}
 .icon-right-block .fa-message {
+  margin-right: 15px;
   font-size: 23px;
   color: rgba(82, 75, 75, 0.5);
   cursor: pointer;

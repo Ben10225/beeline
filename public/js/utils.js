@@ -97,8 +97,31 @@ let checkIfAuthAlready = async (roomId) => {
     }
 }
 
+let generateShortLink = async () => {
+    let currentUrl = window.location.href.split("?")[0];
+    document.querySelector(".copy-link-txt").textContent = currentUrl;
+    const copyBlock = document.querySelector(".copy-block");
+    copyBlock.addEventListener("click", ()=>{
+        copyContent(currentUrl);
+        copyBlock.style.opacity = "0.5";
+        setTimeout(()=>{
+            copyBlock.style.opacity = "1";
+        }, 700)
+    })
+}
+
+
+let copyContent = async (url) => {
+    try {
+        await navigator.clipboard.writeText(url)
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+    }
+}
+
 
 export default {
     auth,
-    checkIfAuthAlready
+    checkIfAuthAlready,
+    generateShortLink
 }

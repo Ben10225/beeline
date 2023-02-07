@@ -28,11 +28,16 @@ const bg = document.querySelector(".bg");
 const wrapper = document.querySelector(".wrapper");
 const msgSubmit = document.querySelector("#form-message-submit");
 const messageWrapper = document.querySelector(".message-wrapper");
-const chat = document.querySelector(".chat");
+const sendWrapper = document.querySelector(".send-wrapper");
 const sendMessageInput = document.querySelector("#send-message");
 const sendImg =  document.querySelector(".send-img");
+const infoIcon =  document.querySelector(".fa-circle-info");
 const messageIcon =  document.querySelector(".fa-message");
 const extensionBox = document.querySelector(".extension-box");
+const chat = document.querySelector(".chat");
+const info = document.querySelector(".info");
+const switchInput = document.querySelector("#switch");
+
 
 let enterRoom = false;
 let disconnect = true;
@@ -107,6 +112,7 @@ navigator.mediaDevices.getUserMedia({
         bg.style.opacity = "0.15";
         wrapper.style.justifyContent = "flex-start";
 
+        utils.generateShortLink();
         // 進房時監聽
         addVideoStream(myVideo, stream, true);
         myPeer.on('call', function(call){
@@ -120,12 +126,11 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
-        // let connectPeer = () => {
-        //     myPeer.on('open', async id => {
-        //         socket.emit('join-room', ROOM_ID, id);
-        //     })
-        // }
-        // connectPeer();
+        if(!auth){
+            document.querySelector(".allow-click").remove();
+            document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
+        }
+
     }else if(!auth){
         document.querySelector("#video-streams").remove();
 
@@ -373,8 +378,8 @@ socket.on('client-action', async (roomId, clientName, b) => {
 socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
     if(ROOM_ID === roomId){
         if(tmpMessageName === clientName 
-          && tmpMessageTime === timeSlice[0]
-          && tmpMessageClock === timeSlice[1]){
+          && tmpMessageClock === timeSlice[0]
+          && tmpMessageTime === timeSlice[1]){
             let tag = `<div class="message-content">${message}</div>`
             let messageBlockS = document.querySelectorAll(".message-block");
             messageBlockS.forEach((block, i) => {
@@ -387,8 +392,8 @@ socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
             <div class="message-block">
                 <div class="message-title">
                     <span class="message-name">${clientName}</span>
-                    <span class="message-time">${timeSlice[0]}</span>
-                    <span class="message-clock">${timeSlice[1]}</span>
+                    <span class="message-clock">${timeSlice[0]}</span>
+                    <span class="message-time">${timeSlice[1]}</span>
                 </div>
                 <div class="message-content">${message}</div>
             </div> 
@@ -396,10 +401,10 @@ socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
             messageWrapper.insertAdjacentHTML("beforeend", html);
         }
         tmpMessageName = clientName;
-        tmpMessageTime = timeSlice[0];
-        tmpMessageClock = timeSlice[1];
+        tmpMessageClock = timeSlice[0];
+        tmpMessageTime = timeSlice[1];
 
-        chat.scrollTo(0, chat.scrollHeight);
+        messageWrapper.scrollTo(0, messageWrapper.scrollHeight);
     }
 })
 
@@ -639,28 +644,6 @@ let getRemoteUser = async (roomId, remoteUuid) => {
     }
 }
 
-let generateShortLink = async () => {
-    let currentUrl = window.location.href;
-    const copyIcon = document.querySelector(".fa-copy");
-    document.querySelector("#room-url").textContent = currentUrl;
-    copyIcon.addEventListener("click", ()=>{
-        copyContent(currentUrl);
-        copyIcon.style.opacity = "0.8";
-        setTimeout(()=>{
-            copyIcon.style.opacity = "0.3";
-        }, 700)
-    })
-}
-
-
-let copyContent = async (url) => {
-    try {
-        await navigator.clipboard.writeText(url)
-    } catch (err) {
-        console.error('Failed to copy: ', err);
-    }
-}
-
 let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth) => {
     let response = await fetch(`/room/setusertoroom`, {
         method: "POST",
@@ -829,13 +812,15 @@ let messageSubmit = async (e) => {
     e.preventDefault();
     let input = document.querySelector("#send-message");
     let message = input.value;
+    if (!message) return
+    input.value = "";
+    socket.emit('chat', ROOM_ID, USER_NAME, message);
+    sendImg.classList.remove("entering");
+
     // let currentdate = new Date().toLocaleTimeString();
     // let time = currentdate.slice(0,2);
     // let clock = currentdate.slice(2,-3)
     // if (time === "下午") time = "晚上"
-    input.value = "";
-    socket.emit('chat', ROOM_ID, USER_NAME, message);
-    sendImg.classList.remove("entering");
 }
 
 msgSubmit.addEventListener("submit", messageSubmit);
@@ -847,16 +832,67 @@ sendMessageInput.addEventListener("input", ()=>{
     }
 })
 
-messageIcon.onclick = () => {
-    messageIcon.classList.toggle("clicked");
-    extensionBox.classList.toggle("show");
-    setTimeout(() => {
-        userContainer.classList.toggle("go-left");
-    }, 100);
+infoIcon.onclick = () => {
+    if(!infoIcon.classList.contains("clicked")){
+        infoIcon.classList.add("clicked");
+        messageIcon.classList.remove("clicked");
+        info.classList.add("info-show");
+        chat.classList.remove("chat-show");
+        if(!extensionBox.classList.contains("show")){
+            extensionBox.classList.add("show");
+            setTimeout(() => {
+                userContainer.classList.add("go-left");
+            }, 100);
+        }
+    }else{
+        infoIcon.classList.remove("clicked");
+        setTimeout(() => {
+            info.classList.remove("info-show");
+        }, 300)
+        if(extensionBox.classList.contains("show")){
+            extensionBox.classList.remove("show");
+            setTimeout(() => {
+                userContainer.classList.remove("go-left");
+            }, 100);
+        }
+    }
 }
 
-// generateShortLink();
+messageIcon.onclick = () => {
+    if(!messageIcon.classList.contains("clicked")){
+        messageIcon.classList.add("clicked");
+        infoIcon.classList.remove("clicked");
+        chat.classList.add("chat-show");
+        info.classList.remove("info-show");
+        if(!extensionBox.classList.contains("show")){
+            extensionBox.classList.toggle("show");
+            setTimeout(() => {
+                userContainer.classList.toggle("go-left");
+            }, 100);
+        }
+    }else{
+        messageIcon.classList.remove("clicked");
+        setTimeout(() => {
+            chat.classList.remove("chat-show");
+        }, 300)
+        if(extensionBox.classList.contains("show")){
+            extensionBox.classList.remove("show");
+            setTimeout(() => {
+                userContainer.classList.remove("go-left");
+            }, 100);
+        }
+    }
+}
 
+switchInput.onclick = () => {
+    if(switchInput.checked){
+        messageWrapper.classList.add("add-disabled");
+        sendWrapper.classList.add("add-disabled");
+    }else{
+        messageWrapper.classList.remove("add-disabled");
+        sendWrapper.classList.remove("add-disabled");
+    }
+}
 
 /*
 let setPeerid = async (uuid, peerId) => {
