@@ -36,7 +36,6 @@ const messageIcon =  document.querySelector(".fa-message");
 const extensionBox = document.querySelector(".extension-box");
 const chat = document.querySelector(".chat");
 const info = document.querySelector(".info");
-const switchInput = document.querySelector("#switch");
 
 
 let enterRoom = false;
@@ -45,6 +44,8 @@ let disconnect = true;
 let tmpMessageClock = null;
 let tmpMessageTime = null;
 let tmpMessageName = null;
+
+let userInRoom = {};
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
@@ -114,7 +115,7 @@ navigator.mediaDevices.getUserMedia({
 
         utils.generateShortLink();
         // 進房時監聽
-        addVideoStream(myVideo, stream, true);
+        addVideoStream(myVideo, stream, true, USER_ID);
         myPeer.on('call', function(call){
             call.answer(stream)
             const video = document.createElement("video")
@@ -125,11 +126,6 @@ navigator.mediaDevices.getUserMedia({
                 addVideoStream(video, userVideoStream, false, remoteUuid)
             })
         })
-
-        if(!auth){
-            document.querySelector(".allow-click").remove();
-            document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
-        }
 
     }else if(!auth){
         document.querySelector("#video-streams").remove();
@@ -238,10 +234,32 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-disconnected', async uuid => {
         console.log("out meeting: ", uuid);
 
-        if(uuid !== USER_ID){
+        if (userInRoom[uuid]) delete userInRoom[uuid];
+
+        if(userInRoom[USER_ID] && uuid !== USER_ID){
+            if (document.querySelector(".allow-click")) return
             setTimeout(async()=>{
-                auth = await resetAuthData(ROOM_ID, USER_ID);
-            }, 2000)
+                let data = await resetAuthData(ROOM_ID, USER_ID);
+                let auth = data[0];
+                let chatOpen = data[1];
+                console.log("chatOpen: ", chatOpen);
+                if(auth){
+                    addAllowClick();
+                    document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
+                }
+                if(!chatOpen){
+                    messageWrapper.classList.add("add-disabled");
+                    sendWrapper.classList.add("add-disabled");
+                    sendMessageInput.disabled = true;
+
+                    let switchInput = document.querySelector("#switch");
+                    switchInput.checked = false;
+                }else{
+                    messageWrapper.classList.remove("add-disabled");
+                    sendWrapper.classList.remove("add-disabled");
+                    sendMessageInput.disabled = false;
+                }
+            }, 1000)
         }
 
         if(uuid === USER_ID){
@@ -346,7 +364,8 @@ socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
             socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
             // 需要改成 delete 不只設 leave
-            removeMongoRoomData(ROOM_ID, clientUuid, false);
+            refuseUserInRoom(ROOM_ID, clientUuid);
+            // removeMongoRoomData(ROOM_ID, clientUuid, false);
         }
 
         clientAllow.onmouseover = () => {
@@ -408,11 +427,28 @@ socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
     }
 })
 
+// close open chat wrapper
+socket.on('close-open-chat', async (roomId, close) => {
+    if(ROOM_ID === roomId){
+        if(close){
+            messageWrapper.classList.add("add-disabled");
+            sendWrapper.classList.add("add-disabled");
+            sendMessageInput.disabled = true;
+        }else{
+            messageWrapper.classList.remove("add-disabled");
+            sendWrapper.classList.remove("add-disabled");
+            sendMessageInput.disabled = false;
+        }
+    }
+})
+
 
 let addVideoStream = async (video, stream, islocal, remoteUuid) => {
     video.srcObject = stream
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
+
+    userInRoom[remoteUuid] = true;
 
     if(islocal){
         tempMediaStreamId = stream.id;
@@ -499,6 +535,19 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
             }
+            
+            let chatOpen = await getRoomChatStatus(ROOM_ID);
+            if(!chatOpen){
+                messageWrapper.classList.add("add-disabled");
+                sendWrapper.classList.add("add-disabled");
+                sendMessageInput.disabled = true;
+            }
+
+            document.querySelector(".allow-click").remove();
+            document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
+
+        }else{
+            switchInputInit();
         }
 
     }else{
@@ -677,6 +726,20 @@ let removeMongoRoomData = async (roomId, uuid, auth) => {
     return data.ok;
 }
 
+let refuseUserInRoom = async (roomId, uuid) => {
+    let response = await fetch(`/room/deleteUserArray`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "uuid": uuid,
+        })
+    });
+    let data = await response.json();
+}
+
 let checkNeedReconnect = async (roomId, uuid) => {
     let response = await fetch(`/room/checkneedreconnect`, {
         method: "POST",
@@ -751,7 +814,7 @@ let resetAuthData = async (roomId, uuid) => {
     });
     let data = await response.json();
     if(data){
-        return data.auth;
+        return [data.auth, data.chatOpen];
     }
 }
 
@@ -810,10 +873,9 @@ let settingVideoSize = () => {
 
 let messageSubmit = async (e) => {
     e.preventDefault();
-    let input = document.querySelector("#send-message");
-    let message = input.value;
+    let message = sendMessageInput.value;
     if (!message) return
-    input.value = "";
+    sendMessageInput.value = "";
     socket.emit('chat', ROOM_ID, USER_NAME, message);
     sendImg.classList.remove("entering");
 
@@ -884,58 +946,63 @@ messageIcon.onclick = () => {
     }
 }
 
-switchInput.onclick = () => {
-    if(switchInput.checked){
-        messageWrapper.classList.add("add-disabled");
-        sendWrapper.classList.add("add-disabled");
-    }else{
-        messageWrapper.classList.remove("add-disabled");
-        sendWrapper.classList.remove("add-disabled");
+
+let switchInputInit = () => {
+    const switchInput = document.querySelector("#switch");
+    switchInput.onclick = async () => {
+        if(!switchInput.checked){
+            socket.emit('close-chat', ROOM_ID, true);
+            await setRoomChatStatus(ROOM_ID, false);
+        }else{
+            socket.emit('close-chat', ROOM_ID, false);
+            await setRoomChatStatus(ROOM_ID, true);
+        }
     }
 }
 
-/*
-let setPeerid = async (uuid, peerId) => {
-    let response = await fetch(`/api/setpeerid`, {
+
+let setRoomChatStatus = async (roomId, b) => {
+    let response = await fetch(`/room/roomChatStatus`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
-            "uuid": uuid,
-            "peerId": peerId
+            "roomId": roomId,
+            "chatOpen": b,
         })
     });
     let data = await response.json();
 }
 
-let getLocalPeerId = async (uuid) => {
-    let response = await fetch(`/api/getlocalpeerid`, {
+let getRoomChatStatus = async (roomId) => {
+    let response = await fetch(`/room/getRoomChatStatus`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
-            "uuid": uuid
+            "roomId": roomId,
         })
     });
     let data = await response.json();
-    if(data.data){
-        return data.data
+    if(data){
+        return data.chatOpen;
     }
 }
 
-let setUuid = async (oldUuid, newUuid) => {
-    let response = await fetch(`/api/setnewuuid`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "oldUuid": oldUuid,
-            "newUuid": newUuid,
-        })
-    });
-    let data = await response.json();
-}
-*/
+let addAllowClick = () => {
+    let html = `
+    <div class="allow-click">
+        <p>Let everyone send messages</p>
+        <div class="switch-button">
+            <input type="checkbox" id="switch" checked>
+            <label for="switch">
+                <span class="switch-txt" turnOn="On" turnOff="Off"></span>
+            </label>
+        </div>
+    </div>
+    `;
+    document.querySelector(".chat h2").insertAdjacentHTML("afterend", html);
+    switchInputInit();
+} 

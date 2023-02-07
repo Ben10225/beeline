@@ -22,8 +22,9 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 	if resError != nil {
 		docs := []interface{}{
 			gin.H{
-				"roomId": roomId,
-				"user":   []structs.RoomUserData{},
+				"roomId":   roomId,
+				"chatOpen": true,
+				"user":     []structs.RoomUserData{},
 				// User:   []interface{}{uuid, audio, video, true},
 			},
 		}
@@ -127,19 +128,21 @@ func UserLeaveTrue(c *gin.Context, roomId, uuid string, auth bool) bool {
 		fmt.Println(err)
 	}
 	return true
+}
 
-	// filter := bson.D{{"roomId", roomId}}
-	// userInfo := bson.M{
-	// 	"$pull": bson.M{
-	// 		"user": bson.D{
-	// 			{"uuid", uuid},
-	// 		},
-	// 	},
-	// }
-	// _, err := coll.UpdateOne(context.TODO(), filter, userInfo)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
+func PullUserData(c *gin.Context, roomId, uuid string) {
+	filter := bson.D{{"roomId", roomId}}
+	userInfo := bson.M{
+		"$pull": bson.M{
+			"user": bson.D{
+				{"uuid", uuid},
+			},
+		},
+	}
+	_, err := coll.UpdateOne(context.TODO(), filter, userInfo)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
@@ -232,11 +235,12 @@ func UserBackToRoomLeaveStatus(c *gin.Context, roomId, uuid string) {
 	)
 }
 
-func GetUserNewAuth(c *gin.Context, roomId, uuid string) bool {
+func GetUserNewAuth(c *gin.Context, roomId, uuid string) (bool, bool) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	coll.FindOne(context.TODO(), filter).Decode(&room)
 
+	chatOpen := room.ChatOpen
 	user := room.User
 	var result bool
 
@@ -245,7 +249,28 @@ func GetUserNewAuth(c *gin.Context, roomId, uuid string) bool {
 			result = v.Auth
 		}
 	}
-	return result
+	return result, chatOpen
+}
+
+func SetRoomChatStatus(c *gin.Context, roomId string, b bool) {
+	filter := bson.D{{"roomId", roomId}}
+	update := bson.D{{"$set", bson.D{{"chatOpen", b}}}}
+	_, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GetRoomChat(c *gin.Context, roomId string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	b := room.ChatOpen
+	return b
 }
 
 /*

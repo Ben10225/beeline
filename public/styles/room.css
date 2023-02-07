@@ -614,9 +614,19 @@ body .bg {
   margin-top: 20px;
   height: calc(100vh - 353px);
   overflow-y: scroll;
+  pointer-events: auto;
+  -webkit-user-select: auto;
+     -moz-user-select: auto;
+      -ms-user-select: auto;
+          user-select: auto;
 }
 .extension-wrapper .extension-box .chat .message-wrapper.add-disabled {
   opacity: 0.4;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .extension-wrapper .extension-box .chat .message-wrapper .message-block {
   font-size: 13px;
@@ -646,9 +656,11 @@ body .bg {
 .extension-wrapper .extension-box .chat .send-wrapper {
   position: absolute;
   bottom: 10px;
+  pointer-events: auto;
 }
 .extension-wrapper .extension-box .chat .send-wrapper.add-disabled {
   opacity: 0.4;
+  pointer-events: none;
 }
 .extension-wrapper .extension-box .chat .send-wrapper #send-message {
   outline: none;

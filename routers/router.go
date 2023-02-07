@@ -31,6 +31,7 @@ func Routers(router *gin.Engine) {
 	{
 		room.POST("/setusertoroom", api.SetUserRoomData)
 		room.POST("/deleteuserfromroom", api.SetUserLeaveTrue)
+		room.POST("/deleteUserArray", api.RefuseUserInRoom)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		room.POST("/streamstatus", api.SetUserStreamStatus)
@@ -38,5 +39,7 @@ func Routers(router *gin.Engine) {
 		room.POST("/checkAuth", api.CheckAuth)
 		room.POST("/setLeaveFalse", api.SetUserLeaveFalse)
 		room.POST("/checkAuthChange", api.GetUserAuth)
+		room.POST("/roomChatStatus", api.RoomChatStatus)
+		room.POST("/getRoomChatStatus", api.GetRoomChatStatus)
 	}
 }

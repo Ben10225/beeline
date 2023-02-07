@@ -72,6 +72,12 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "chat-room", roomId, clientName, current, message)
 	})
 
+	// close chat
+	server.OnEvent("/", "close-chat", func(s socketio.Conn, roomId string, b bool) {
+		server.BroadcastToRoom("/", roomId, "close-open-chat", roomId, b)
+
+	})
+
 	// reconnect
 	// server.OnEvent("/", "reconnect", func(s socketio.Conn, roomId, uuid string) {
 	// 	server.BroadcastToRoom("/", roomId, "user-reconnect", uuid)

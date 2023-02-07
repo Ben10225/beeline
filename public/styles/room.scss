@@ -652,8 +652,12 @@ body{
                 margin-top: 20px;
                 height: calc(100vh - 353px);
                 overflow-y: scroll;
+                pointer-events: auto;
+                user-select: auto;
                 &.add-disabled{
                     opacity: 0.4;
+                    pointer-events: none;
+                    user-select: none;
                 }
                 .message-block{
                     font-size: 13px;
@@ -684,8 +688,10 @@ body{
             .send-wrapper{
                 position: absolute;
                 bottom: 10px;
+                pointer-events: auto;
                 &.add-disabled{
                     opacity: 0.4;
+                    pointer-events: none;
                 }
                 #send-message{
                     outline: none;

@@ -46,6 +46,18 @@ func SetUserLeaveTrue(c *gin.Context) {
 	})
 }
 
+func RefuseUserInRoom(c *gin.Context) {
+	var req structs.RoomUserData
+	c.BindJSON(&req)
+	roomId := req.RoomId
+	uuid := req.Uuid
+
+	models.PullUserData(c, roomId, uuid)
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
 func CheckUserStillInRoom(c *gin.Context) {
 	var req structs.RoomUserData
 	err := c.BindJSON(&req)
@@ -161,11 +173,37 @@ func GetUserAuth(c *gin.Context) {
 	roomId := req.RoomId
 	uuid := req.Uuid
 
-	auth := models.GetUserNewAuth(c, roomId, uuid)
+	auth, chatOpen := models.GetUserNewAuth(c, roomId, uuid)
 	c.JSON(http.StatusOK, gin.H{
-		"auth": auth,
+		"auth":     auth,
+		"chatOpen": chatOpen,
 	})
+}
 
+func RoomChatStatus(c *gin.Context) {
+	var req structs.RoomInfo
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	chatOpen := req.ChatOpen
+
+	models.SetRoomChatStatus(c, roomId, chatOpen)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func GetRoomChatStatus(c *gin.Context) {
+	var req structs.RoomInfo
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	chatOpen := models.GetRoomChat(c, roomId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"chatOpen": chatOpen,
+	})
 }
 
 func SetEnterToken(c *gin.Context) {
