@@ -221,3 +221,16 @@ func SetEnterToken(c *gin.Context) {
 		"ok": true,
 	})
 }
+
+func GetGroupInfo(c *gin.Context) {
+	var req structs.RoomInfo
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	group, host := models.GetGroupInfoData(c, roomId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": group,
+		"host": host,
+	})
+}

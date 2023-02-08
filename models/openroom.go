@@ -273,6 +273,32 @@ func GetRoomChat(c *gin.Context, roomId string) bool {
 	return b
 }
 
+func GetGroupInfoData(c *gin.Context, roomId string) ([]gin.H, string) {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+	user := room.User
+	var host string
+	var result []gin.H
+
+	for _, v := range user {
+		if !v.Leave {
+			soloData := gin.H{
+				"uuid":        v.Uuid,
+				"audioStatus": v.AudioStatus,
+			}
+			result = append(result, soloData)
+		}
+		if v.Auth {
+			host = v.Uuid
+		}
+	}
+	return result, host
+}
+
 /*
 func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
 

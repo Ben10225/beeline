@@ -1,5 +1,5 @@
 import utils from "./utils.js";
-// import extension from "./extension.js";
+import extension from "./extension.js";
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -47,7 +47,7 @@ let tmpMessageClock = null;
 let tmpMessageTime = null;
 let tmpMessageName = null;
 
-let userInRoom = {};
+let userInRoomObj = {};
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
@@ -133,6 +133,7 @@ navigator.mediaDevices.getUserMedia({
     }else if(!auth){
         document.querySelector("#video-streams").remove();
         document.querySelector("#controls-wrapper").remove();
+        document.querySelector(".extension-wrapper").remove();
 
         const video = document.createElement("video");
         video.muted = true;
@@ -210,7 +211,8 @@ navigator.mediaDevices.getUserMedia({
         }
 
         window.onunload = () => {
-            refuseUserInRoom(ROOM_ID, USER_ID);
+            // 這邊不要用 onunload 不然頁面轉跳 資料庫就直接拿掉了
+            // refuseUserInRoom(ROOM_ID, USER_ID);
         }
 
         insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
@@ -222,10 +224,16 @@ navigator.mediaDevices.getUserMedia({
 
         if(USER_ID === uuid){
             if(auth){
-                insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
-            }
-            if(CLIENT){
-                setBackRoomLeaveStatus(ROOM_ID,uuid);
+                await insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
+
+                let groupData = await extension.getGroupInfo(ROOM_ID);
+                let groupLst = groupData[0];
+                let host = groupData[1];
+                createGroupDom(groupLst, host, USER_ID);
+
+            }else if(CLIENT){
+                setBackRoomLeaveStatus(ROOM_ID, uuid);
+
             }
             enterRoom = true;
             disconnect = false;
@@ -235,9 +243,9 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-disconnected', async uuid => {
         console.log("out meeting: ", uuid);
 
-        if (userInRoom[uuid]) delete userInRoom[uuid];
+        if (userInRoomObj[uuid]) delete userInRoomObj[uuid];
 
-        if(userInRoom[USER_ID] && uuid !== USER_ID){
+        if(userInRoomObj[USER_ID] && uuid !== USER_ID){
             if (document.querySelector(".allow-click")) return
             setTimeout(async()=>{
                 let data = await resetAuthData(ROOM_ID, USER_ID);
@@ -305,6 +313,12 @@ socket.on('set-view', (options, uuid, b) => {
         }else if(remoteDiv && !b){
             remoteDiv.classList.add("show");
         }
+        let remoteGroupMicro = document.querySelector(`#group-${uuid} .user-micro`);
+        if(remoteGroupMicro && b){
+            remoteGroupMicro.classList.remove("micro-off");
+        }else if(remoteGroupMicro && !b){
+            remoteGroupMicro.classList.add("micro-off");
+        }
     }
 })
 
@@ -317,7 +331,11 @@ socket.on('leave-video-remove', async (uuid) => {
 
     let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
     if(remoteUserWrapper){
-        document.querySelector(`#wrapper-${uuid}`).remove();
+        remoteUserWrapper.remove();
+    }
+    let groupUserWrapper = document.querySelector(`#group-${uuid}`);
+    if(groupUserWrapper){
+        groupUserWrapper.remove();
     }
     settingVideoSize();
 })
@@ -393,6 +411,7 @@ socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
 
 
 socket.on('client-action', async (roomId, clientName, b) => {
+    console.log(clientName, USER_NAME, b)
     if(clientName === USER_NAME && b){
         await SetRoomEnterToken(roomId);
         history.go(0);
@@ -456,9 +475,10 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
 
-    userInRoom[remoteUuid] = true;
-
     if(islocal){
+
+        userInRoomObj[remoteUuid] = [USER_NAME, USER_IMG];
+
         tempMediaStreamId = stream.id;
 
         audioBtn.onclick = () => {
@@ -524,9 +544,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             video.play()
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
-        // const videoContainer = document.querySelector(".video-container");
-        // videoContainer.style.height = `calc(${videoContainer.offsetWidth}px * 3 / 4);`;
-
+        
         if(!auth){
             let data = await getRemoteUser(ROOM_ID, USER_ID);
 
@@ -559,10 +577,12 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         }
 
     }else{
+
         // create remote container
         if(document.querySelector(`#wrapper-${remoteUuid}`)){
             document.querySelector(`#wrapper-${remoteUuid}`).remove();
         }
+
         tempRemoteMediaStreamId = stream.id
 
         // let remoteVideoStatus = stream.getTracks()[1].enabled;
@@ -600,6 +620,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         let remoteAudioStatus = data.audioStatus;
         let remoteVideoStatus = data.videoStatus;
 
+        userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
+
         document.querySelector(`#wrapper-${remoteUuid} span`).textContent = remoteName;
         if(remoteImgUrl[0] !== "#"){
             document.querySelector(`#wrapper-${remoteUuid} .img-bg`).style = `
@@ -619,6 +641,12 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             document.querySelector(`#wrapper-${remoteUuid} .user-block`).classList.add("show");
             document.querySelector(`#wrapper-${remoteUuid} .username-wrapper-room`).classList.add("bg-none");
         }
+
+        let groupData = await extension.getGroupInfo(ROOM_ID);
+        let groupLst = groupData[0];
+        let host = groupData[1];
+        createGroupDom(groupLst, host, USER_ID);
+
     }
     
     settingVideoSize();
@@ -658,6 +686,7 @@ let toggleAudio = async (stream, dom) => {
         dom.classList.add("disable");
         stream.getTracks()[0].enabled = false;
         document.querySelector(".micro-status-icon.local").classList.add("show");
+        document.querySelector(`#group-${USER_ID} .user-micro`).classList.add("micro-off");
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
@@ -665,6 +694,7 @@ let toggleAudio = async (stream, dom) => {
         dom.classList.remove("disable");
         stream.getTracks()[0].enabled = true;
         document.querySelector(".micro-status-icon.local").classList.remove("show");
+        document.querySelector(`#group-${USER_ID} .user-micro`).classList.remove("micro-off");
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
@@ -893,7 +923,7 @@ let messageSubmit = async (e) => {
     // if (time === "下午") time = "晚上"
 }
 
-utils.rightIconsInit();
+extension.rightIconsInit();
 
 msgSubmit.addEventListener("submit", messageSubmit);
 
@@ -964,3 +994,69 @@ let addAllowClick = () => {
     document.querySelector(".chat h2").insertAdjacentHTML("afterend", html);
     switchInputInit();
 } 
+
+let createGroupDom = async (groupLst, host, localUuid) => {
+    let firstLine = "";
+    let otherLine = "";
+    let html = "";
+    let existUser = document.querySelectorAll(".user-one");
+    let existLst = [];
+    existUser.forEach(dom => {
+        let existId = dom.id.split("-")[1];
+        existLst.push(existId);
+    })
+
+    groupLst.forEach(user => {
+        if (existLst.includes(user.uuid)) return; // forEach 的 return 相當於使用 continue
+        let txt = groupHtml(user, host)
+
+        if(user.uuid === localUuid){
+            firstLine = txt;
+        }else{
+            otherLine += txt;
+        }
+    })
+    html = firstLine + otherLine;
+
+    document.querySelector(".user-wrapper").insertAdjacentHTML("beforeend", html);
+}
+
+let groupHtml = (user, host) => {
+    let hostTag = "";
+    let audioTag = "";
+    if(user.uuid === host){
+        hostTag = `<div class="user-host"></div>`;
+    }
+    if(!user.audioStatus){
+        audioTag = "micro-off"
+    }
+    let imgSetting = "";
+    if(userInRoomObj[user.uuid][1][0] !== "#"){
+        imgSetting = `
+        <div class="user-img" style="
+            background-image: url('${userInRoomObj[user.uuid][1]}');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        "></div>
+        `;
+    }else{
+        imgSetting = `
+        <div class="user-img" style="background-color: ${userInRoomObj[user.uuid][1]};">
+            <h3>${userInRoomObj[user.uuid][0][0]}</h3>
+        </div>
+        `;
+    }
+    let txt = `
+    <div class="user-one" id="group-${user.uuid}">
+        ${imgSetting}
+        <div class="user-name">${userInRoomObj[user.uuid][0]}</div>
+        ${hostTag}
+        <div class="user-micro ${audioTag}">
+            <i class="fa-solid fa-microphone-slash"></i>
+            <i class="fa-solid fa-microphone"></i>
+        </div>
+    </div>
+    `;
+    return txt;
+}

@@ -22,9 +22,6 @@ func Routers(router *gin.Engine) {
 		user.GET("/signout", api.Signout)
 		user.POST("/getremoteuser", api.GetRemoteUser)
 		user.POST("/uploadimg", api.UploadImg)
-		// user.POST("/setnewuuid", api.SetNewUuid)
-		// user.POST("/setpeerid", api.SetUserPeerId)
-		// user.POST("/getlocalpeerid", api.GetUserPeerId)
 	}
 
 	room := router.Group("/room")
@@ -41,5 +38,6 @@ func Routers(router *gin.Engine) {
 		room.POST("/checkAuthChange", api.GetUserAuth)
 		room.POST("/roomChatStatus", api.RoomChatStatus)
 		room.POST("/getRoomChatStatus", api.GetRoomChatStatus)
+		room.POST("/getGroupInfo", api.GetGroupInfo)
 	}
 }
