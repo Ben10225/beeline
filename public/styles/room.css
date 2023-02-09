@@ -703,10 +703,6 @@ body .bg {
   font-size: 14px;
   margin-right: 20px;
   position: relative;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
 }
 .extension-wrapper .extension-box .group .user-wrapper .user-one .user-name.can-auth {
   cursor: pointer;
@@ -722,7 +718,7 @@ body .bg {
   padding: 6px 10px;
   opacity: 0;
   visibility: hidden;
-  transform: scale(0.4) translateY(-55px);
+  transform: scale(0.4) translateY(-30px);
   transition: 0.3s;
   font-weight: 300;
 }

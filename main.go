@@ -75,7 +75,11 @@ func main() {
 	// close chat
 	server.OnEvent("/", "close-chat", func(s socketio.Conn, roomId string, b bool) {
 		server.BroadcastToRoom("/", roomId, "close-open-chat", roomId, b)
+	})
 
+	// auth change
+	server.OnEvent("/", "auth-change", func(s socketio.Conn, roomId, oldUuid, newUuid string) {
+		server.BroadcastToRoom("/", roomId, "auth-change-set", roomId, oldUuid, newUuid)
 	})
 
 	// reconnect

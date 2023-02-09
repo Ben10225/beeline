@@ -158,11 +158,28 @@ let getGroupInfo = async (roomId) => {
     return [data.data, data.host];
 }
 
+let assignNewAuth = async (roomId, oldUuid, newUuid) => {
+    let response = await fetch(`/room/assignNewAuth`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "oldUuid": oldUuid,
+            "newUuid": newUuid,
+        })
+    });
+    let data = await response.json();
+    // return [data.data, data.host];
+}
+
 
 
 export default {
     rightIconsInit,
     getGroupInfo,
+    assignNewAuth,
 }
 
 

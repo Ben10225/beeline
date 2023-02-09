@@ -299,6 +299,38 @@ func GetGroupInfoData(c *gin.Context, roomId string) ([]gin.H, string) {
 	return result, host
 }
 
+func AssignNewAuthFunc(c *gin.Context, roomId, oldUuid, newUuid string) string {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+	user := room.User
+	for _, v := range user {
+		if v.Auth && v.Uuid != oldUuid {
+			return "bad request"
+		}
+	}
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{"user.$[elem].auth": false}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": oldUuid}},
+		}),
+	)
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{"user.$[elem].auth": true}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": newUuid}},
+		}),
+	)
+	return "ok"
+}
+
 /*
 func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
 

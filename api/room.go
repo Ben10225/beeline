@@ -234,3 +234,28 @@ func GetGroupInfo(c *gin.Context) {
 		"host": host,
 	})
 }
+
+func AssignNewAuth(c *gin.Context) {
+	req := struct {
+		RoomId  string
+		OldUuid string
+		NewUuid string
+	}{}
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	oldUuid := req.OldUuid
+	newUuid := req.NewUuid
+
+	status := models.AssignNewAuthFunc(c, roomId, oldUuid, newUuid)
+	if status == "bad request" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": true,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}

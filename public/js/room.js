@@ -246,10 +246,26 @@ navigator.mediaDevices.getUserMedia({
                 let groupData = await extension.getGroupInfo(ROOM_ID);
                 groupLst = groupData[0];
                 host = groupData[1];
-                createGroupDom(groupLst, host, USER_ID);
+                if (Object.keys(userInRoomObj).length >= groupLst.length){
+                    // console.log("aa")
+                    createGroupDom(groupLst, host, USER_ID);
+                }
+
 
             }else if(CLIENT){
-                setBackRoomLeaveStatus(ROOM_ID, uuid);
+                await setBackRoomLeaveStatus(ROOM_ID, uuid);
+
+                let groupData = await extension.getGroupInfo(ROOM_ID);
+                groupLst = groupData[0];
+                host = groupData[1];
+
+                console.log(groupLst)
+
+                if (Object.keys(userInRoomObj).length >= groupLst.length 
+                    && userInRoomObj[USER_ID]){
+                    // console.log("bb")
+                    createGroupDom(groupLst, host, USER_ID);
+                }
 
             }
             enterRoom = true;
@@ -266,24 +282,27 @@ navigator.mediaDevices.getUserMedia({
             if (document.querySelector(".allow-click")) return
             setTimeout(async()=>{
                 let data = await resetAuthData(ROOM_ID, USER_ID);
-                let auth = data[0];
+                let newAuth = data[0];
                 let chatOpen = data[1];
                 // console.log("chatOpen: ", chatOpen);
-                if(auth){
+                if(newAuth){
+                    auth = true;
                     addAllowClick();
                     document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
-                }
-                if(!chatOpen){
-                    messageWrapper.classList.add("add-disabled");
-                    sendWrapper.classList.add("add-disabled");
-                    sendMessageInput.disabled = true;
-
-                    let switchInput = document.querySelector("#switch");
-                    switchInput.checked = false;
+                    if(!chatOpen){
+                        messageWrapper.classList.add("add-disabled");
+                        sendWrapper.classList.add("add-disabled");
+                        sendMessageInput.disabled = true;
+    
+                        let switchInput = document.querySelector("#switch");
+                        switchInput.checked = false;
+                    }else{
+                        messageWrapper.classList.remove("add-disabled");
+                        sendWrapper.classList.remove("add-disabled");
+                        sendMessageInput.disabled = false;
+                    }
                 }else{
-                    messageWrapper.classList.remove("add-disabled");
-                    sendWrapper.classList.remove("add-disabled");
-                    sendMessageInput.disabled = false;
+                    auth = false;
                 }
             }, 1000)
         }
@@ -305,7 +324,6 @@ let WaitingSocketInit = async () => {
     socket.on('client-action', async (roomId, clientName, b) => {
         if(clientName === USER_NAME && b){
             await SetRoomEnterToken(roomId);
-            console.log("here");
             window.location.reload();
             // history.go(0);
         }else if(clientName === USER_NAME && !b){
@@ -477,6 +495,71 @@ let InRoomSocketInit = async () => {
                 messageWrapper.classList.remove("add-disabled");
                 sendWrapper.classList.remove("add-disabled");
                 sendMessageInput.disabled = false;
+            }
+        }
+    })
+
+    // auth change
+    socket.on('auth-change-set', async (roomId, oldUuid, newUuid) => {
+        if(ROOM_ID === roomId){
+            if(USER_ID === newUuid){
+                auth = true;
+            }else{
+                auth = false;
+            }
+
+            let hostTag = `<div class="user-host"></div>`;
+            document.querySelector(`#group-${oldUuid} .user-host`).remove();
+            document.querySelector(`#group-${newUuid} .user-micro`).insertAdjacentHTML("beforebegin", hostTag);
+
+            if(USER_ID === oldUuid){
+                let blocks = document.querySelectorAll(`.auth-check-block`);
+                blocks.forEach(block => {
+                    block.remove();
+                })
+                let nameBtns = document.querySelectorAll(`.user-name`);
+                nameBtns.forEach(name => {
+                    name.classList.remove("can-auth");
+                })
+
+                // chat room
+                document.querySelector(".allow-click").remove();
+                document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
+            }
+            if(USER_ID === newUuid){
+                // group
+                let uuidDoms = document.querySelectorAll(".user-one");
+                let uuids = []
+                uuidDoms.forEach(dom => {
+                    let uuid = dom.id.split("-")[1];
+                    uuids.push(uuid);
+                })
+
+                let nameBtns = document.querySelectorAll(`.group .user-name`);
+                nameBtns.forEach((name, index)=> {
+                    if (index === 0 ) return
+                    name.classList.add("can-auth");
+                    let html = `
+                    <div class="auth-check-block">
+                        <p>Assign <span>${name.textContent}</span> to be the host ?</p>
+                        <p class="auth-allow">Yes</p>
+                    </div>
+                    `;
+                    name.insertAdjacentHTML("afterend", html);
+                    NameBtnInit(uuids[index]);
+                })
+
+                // chat room
+                let data = await resetAuthData(ROOM_ID, USER_ID);
+                let chatOpen = data[1];
+
+                addAllowClick();
+                document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
+
+                if(!chatOpen){
+                    let switchInput = document.querySelector("#switch");
+                    switchInput.checked = false;
+                }
             }
         }
     })
@@ -660,6 +743,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             groupLst = groupData[0];
             host = groupData[1];
             if (Object.keys(userInRoomObj).length >= groupLst.length){
+                // console.log("cc")
                 createGroupDom(groupLst, host, USER_ID);
             }
         }else{
@@ -673,6 +757,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
                 groupLst.push({"uuid": remoteUuid, "audioStatus": remoteAudioStatus});
             }
             if (Object.keys(userInRoomObj).length >= groupLst.length){
+                // console.log("dd")
                 createGroupDom(groupLst, host, USER_ID);
             }
         }
@@ -1002,33 +1087,46 @@ let createGroupDom = async (gLst, host, localUuid) => {
 
     document.querySelector(".user-wrapper").insertAdjacentHTML("beforeend", html);
 
-    gLst.forEach(user => {
-        let nameBtn = document.querySelector(`#group-${user.uuid} .user-name`);
-        let block = document.querySelector(`#group-${user.uuid} .auth-check-block`);
-        let extensionBox = document.querySelector(".extension-box");
-        let yesBtn = document.querySelector(`#group-${user.uuid} .auth-allow`);
-        nameBtn.onclick = () => {
-            block.classList.add("show");
-            let ct = 0
-            extensionBox.addEventListener("click", function blockShow(e){
-                ct ++;
-                if (!block.contains(e.target) 
-                    && !nameBtn.contains(e.target) 
-                    && ct > 1) {
-                    block.classList.remove("show");
-                    this.removeEventListener("click", blockShow);
-                }else if(yesBtn.contains(e.target)){
-                    this.removeEventListener("click", blockShow);
-                }
-            })
-        }
-        yesBtn.onclick = () => {
-            block.classList.remove("show");
-        }
-    })
-
+    if(auth){
+        gLst.forEach(user => {
+            if (user.uuid === localUuid) return
+            NameBtnInit(user.uuid)
+            document.querySelector(`#group-${user.uuid} .user-name`).classList.add("can-auth");
+        })
+    }
     groupLst = [];
 }
+
+let NameBtnInit = (uuid) => {
+    let extensionBox = document.querySelector(".extension-box");
+    let nameBtn = document.querySelector(`#group-${uuid} .user-name`);
+    let block = document.querySelector(`#group-${uuid} .auth-check-block`);
+    let yesBtn = document.querySelector(`#group-${uuid} .auth-allow`);
+
+    nameBtn.addEventListener("click",() => {
+        block.classList.add("show");
+        let ct = 0
+        extensionBox.addEventListener("click", function blockShow(e){
+            ct ++;
+            if (!block.contains(e.target) 
+                && !nameBtn.contains(e.target) 
+                && ct > 1) {
+                block.classList.remove("show");
+                this.removeEventListener("click", blockShow);
+            }else if(yesBtn.contains(e.target)){
+                this.removeEventListener("click", blockShow);
+            }
+        })
+    })
+    yesBtn.onclick = async () => {
+        // console.log(ROOM_ID, USER_ID, uuid);
+        await extension.assignNewAuth(ROOM_ID, USER_ID, uuid);
+        socket.emit("auth-change", ROOM_ID, USER_ID, uuid);
+        auth = false;
+        block.classList.remove("show");
+    }
+}
+
 
 let groupHtml = (user, host, localUuid) => {
     let hostTag = "";
@@ -1037,17 +1135,15 @@ let groupHtml = (user, host, localUuid) => {
     if(user.uuid === host){
         hostTag = `<div class="user-host"></div>`;
     }
-    if(user.uuid === localUuid){
-        nameTag = `
-        <div class="user-name can-auth">${userInRoomObj[user.uuid][0]} (you)</div>
-        <div class="auth-check-block">
-            <p>Assign <span>${userInRoomObj[user.uuid][0]}</span> to be the host ?</p>
-            <p class="auth-allow">Yes</p>
-        </div>
-        `;
+    if(user.uuid === localUuid || !auth){
+        if(user.uuid === localUuid){
+            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]} (you)</div>`;
+        }else{
+            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]}</div>`;
+        }
     }else{
         nameTag = `
-        <div class="user-name can-auth">${userInRoomObj[user.uuid][0]}</div>
+        <div class="user-name">${userInRoomObj[user.uuid][0]}</div>
         <div class="auth-check-block">
             <p>Assign <span>${userInRoomObj[user.uuid][0]}</span> to be the host ?</p>
             <p class="auth-allow">Yes</p>
@@ -1088,7 +1184,4 @@ let groupHtml = (user, host, localUuid) => {
     return txt;
 }
 
-
-
-// window.checkGiveAuth = checkGiveAuth;
 

@@ -717,7 +717,7 @@ body{
                         font-size: 14px;
                         margin-right: 20px;
                         position: relative;
-                        user-select: none;
+                        // user-select: none;
                         &.can-auth{
                             cursor: pointer;
                         }
@@ -735,7 +735,7 @@ body{
                         padding: 6px 10px;
                         opacity: 0;
                         visibility: hidden;
-                        transform: scale(0.4) translateY(-55px);
+                        transform: scale(0.4) translateY(-30px);
                         transition: 0.3s;
                         font-weight: 300;
                         &.show{
