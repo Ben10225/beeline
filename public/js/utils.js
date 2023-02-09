@@ -117,13 +117,65 @@ let copyContent = async (url) => {
     }
 }
 
+let settingVideoSize = () => {
+    let videoContainerS = document.querySelectorAll(".video-container");
 
+    if(videoContainerS.length == 1){
+        document.querySelector(".user-container").style.flexWrap = "nowrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 80%;
+                height: 600px;
+            `;
+        })
+    }else if(videoContainerS.length == 2){
+        document.querySelector(".user-container").style.flexWrap = "nowrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 50%;
+                height: 440px;
+            `;
+        })
+    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
+        document.querySelector(".user-container").style.flexWrap = "wrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 35%;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 300px;
+            `;
+        })
+        let imgBgS = document.querySelectorAll(".img-bg");
+        imgBgS.forEach(img => {
+            img.classList.remove("smaller");
+        })
+    }
+    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
+        document.querySelector(".user-container").style.flexWrap = "wrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+            width: 30%;
+            max-height: 270px;
+            `;
+        })
+        let imgBgS = document.querySelectorAll(".img-bg");
+        imgBgS.forEach(img => {
+            img.classList.add("smaller");
+        })
+    }
+}
 
 
 export default {
     auth,
     checkIfAuthAlready,
     generateShortLink,
+    settingVideoSize,
 }
 
 

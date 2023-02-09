@@ -172,6 +172,7 @@ body{
     padding: 70px;
     border-radius: 15px;
     box-shadow: 5px 5px 10px rgba(#000, 0.4);
+    width: 70vw;
     .waiting-exit{
         width: 30px;
         height: 30px;
@@ -192,16 +193,18 @@ body{
     }
     .setup-container{
         // border: 3px solid rgb(219, 154, 172);
-        border-radius: 8px;
+        border-radius: 10px;
         background-color: #777;
-        height: 100%;
+        // height: 100%;
         position: relative;
+        width: 55%;
+        height: 400px;
         .username-wrapper{
             font-size: 22px;
         }
         .setup-player{
-            width: 600px;
-            height: 400px;
+            width: 100%;
+            height: 100%;
             position: relative;
             video{
                 width: 100%;
@@ -309,11 +312,11 @@ body{
     }
     .setting-options{
         position: relative;
-        padding: 100px;
+        padding-left: 90px;
         display: flex;
         justify-content: center;
         flex-direction: column;
-        margin-left: 20px;
+        // margin-left: 20px;
         h2{
             margin-top: 20px;
             margin-bottom: 50px;

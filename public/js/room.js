@@ -20,6 +20,8 @@ if(authExist === "exist"){
     auth = (parseInt(params.auth) === 0);
 }
 
+console.log(CLIENT)
+
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
@@ -31,13 +33,6 @@ const messageWrapper = document.querySelector(".message-wrapper");
 const sendWrapper = document.querySelector(".send-wrapper");
 const sendMessageInput = document.querySelector("#send-message");
 const sendImg =  document.querySelector(".send-img");
-// const infoIcon =  document.querySelector(".fa-circle-info");
-// const infoIconBlock = document.querySelector(".icon-right-solo.ic-info");
-// const messageIcon =  document.querySelector(".fa-message");
-// const messageIconBlock = document.querySelector(".icon-right-solo.ic-message");
-// const extensionBox = document.querySelector(".extension-box");
-// const chat = document.querySelector(".chat");
-// const info = document.querySelector(".info");
 
 
 let enterRoom = false;
@@ -46,8 +41,12 @@ let disconnect = true;
 let tmpMessageClock = null;
 let tmpMessageTime = null;
 let tmpMessageName = null;
-
+let clientFirstLoad = true;
+let host = "";
+let groupLst = [];
 let userInRoomObj = {};
+
+let socket;
 
 let tryEnterRoom = (uuid) => {
     if(uuid){
@@ -57,6 +56,7 @@ let tryEnterRoom = (uuid) => {
                 ct ++;
                 if(disconnect){
                     if(ct > 700){
+                        // window.location.reload();
                         history.go(0);
                     }
                 }else{
@@ -72,7 +72,7 @@ let tryEnterRoom = (uuid) => {
             let timer = setInterval(() => {
                 if(disconnect){
                     console.log("try");
-                    let socket = io({transports: ['websocket']});
+                    socket = io({transports: ['websocket']});
                     socket.emit('join-room', ROOM_ID, USER_ID);
                 }else{
                     console.log("conn establish");
@@ -85,11 +85,10 @@ let tryEnterRoom = (uuid) => {
     }
 }
 
-tryEnterRoom(USER_ID);
-
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
-const socket = io({transports: ['websocket']});
+
+// const socket = io({transports: ['websocket']});
 
 const userContainer = document.querySelector(".user-container");
 
@@ -105,11 +104,24 @@ let tempRemoteMediaStreamId = null;
 
 const peers = {}
 
+let connectPeer = () => {
+    myPeer.on('open', async id => {
+        socket.emit('join-room', ROOM_ID, id);
+    })
+}
+
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( stream => {
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+
+        socket = io({transports: ['websocket']});
+        InRoomSocketInit();
+        tryEnterRoom(USER_ID);
+        
+        connectPeer();
+
         body.style.backgroundColor = "#000";
         bg.style.backgroundImage = "url('/public/images/roombg2.svg')";;
         bg.style.opacity = "0.15";
@@ -131,6 +143,13 @@ navigator.mediaDevices.getUserMedia({
         })
 
     }else if(!auth){
+
+        socket = io({transports: ['websocket']});
+        WaitingSocketInit();
+        tryEnterRoom(USER_ID);
+
+        connectPeer();
+
         document.querySelector("#video-streams").remove();
         document.querySelector("#controls-wrapper").remove();
         document.querySelector(".extension-wrapper").remove();
@@ -227,8 +246,8 @@ navigator.mediaDevices.getUserMedia({
                 await insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
 
                 let groupData = await extension.getGroupInfo(ROOM_ID);
-                let groupLst = groupData[0];
-                let host = groupData[1];
+                groupLst = groupData[0];
+                host = groupData[1];
                 createGroupDom(groupLst, host, USER_ID);
 
             }else if(CLIENT){
@@ -251,7 +270,7 @@ navigator.mediaDevices.getUserMedia({
                 let data = await resetAuthData(ROOM_ID, USER_ID);
                 let auth = data[0];
                 let chatOpen = data[1];
-                console.log("chatOpen: ", chatOpen);
+                // console.log("chatOpen: ", chatOpen);
                 if(auth){
                     addAllowClick();
                     document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
@@ -284,190 +303,186 @@ navigator.mediaDevices.getUserMedia({
 })
 
 
-let connectPeer = () => {
-    myPeer.on('open', async id => {
-        socket.emit('join-room', ROOM_ID, id);
+let WaitingSocketInit = async () => {
+    socket.on('client-action', async (roomId, clientName, b) => {
+        if(clientName === USER_NAME && b){
+            await SetRoomEnterToken(roomId);
+            console.log("here");
+            window.location.reload();
+            // history.go(0);
+        }else if(clientName === USER_NAME && !b){
+            window.location = "/";
+        }
     })
 }
 
-connectPeer();
 
-
-// camera
-socket.on('set-view', (options, uuid, b) => {
-    if (uuid === USER_ID) return
-    if(options === "video"){
-        let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
-        let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
-        if(remoteDiv && b){
-            remoteDiv.classList.remove("show");
-            remoteNameBg.classList.remove("bg-none");
-        }else if(remoteDiv && !b){
-            remoteDiv.classList.add("show");
-            remoteNameBg.classList.add("bg-none");
+let InRoomSocketInit = async () => {
+        // camera
+    socket.on('set-view', (options, uuid, b) => {
+        if (uuid === USER_ID) return
+        if(options === "video"){
+            let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
+            let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
+            if(remoteDiv && b){
+                remoteDiv.classList.remove("show");
+                remoteNameBg.classList.remove("bg-none");
+            }else if(remoteDiv && !b){
+                remoteDiv.classList.add("show");
+                remoteNameBg.classList.add("bg-none");
+            }
+        }else if(options === "audio"){
+            let remoteDiv = document.querySelector(`#wrapper-${uuid} .micro-status-icon`)
+            if(remoteDiv && b){
+                remoteDiv.classList.remove("show");
+            }else if(remoteDiv && !b){
+                remoteDiv.classList.add("show");
+            }
+            let remoteGroupMicro = document.querySelector(`#group-${uuid} .user-micro`);
+            if(remoteGroupMicro && b){
+                remoteGroupMicro.classList.remove("micro-off");
+            }else if(remoteGroupMicro && !b){
+                remoteGroupMicro.classList.add("micro-off");
+            }
         }
-    }else if(options === "audio"){
-        let remoteDiv = document.querySelector(`#wrapper-${uuid} .micro-status-icon`)
-        if(remoteDiv && b){
-            remoteDiv.classList.remove("show");
-        }else if(remoteDiv && !b){
-            remoteDiv.classList.add("show");
+    })
+
+    // leave room
+    socket.on('leave-video-remove', async (uuid) => {
+        // if(authParam){
+        //     let newAuth = await resetAuthData(ROOM_ID, USER_ID);
+        //     console.log(newAuth);
+        // }
+
+        let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
+        if(remoteUserWrapper){
+            remoteUserWrapper.remove();
         }
-        let remoteGroupMicro = document.querySelector(`#group-${uuid} .user-micro`);
-        if(remoteGroupMicro && b){
-            remoteGroupMicro.classList.remove("micro-off");
-        }else if(remoteGroupMicro && !b){
-            remoteGroupMicro.classList.add("micro-off");
+        let groupUserWrapper = document.querySelector(`#group-${uuid}`);
+        if(groupUserWrapper){
+            groupUserWrapper.remove();
         }
-    }
-})
+        utils.settingVideoSize();
+    })
 
-// leave room
-socket.on('leave-video-remove', async (uuid) => {
-    // if(authParam){
-    //     let newAuth = await resetAuthData(ROOM_ID, USER_ID);
-    //     console.log(newAuth);
-    // }
-
-    let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
-    if(remoteUserWrapper){
-        remoteUserWrapper.remove();
-    }
-    let groupUserWrapper = document.querySelector(`#group-${uuid}`);
-    if(groupUserWrapper){
-        groupUserWrapper.remove();
-    }
-    settingVideoSize();
-})
-
-// get enter request
-socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
-    if(auth){
-        let imgSetting = "";
-        if(clientImg[0] !== "#"){
-            imgSetting = `
-            <div class="alert-user-img" style="
-                background-image: url('${clientImg}');
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: cover;
-            "></div>
-            `;
-        }else{
-            imgSetting = `
-            <div class="alert-user-img" style="background-color: ${clientImg};">
-                <h3>${clientName[0]}</h3>
+    // get enter request
+    socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
+        if(auth){
+            let imgSetting = "";
+            if(clientImg[0] !== "#"){
+                imgSetting = `
+                <div class="alert-user-img" style="
+                    background-image: url('${clientImg}');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                "></div>
+                `;
+            }else{
+                imgSetting = `
+                <div class="alert-user-img" style="background-color: ${clientImg};">
+                    <h3>${clientName[0]}</h3>
+                </div>
+                `;
+            }
+            let html = `
+            <div class="alert-block" id="alert-user-${clientUuid}">
+                ${imgSetting}
+                <h3><span>${clientName}</span>想進入聊天室</h3>
+                <h3 class="allow">准許</h3>
+                <h3 class="refuse">拒絕</h3>
             </div>
             `;
-        }
-        let html = `
-        <div class="alert-block" id="alert-user-${clientUuid}">
-            ${imgSetting}
-            <h3><span>${clientName}</span>想進入聊天室</h3>
-            <h3 class="allow">准許</h3>
-            <h3 class="refuse">拒絕</h3>
-        </div>
-        `;
-        document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-        new Audio("/public/audio/client-request.mp3").play();
+            document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
+            new Audio("/public/audio/client-request.mp3").play();
 
-        let alert = document.querySelector(`#alert-user-${clientUuid}`);
-        let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
-        clientAllow.onclick = () => {
-            alert.classList.add("alert-click");
-            setTimeout(() => {
-                alert.remove();
-            } ,500)
-            socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
-        }
+            let alert = document.querySelector(`#alert-user-${clientUuid}`);
+            let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
+            clientAllow.onclick = () => {
+                alert.classList.add("alert-click");
+                setTimeout(() => {
+                    alert.remove();
+                } ,500)
+                socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
+            }
 
-        let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
-        clientRefuse.onclick = () => {
-            alert.classList.add("alert-click");
-            setTimeout(() => {
-                alert.remove();
-            } ,500)
-            socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
+            let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
+            clientRefuse.onclick = () => {
+                alert.classList.add("alert-click");
+                setTimeout(() => {
+                    alert.remove();
+                } ,500)
+                socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
-            // 需要改成 delete 不只設 leave
-            refuseUserInRoom(ROOM_ID, clientUuid);
-            // removeMongoRoomData(ROOM_ID, clientUuid, false);
-        }
+                // 需要改成 delete 不只設 leave
+                refuseUserInRoom(ROOM_ID, clientUuid);
+                // removeMongoRoomData(ROOM_ID, clientUuid, false);
+            }
 
-        clientAllow.onmouseover = () => {
-            clientAllow.classList.add("hover");
+            clientAllow.onmouseover = () => {
+                clientAllow.classList.add("hover");
+            }
+            clientAllow.onmouseout = () => {
+                clientAllow.classList.remove("hover");
+            }
+            clientRefuse.onmouseover = () => {
+                clientRefuse.classList.add("hover");
+            }
+            clientRefuse.onmouseout = () => {
+                clientRefuse.classList.remove("hover");
+            }
         }
-        clientAllow.onmouseout = () => {
-            clientAllow.classList.remove("hover");
-        }
-        clientRefuse.onmouseover = () => {
-            clientRefuse.classList.add("hover");
-        }
-        clientRefuse.onmouseout = () => {
-            clientRefuse.classList.remove("hover");
-        }
-    }
-})
+    })
 
+    // chat room
+    socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
+        if(ROOM_ID === roomId){
+            if(tmpMessageName === clientName 
+            && tmpMessageClock === timeSlice[0]
+            && tmpMessageTime === timeSlice[1]){
+                let tag = `<div class="message-content">${message}</div>`
+                let messageBlockS = document.querySelectorAll(".message-block");
+                messageBlockS.forEach((block, i) => {
+                    if(i === messageBlockS.length-1){
+                        block.insertAdjacentHTML("beforeend", tag);
+                    }
+                })
+            }else{
+                let html = `
+                <div class="message-block">
+                    <div class="message-title">
+                        <span class="message-name">${clientName}</span>
+                        <span class="message-clock">${timeSlice[0]}</span>
+                        <span class="message-time">${timeSlice[1]}</span>
+                    </div>
+                    <div class="message-content">${message}</div>
+                </div> 
+                `;
+                messageWrapper.insertAdjacentHTML("beforeend", html);
+            }
+            tmpMessageName = clientName;
+            tmpMessageClock = timeSlice[0];
+            tmpMessageTime = timeSlice[1];
 
-socket.on('client-action', async (roomId, clientName, b) => {
-    console.log(clientName, USER_NAME, b)
-    if(clientName === USER_NAME && b){
-        await SetRoomEnterToken(roomId);
-        history.go(0);
-    }else if(clientName === USER_NAME && !b){
-        window.location = "/";
-    }
-})
-
-// chat room
-socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
-    if(ROOM_ID === roomId){
-        if(tmpMessageName === clientName 
-          && tmpMessageClock === timeSlice[0]
-          && tmpMessageTime === timeSlice[1]){
-            let tag = `<div class="message-content">${message}</div>`
-            let messageBlockS = document.querySelectorAll(".message-block");
-            messageBlockS.forEach((block, i) => {
-                if(i === messageBlockS.length-1){
-                    block.insertAdjacentHTML("beforeend", tag);
-                }
-            })
-        }else{
-            let html = `
-            <div class="message-block">
-                <div class="message-title">
-                    <span class="message-name">${clientName}</span>
-                    <span class="message-clock">${timeSlice[0]}</span>
-                    <span class="message-time">${timeSlice[1]}</span>
-                </div>
-                <div class="message-content">${message}</div>
-            </div> 
-            `;
-            messageWrapper.insertAdjacentHTML("beforeend", html);
+            messageWrapper.scrollTo(0, messageWrapper.scrollHeight);
         }
-        tmpMessageName = clientName;
-        tmpMessageClock = timeSlice[0];
-        tmpMessageTime = timeSlice[1];
+    })
 
-        messageWrapper.scrollTo(0, messageWrapper.scrollHeight);
-    }
-})
-
-// close open chat wrapper
-socket.on('close-open-chat', async (roomId, close) => {
-    if(ROOM_ID === roomId){
-        if(close){
-            messageWrapper.classList.add("add-disabled");
-            sendWrapper.classList.add("add-disabled");
-            sendMessageInput.disabled = true;
-        }else{
-            messageWrapper.classList.remove("add-disabled");
-            sendWrapper.classList.remove("add-disabled");
-            sendMessageInput.disabled = false;
+    // close open chat wrapper
+    socket.on('close-open-chat', async (roomId, close) => {
+        if(ROOM_ID === roomId){
+            if(close){
+                messageWrapper.classList.add("add-disabled");
+                sendWrapper.classList.add("add-disabled");
+                sendMessageInput.disabled = true;
+            }else{
+                messageWrapper.classList.remove("add-disabled");
+                sendWrapper.classList.remove("add-disabled");
+                sendMessageInput.disabled = false;
+            }
         }
-    }
-})
+    })
+}
 
 
 let addVideoStream = async (video, stream, islocal, remoteUuid) => {
@@ -642,14 +657,32 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             document.querySelector(`#wrapper-${remoteUuid} .username-wrapper-room`).classList.add("bg-none");
         }
 
-        let groupData = await extension.getGroupInfo(ROOM_ID);
-        let groupLst = groupData[0];
-        let host = groupData[1];
-        createGroupDom(groupLst, host, USER_ID);
+        if(clientFirstLoad && !auth){
+            let groupData = await extension.getGroupInfo(ROOM_ID);
+            groupLst = groupData[0];
+            host = groupData[1];
+            if (Object.keys(userInRoomObj).length >= groupLst.length){
+                createGroupDom(groupLst, host, USER_ID);
+            }
+        }else{
+            let needAdd = true;
+            groupLst.forEach(data => {
+                if(data.uuid === remoteUuid){
+                    needAdd = false
+                }
+            })
+            if(needAdd){
+                groupLst.push({"uuid": remoteUuid, "audioStatus": remoteAudioStatus});
+            }
+            if (Object.keys(userInRoomObj).length >= groupLst.length){
+                createGroupDom(groupLst, host, USER_ID);
+            }
+        }
 
+        clientFirstLoad = false;
     }
     
-    settingVideoSize();
+    utils.settingVideoSize();
 }
 
 // camera button
@@ -686,7 +719,9 @@ let toggleAudio = async (stream, dom) => {
         dom.classList.add("disable");
         stream.getTracks()[0].enabled = false;
         document.querySelector(".micro-status-icon.local").classList.add("show");
-        document.querySelector(`#group-${USER_ID} .user-micro`).classList.add("micro-off");
+        if(auth || CLIENT){
+            document.querySelector(`#group-${USER_ID} .user-micro`).classList.add("micro-off");
+        }
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
@@ -694,7 +729,9 @@ let toggleAudio = async (stream, dom) => {
         dom.classList.remove("disable");
         stream.getTracks()[0].enabled = true;
         document.querySelector(".micro-status-icon.local").classList.remove("show");
-        document.querySelector(`#group-${USER_ID} .user-micro`).classList.remove("micro-off");
+        if(auth || CLIENT){
+            document.querySelector(`#group-${USER_ID} .user-micro`).classList.remove("micro-off");
+        }
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
@@ -856,59 +893,6 @@ let resetAuthData = async (roomId, uuid) => {
     }
 }
 
-let settingVideoSize = () => {
-    let videoContainerS = document.querySelectorAll(".video-container");
-
-    if(videoContainerS.length == 1){
-        document.querySelector(".user-container").style.flexWrap = "nowrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 80%;
-                height: 600px;
-            `;
-        })
-    }else if(videoContainerS.length == 2){
-        document.querySelector(".user-container").style.flexWrap = "nowrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 50%;
-                height: 440px;
-            `;
-        })
-    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
-        document.querySelector(".user-container").style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 35%;
-            `;
-        })
-        let containerWidth = document.querySelector(".video-container").offsetWidth;
-        videoContainerS.forEach(container => {
-            container.style = `
-                height: calc(${containerWidth}px * 3 / 4);
-                max-height: 300px;
-            `;
-        })
-        let imgBgS = document.querySelectorAll(".img-bg");
-        imgBgS.forEach(img => {
-            img.classList.remove("smaller");
-        })
-    }
-    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
-        document.querySelector(".user-container").style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-            width: 30%;
-            max-height: 270px;
-            `;
-        })
-        let imgBgS = document.querySelectorAll(".img-bg");
-        imgBgS.forEach(img => {
-            img.classList.add("smaller");
-        })
-    }
-}
-
 let messageSubmit = async (e) => {
     e.preventDefault();
     let message = sendMessageInput.value;
@@ -995,7 +979,7 @@ let addAllowClick = () => {
     switchInputInit();
 } 
 
-let createGroupDom = async (groupLst, host, localUuid) => {
+let createGroupDom = async (gLst, host, localUuid) => {
     let firstLine = "";
     let otherLine = "";
     let html = "";
@@ -1006,9 +990,9 @@ let createGroupDom = async (groupLst, host, localUuid) => {
         existLst.push(existId);
     })
 
-    groupLst.forEach(user => {
+    gLst.forEach(user => {
         if (existLst.includes(user.uuid)) return; // forEach 的 return 相當於使用 continue
-        let txt = groupHtml(user, host)
+        let txt = groupHtml(user, host);
 
         if(user.uuid === localUuid){
             firstLine = txt;
@@ -1019,6 +1003,7 @@ let createGroupDom = async (groupLst, host, localUuid) => {
     html = firstLine + otherLine;
 
     document.querySelector(".user-wrapper").insertAdjacentHTML("beforeend", html);
+    groupLst = [];
 }
 
 let groupHtml = (user, host) => {

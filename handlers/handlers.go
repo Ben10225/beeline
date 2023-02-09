@@ -47,6 +47,17 @@ func Room(c *gin.Context) {
 		return
 	}
 
+	if roomPayload.RoomId != room {
+		c.SetCookie("roomT", "", -1, "/", "", false, true)
+		c.HTML(http.StatusOK, "room.html", gin.H{
+			"roomId":     room,
+			"userId":     payload.Uuid,
+			"userName":   payload.Name,
+			"userImgUrl": payload.ImgUrl,
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "room.html", gin.H{
 		"roomId":      room,
 		"userId":      payload.Uuid,
