@@ -20,8 +20,6 @@ if(authExist === "exist"){
     auth = (parseInt(params.auth) === 0);
 }
 
-console.log(CLIENT)
-
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
@@ -992,7 +990,7 @@ let createGroupDom = async (gLst, host, localUuid) => {
 
     gLst.forEach(user => {
         if (existLst.includes(user.uuid)) return; // forEach 的 return 相當於使用 continue
-        let txt = groupHtml(user, host);
+        let txt = groupHtml(user, host, localUuid);
 
         if(user.uuid === localUuid){
             firstLine = txt;
@@ -1003,14 +1001,58 @@ let createGroupDom = async (gLst, host, localUuid) => {
     html = firstLine + otherLine;
 
     document.querySelector(".user-wrapper").insertAdjacentHTML("beforeend", html);
+
+    gLst.forEach(user => {
+        let nameBtn = document.querySelector(`#group-${user.uuid} .user-name`);
+        let block = document.querySelector(`#group-${user.uuid} .auth-check-block`);
+        let extensionBox = document.querySelector(".extension-box");
+        let yesBtn = document.querySelector(`#group-${user.uuid} .auth-allow`);
+        nameBtn.onclick = () => {
+            block.classList.add("show");
+            let ct = 0
+            extensionBox.addEventListener("click", function blockShow(e){
+                ct ++;
+                if (!block.contains(e.target) 
+                    && !nameBtn.contains(e.target) 
+                    && ct > 1) {
+                    block.classList.remove("show");
+                    this.removeEventListener("click", blockShow);
+                }else if(yesBtn.contains(e.target)){
+                    this.removeEventListener("click", blockShow);
+                }
+            })
+        }
+        yesBtn.onclick = () => {
+            block.classList.remove("show");
+        }
+    })
+
     groupLst = [];
 }
 
-let groupHtml = (user, host) => {
+let groupHtml = (user, host, localUuid) => {
     let hostTag = "";
     let audioTag = "";
+    let nameTag = "";
     if(user.uuid === host){
         hostTag = `<div class="user-host"></div>`;
+    }
+    if(user.uuid === localUuid){
+        nameTag = `
+        <div class="user-name can-auth">${userInRoomObj[user.uuid][0]} (you)</div>
+        <div class="auth-check-block">
+            <p>Assign <span>${userInRoomObj[user.uuid][0]}</span> to be the host ?</p>
+            <p class="auth-allow">Yes</p>
+        </div>
+        `;
+    }else{
+        nameTag = `
+        <div class="user-name can-auth">${userInRoomObj[user.uuid][0]}</div>
+        <div class="auth-check-block">
+            <p>Assign <span>${userInRoomObj[user.uuid][0]}</span> to be the host ?</p>
+            <p class="auth-allow">Yes</p>
+        </div>
+        `
     }
     if(!user.audioStatus){
         audioTag = "micro-off"
@@ -1035,7 +1077,7 @@ let groupHtml = (user, host) => {
     let txt = `
     <div class="user-one" id="group-${user.uuid}">
         ${imgSetting}
-        <div class="user-name">${userInRoomObj[user.uuid][0]}</div>
+        ${nameTag}
         ${hostTag}
         <div class="user-micro ${audioTag}">
             <i class="fa-solid fa-microphone-slash"></i>
@@ -1045,3 +1087,8 @@ let groupHtml = (user, host) => {
     `;
     return txt;
 }
+
+
+
+// window.checkGiveAuth = checkGiveAuth;
+

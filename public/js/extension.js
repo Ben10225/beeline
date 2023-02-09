@@ -158,6 +158,8 @@ let getGroupInfo = async (roomId) => {
     return [data.data, data.host];
 }
 
+
+
 export default {
     rightIconsInit,
     getGroupInfo,
