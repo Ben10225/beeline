@@ -173,9 +173,9 @@ func GetUserAuth(c *gin.Context) {
 	roomId := req.RoomId
 	uuid := req.Uuid
 
-	auth, chatOpen := models.GetUserNewAuth(c, roomId, uuid)
+	newHost, chatOpen := models.GetRoomNewHost(c, roomId, uuid)
 	c.JSON(http.StatusOK, gin.H{
-		"auth":     auth,
+		"newHost":  newHost,
 		"chatOpen": chatOpen,
 	})
 }

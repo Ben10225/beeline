@@ -235,18 +235,18 @@ func UserBackToRoomLeaveStatus(c *gin.Context, roomId, uuid string) {
 	)
 }
 
-func GetUserNewAuth(c *gin.Context, roomId, uuid string) (bool, bool) {
+func GetRoomNewHost(c *gin.Context, roomId, uuid string) (string, bool) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	coll.FindOne(context.TODO(), filter).Decode(&room)
 
 	chatOpen := room.ChatOpen
 	user := room.User
-	var result bool
+	var result string
 
 	for _, v := range user {
-		if v.Uuid == uuid {
-			result = v.Auth
+		if v.Auth {
+			result = v.Uuid
 		}
 	}
 	return result, chatOpen

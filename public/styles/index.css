@@ -133,7 +133,6 @@ body {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .wrapper main #form-container .user-info .auto-img .img-bg {

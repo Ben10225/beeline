@@ -76,22 +76,10 @@ body .bg {
   vertical-align: middle;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   margin-top: 10px;
-  -webkit-animation: alertIn 0.4s both;
-          animation: alertIn 0.4s both;
+  animation: alertIn 0.4s both;
 }
 .client-alert .alert-block.alert-click {
-  -webkit-animation: alertOut 0.4s both;
-          animation: alertOut 0.4s both;
-}
-@-webkit-keyframes alertIn {
-  0% {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0px);
-    opacity: 1;
-  }
+  animation: alertOut 0.4s both;
 }
 @keyframes alertIn {
   0% {
@@ -101,16 +89,6 @@ body .bg {
   100% {
     transform: translateY(0px);
     opacity: 1;
-  }
-}
-@-webkit-keyframes alertOut {
-  0% {
-    transform: translateY(0px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-10px);
-    opacity: 0;
   }
 }
 @keyframes alertOut {
@@ -143,7 +121,6 @@ body .bg {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .client-alert .alert-block h3 {
@@ -159,6 +136,14 @@ body .bg {
   font-weight: 400;
   margin-right: 14px;
   letter-spacing: 0.1em;
+}
+.client-alert .alert-block h3.change-auth-h3 {
+  text-align: center;
+  margin-right: 0;
+  color: #444;
+  font-size: 16px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 .client-alert .alert-block .allow, .client-alert .alert-block .refuse {
   cursor: pointer;
@@ -290,7 +275,6 @@ body .bg {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 #user-setup .setup-container .setup-player .icon-wrapper {
@@ -301,7 +285,6 @@ body .bg {
   transform: translateX(-50%);
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 #user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon {
@@ -490,7 +473,6 @@ body .bg {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 #video-streams .user-container .video-container .video-player video {
@@ -692,7 +674,6 @@ body .bg {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .extension-wrapper .extension-box .group .user-wrapper .user-one .user-name {
@@ -895,7 +876,6 @@ body .bg {
   pointer-events: auto;
   -webkit-user-select: auto;
      -moz-user-select: auto;
-      -ms-user-select: auto;
           user-select: auto;
 }
 .extension-wrapper .extension-box .chat .message-wrapper.add-disabled {
@@ -903,7 +883,6 @@ body .bg {
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .extension-wrapper .extension-box .chat .message-wrapper .message-block {
@@ -1072,6 +1051,7 @@ body .bg {
   margin-right: 5px;
   transition: 0.3s;
   cursor: pointer;
+  position: relative;
 }
 .icon-right-block .icon-right-solo:hover {
   background-color: rgba(207, 207, 207, 0.2);
@@ -1086,6 +1066,23 @@ body .bg {
 }
 .icon-right-block .icon-right-solo .fa-circle-info.clicked {
   color: rgb(48, 48, 48);
+}
+.icon-right-block .icon-right-solo .group-num-block {
+  width: 22px;
+  height: 15px;
+  background-color: rgba(82, 75, 75, 0.8);
+  border-radius: 50px;
+  position: absolute;
+  left: 32px;
+  top: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.icon-right-block .icon-right-solo .group-num-block h6 {
+  color: #fff;
+  font-size: 6px;
+  font-weight: 300;
 }
 .icon-right-block .icon-right-solo .fa-user-group {
   font-size: 22px;

@@ -31,6 +31,7 @@ const messageWrapper = document.querySelector(".message-wrapper");
 const sendWrapper = document.querySelector(".send-wrapper");
 const sendMessageInput = document.querySelector("#send-message");
 const sendImg =  document.querySelector(".send-img");
+const groupNumber = document.querySelector(".group-number");
 
 
 let enterRoom = false;
@@ -282,28 +283,34 @@ navigator.mediaDevices.getUserMedia({
             if (document.querySelector(".allow-click")) return
             setTimeout(async()=>{
                 let data = await resetAuthData(ROOM_ID, USER_ID);
-                let newAuth = data[0];
+                let newHostUuid = data[0];
                 let chatOpen = data[1];
                 // console.log("chatOpen: ", chatOpen);
-                if(newAuth){
+                if(USER_ID === newHostUuid){
                     auth = true;
                     addAllowClick();
                     document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
                     if(!chatOpen){
-                        messageWrapper.classList.add("add-disabled");
-                        sendWrapper.classList.add("add-disabled");
-                        sendMessageInput.disabled = true;
+                        // messageWrapper.classList.add("add-disabled");
+                        // sendWrapper.classList.add("add-disabled");
+                        // sendMessageInput.disabled = true;
     
                         let switchInput = document.querySelector("#switch");
                         switchInput.checked = false;
                     }else{
-                        messageWrapper.classList.remove("add-disabled");
-                        sendWrapper.classList.remove("add-disabled");
-                        sendMessageInput.disabled = false;
+                        // messageWrapper.classList.remove("add-disabled");
+                        // sendWrapper.classList.remove("add-disabled");
+                        // sendMessageInput.disabled = false;
                     }
                 }else{
                     auth = false;
                 }
+
+                let hostTag = `<div class="user-host"></div>`;
+                document.querySelector(`#group-${newHostUuid} .user-micro`).insertAdjacentHTML("beforebegin", hostTag);
+
+                alertNewAuth(newHostUuid);
+
             }, 1000)
         }
 
@@ -334,7 +341,7 @@ let WaitingSocketInit = async () => {
 
 
 let InRoomSocketInit = async () => {
-        // camera
+    // camera
     socket.on('set-view', (options, uuid, b) => {
         if (uuid === USER_ID) return
         if(options === "video"){
@@ -560,6 +567,9 @@ let InRoomSocketInit = async () => {
                     let switchInput = document.querySelector("#switch");
                     switchInput.checked = false;
                 }
+
+                // alert
+                alertNewAuth(newUuid);
             }
         }
     })
@@ -972,7 +982,7 @@ let resetAuthData = async (roomId, uuid) => {
     });
     let data = await response.json();
     if(data){
-        return [data.auth, data.chatOpen];
+        return [data.newHost, data.chatOpen];
     }
 }
 
@@ -1095,6 +1105,7 @@ let createGroupDom = async (gLst, host, localUuid) => {
         })
     }
     groupLst = [];
+    groupNumber.textContent = Object.keys(userInRoomObj).length;
 }
 
 let NameBtnInit = (uuid) => {
@@ -1184,4 +1195,21 @@ let groupHtml = (user, host, localUuid) => {
     return txt;
 }
 
+let alertNewAuth = (uuid) => {
+    let html = `
+    <div class="alert-block" id="auth-alert-${uuid}">
+        <h3 class="change-auth-h3">You are assigned to be the host !</h3>
+    </div>
+    `;
+    document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
+    new Audio("/public/audio/client-request.mp3").play();
+
+    let alert = document.querySelector(`#auth-alert-${uuid}`);
+    setTimeout(() => {
+        alert.classList.add("alert-click");
+    }, 3000)
+    setTimeout(() => {
+        alert.remove();
+    }, 3500)
+}
 
