@@ -70,7 +70,7 @@ body .bg {
   transform: translateX(-158px);
 }
 .client-alert .alert-block {
-  padding: 5px 10px;
+  padding: 7px 10px;
   background-color: #fff;
   border-radius: 7px;
   vertical-align: middle;
@@ -126,15 +126,15 @@ body .bg {
 .client-alert .alert-block h3 {
   font-weight: 300;
   display: inline-block;
-  margin-right: 60px;
+  margin-right: 30px;
   color: #444;
   letter-spacing: 0.04em;
-  font-size: 18px;
+  font-size: 16px;
   vertical-align: middle;
 }
 .client-alert .alert-block h3 span {
   font-weight: 400;
-  margin-right: 14px;
+  margin-right: 16px;
   letter-spacing: 0.1em;
 }
 .client-alert .alert-block h3.change-auth-h3 {
@@ -148,7 +148,7 @@ body .bg {
 .client-alert .alert-block .allow, .client-alert .alert-block .refuse {
   cursor: pointer;
   opacity: 0.4;
-  font-size: 15px;
+  font-size: 16px;
   transition: 0.3s;
 }
 .client-alert .alert-block .allow {

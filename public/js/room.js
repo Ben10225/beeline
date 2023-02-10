@@ -411,9 +411,9 @@ let InRoomSocketInit = async () => {
             let html = `
             <div class="alert-block" id="alert-user-${clientUuid}">
                 ${imgSetting}
-                <h3><span>${clientName}</span>想進入聊天室</h3>
-                <h3 class="allow">准許</h3>
-                <h3 class="refuse">拒絕</h3>
+                <h3><span>${clientName}</span>wants to join this room.</h3>
+                <h3 class="allow">Allow</h3>
+                <h3 class="refuse">Deny</h3>
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
@@ -632,7 +632,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         let player = `
         <div class="video-container">
             <div class="username-wrapper-room local">
-                <span class="user-name">你</span>
+                <span class="user-name">You</span>
             </div>
             <div class="video-player" id="user-${USER_ID}">
                 <div class="micro-status-icon local"></div>

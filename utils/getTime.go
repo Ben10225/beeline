@@ -14,7 +14,6 @@ func GetCurrentTime() []string {
 		minute = "0" + minute
 	}
 
-	var ti string
 	// if hour <= 5 {
 	// 	ti = "凌晨"
 	// } else if hour <= 11 {
@@ -24,6 +23,12 @@ func GetCurrentTime() []string {
 	// } else {
 	// 	ti = "晚上"
 	// }
+
+	var ti string
+	hour += 8
+	if hour > 23 {
+		hour -= 24
+	}
 
 	if hour <= 11 {
 		ti = "AM"
