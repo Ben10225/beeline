@@ -234,6 +234,7 @@ body{
                 right: 5px;
                 top: 0;
                 z-index: 10;
+                z-index: 160;
                 display: none;
                 &.show{
                     display: block;
@@ -464,6 +465,7 @@ body{
                     top: 0;
                     z-index: 10;
                     display: none;
+                    z-index: 160;
                     &.show{
                         display: block;
                     }
