@@ -402,7 +402,7 @@ body{
         justify-content: center;
         align-items: center;
         flex-wrap: nowrap;
-        // gap: 20px;
+        gap: 20px;
         // flex-shrink: 1;
         // flex-direction: row;
         // grid-template-columns: 1fr 1fr;
@@ -425,7 +425,7 @@ body{
             border-radius: 8px;
             background-color: #444;
             position: relative;
-            margin: 15px;
+            // margin: 15px;
             // width: 80%;
             // max-height: 600px;
             // height: calc(100% * 3 / 4);
@@ -1000,6 +1000,7 @@ body{
                     border: none;
                     width: 240px;
                     position: absolute;
+                    font-weight: 300;
                 }
                 #send-message::-webkit-input-placeholder {
                     font-weight: 300;

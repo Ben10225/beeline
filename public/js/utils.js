@@ -154,7 +154,7 @@ let settingVideoSize = () => {
         containerWrapper.style.flexWrap = "wrap";
         videoContainerS.forEach(container => {
             container.style = `
-                width: 40%;
+                width: 35%;
             `;
         })
         let containerWidth = document.querySelector(".video-container").offsetWidth;
