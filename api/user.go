@@ -191,11 +191,12 @@ func UploadImg(c *gin.Context) {
 	imgFile := strings.Split(imgData, ",")[1]
 	imgDecode, _ := base64.StdEncoding.DecodeString(imgFile)
 
-	prefix := strings.Split(fileName, ".")[0]
+	// prefix := strings.Split(fileName, ".")[0]
 	extension := strings.Split(fileName, ".")[1]
 
-	timeString := utils.GenerateCurrentNumber()
-	newFileName := fmt.Sprintf("%v-%v.%v", prefix, timeString, extension)
+	// timeString := utils.GenerateCurrentNumber()
+	// newFileName := fmt.Sprintf("%v-%v.%v", prefix, timeString, extension)
+	newFileName := fmt.Sprintf("%v.%v", payload.Uuid, extension)
 
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-west-2"),

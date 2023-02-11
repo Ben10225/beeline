@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,13 +26,17 @@ func CheckEmailExist(c *gin.Context, email string) bool {
 }
 
 func CreateUser(c *gin.Context, uuid, name, email, password, color string) bool {
+	var tpZone = time.FixedZone("GMT", 8*3600)
+	// fmt.Println(time.Now().In(tpZone).Format("01-02-2006 15:04:05"))
+
 	newUser := structs.User{
 		// Id:       primitive.NewObjectID(),
-		Uuid:     uuid,
-		Name:     name,
-		Email:    email,
-		Password: password,
-		ImgUrl:   color,
+		Uuid:        uuid,
+		Name:        name,
+		Email:       email,
+		Password:    password,
+		ImgUrl:      color,
+		CreatedTime: time.Now().In(tpZone).Format("2006-01-02 15:04:05"),
 	}
 
 	_, err := userCollection.InsertOne(c, newUser)

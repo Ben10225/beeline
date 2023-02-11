@@ -10,17 +10,153 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+.wrapper .bg {
+  width: 100%;
+  height: 100%;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+}
+.wrapper .bg .bg-title {
+  position: absolute;
+  right: 15%;
+  bottom: 10%;
+  color: #111;
+  text-shadow: 2px 2px 2px white;
+  font-style: italic;
+}
+.wrapper .bg .bg-title .brush {
+  position: absolute;
+  width: 300px;
+  height: 150px;
+  top: 10px;
+  left: 160px;
+  background-image: url("/public/images/brush.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0.3;
+}
+.wrapper .bg .bg-title h4 {
+  position: relative;
+  left: 40px;
+  font-size: 50px;
+  z-index: 3;
+  top: -10px;
+}
+.wrapper .bg .bg-title h6 {
+  position: relative;
+  font-size: 35px;
+  z-index: 3;
+}
+.wrapper .bg .template {
+  background-image: url("/public/images/home.png");
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+.wrapper .bg .pic {
+  position: absolute;
+  right: -10px;
+  top: 0;
+  width: 1300px;
+  height: 900px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -2;
+}
+.wrapper .bg .pic.p1 {
+  background-image: url("/public/images/meeting1.jpg");
+  animation: scale-small 18s both linear infinite;
+  background-position: center -40px;
+}
+.wrapper .bg .pic.p2 {
+  background-image: url("/public/images/meeting2.jpg");
+  animation: trans-left 18s 6s both linear infinite;
+}
+.wrapper .bg .pic.p3 {
+  background-image: url("/public/images/meeting3.jpg");
+  animation: trans-right 18s 12s both linear infinite;
+  background-position: 0px -20px;
+}
+@keyframes scale-small {
+  0% {
+    transform: scale(1.1);
+  }
+  40% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+@keyframes trans-left {
+  0% {
+    transform: translateX(0px);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  47% {
+    transform: translateX(40px);
+    opacity: 1;
+  }
+  55% {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+}
+@keyframes trans-right {
+  0% {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  42% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(0px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
 .wrapper main #form-container {
+  height: 100%;
+  position: fixed;
+  left: 0;
   width: 400px;
   box-shadow: var(--shadow);
   background-color: #fff;
   padding: 30px;
-  border-radius: 5px;
-  position: fixed;
-  left: 50%;
-  top: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   font-weight: 500;
-  transform: translate(-50%, -50%);
 }
 .wrapper main #form-container img {
   display: block;
@@ -30,14 +166,16 @@ body {
 .wrapper main #form-container #welcome-message {
   text-align: center;
   margin: 20px;
+  color: rgba(66, 33, 10, 0.9);
 }
 .wrapper main #form-container #welcome-message h1 {
   font-size: 30px;
-  margin-top: 40px;
+  margin-top: 30px;
   margin-bottom: 10px;
 }
 .wrapper main #form-container #welcome-message p {
   font-size: 22px;
+  margin-bottom: 30px;
 }
 .wrapper main #form-container .loading {
   position: absolute;
@@ -48,9 +186,9 @@ body {
 }
 .wrapper main #form-container .loading .loading-txt {
   font-size: 24px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   color: #555;
-  font-weight: 400;
+  font-weight: 500;
   display: inline-block;
 }
 .wrapper main #form-container .loading .loading-gif {
@@ -68,13 +206,14 @@ body {
 .wrapper main #form-container .user-info {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   opacity: 0;
   visibility: hidden;
+  top: 46%;
+  transform: translateX(-50%);
 }
 .wrapper main #form-container .user-info.show {
   opacity: 1;
@@ -148,16 +287,17 @@ body {
 }
 .wrapper main #form-container .user-info .stream {
   margin-top: 40px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-radius: 7px;
   cursor: pointer;
   border: none;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 400;
   color: #fff;
   background-color: rgb(87, 87, 87);
   opacity: 0.3;
   transition: 0.5s;
+  letter-spacing: 0.1px;
 }
 .wrapper main #form-container .user-info .stream:hover {
   opacity: 0.8;
@@ -168,10 +308,10 @@ body {
   border-radius: 7px;
   cursor: pointer;
   border: none;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 500;
   color: #999;
-  opacity: 0.3;
+  opacity: 0.4;
   background: transparent;
   transition: 0.5s;
 }
@@ -266,7 +406,7 @@ body {
 .wrapper main #form-container #sign-wrapper #form-signup .form-field.pwd-role .role h4, .wrapper main #form-container #sign-wrapper #form-signin .form-field.pwd-role .role h4 {
   transition: 0.3s;
   font-weight: 400;
-  margin-top: 6px;
+  margin-top: 1px;
   font-size: 14px;
   opacity: 0.2;
 }

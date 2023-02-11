@@ -175,7 +175,6 @@ let assignNewAuth = async (roomId, oldUuid, newUuid) => {
 }
 
 
-
 export default {
     rightIconsInit,
     getGroupInfo,

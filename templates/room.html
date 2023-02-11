@@ -25,7 +25,7 @@
 <body>
     <div class="bg"></div>
     <div id="waiting-block">
-        <h4>Room entering</h4>
+        <h4>讀取中</h4>
         <div class="waiting-gif"></div>
     </div>
     <div class="wrapper">
@@ -35,30 +35,32 @@
             <div class="extension-box">
                 <div class="exit"></div>
                 <div class="info">
-                    <h2>Room's information</h2>
+                    <h2>會議詳細資料</h2>
                     <div class="info-details">
-                        <p class="info-p">Joining info</p>
+                        <p class="info-p">如何加入會議</p>
                         <p class="copy-link-txt"></p>
                         <div class="copy-block">
                             <i class="fa-regular fa-copy"></i>
-                            <p>Copy joining info</p>
+                            <p>複製會議參加資訊</p>
                         </div>
                         <hr>
                     </div>
                 </div>
                 <div class="group">
-                    <h2>People</h2>
+                    <h2>參與者</h2>
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="search" placeholder="Search for people">
+                        <input type="text" id="search" placeholder="搜尋使用者">
                     </div>
-                    <h6>In call</h6>
+                    <h6>通話中</h6>
                     <div class="user-wrapper">
                         <!-- 
                         <div class="user-one">
                             <div class="user-img"></div>
                             <div class="user-name">ben peng</div>
-                            <div class="user-host"></div>
+                            <div class="user-host">
+                                <div class="bee-gif"></div>
+                            </div>
                             <div class="user-micro micro-off">
                                 <i class="fa-solid fa-microphone-slash"></i>
                                 <i class="fa-solid fa-microphone"></i>
@@ -79,9 +81,9 @@
                     </div>
                 </div>
                 <div class="chat">
-                    <h2>In-call messages</h2>
+                    <h2>通話中的訊息</h2>
                     <div class="allow-click">
-                        <p>Let everyone send messages</p>
+                        <p>允許所有人傳送訊息</p>
                         <div class="switch-button">
                             <input type="checkbox" id="switch" checked>
                             <label for="switch">
@@ -90,7 +92,7 @@
                         </div>
                     </div>
                     <div class="chat-caution">
-                        <p>Message can only be seen by people in the call and are deleted when the call ends</p>
+                        <p>只有這場通話的參與者可以查看訊息，而且訊息會在通話結束後刪除</p>
                     </div>
                     <div class="message-wrapper">
                         <!-- <div class="message-block">
@@ -115,7 +117,7 @@
 
                     <div class="send-wrapper">
                         <form id="form-message-submit">
-                            <input id="send-message" type="text" placeholder="Send a message to everyone" autocomplete="off">
+                            <input id="send-message" type="text" placeholder="傳送訊息給所有人" autocomplete="off">
                             <input id="send-messagebg" autocomplete="off" disabled>
                             <button class="send-button">
                                 <div class="send-img"></div>

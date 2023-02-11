@@ -118,36 +118,50 @@ let copyContent = async (url) => {
 }
 
 let settingVideoSize = () => {
+    const videoStreams = document.querySelector("#video-streams");
+    const containerWrapper = document.querySelector(".user-container");
     let videoContainerS = document.querySelectorAll(".video-container");
 
     if(videoContainerS.length == 1){
-        document.querySelector(".user-container").style.flexWrap = "nowrap";
+        containerWrapper.style.flexWrap = "nowrap";
         videoContainerS.forEach(container => {
             container.style = `
                 width: 80%;
-                height: 600px;
-            `;
-        })
-    }else if(videoContainerS.length == 2){
-        document.querySelector(".user-container").style.flexWrap = "nowrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 50%;
-                height: 440px;
-            `;
-        })
-    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
-        document.querySelector(".user-container").style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 35%;
             `;
         })
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 300px;
+                max-height: 100%;
+            `;
+        })
+    }else if(videoContainerS.length == 2){
+        containerWrapper.style.flexWrap = "nowrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 50%;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 100%;
+            `;
+        })
+    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
+        containerWrapper.style.flexWrap = "wrap";
+        videoContainerS.forEach(container => {
+            container.style = `
+                width: 40%;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 100%;
             `;
         })
         let imgBgS = document.querySelectorAll(".img-bg");
@@ -156,11 +170,16 @@ let settingVideoSize = () => {
         })
     }
     else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
-        document.querySelector(".user-container").style.flexWrap = "wrap";
         videoContainerS.forEach(container => {
             container.style = `
             width: 30%;
-            max-height: 270px;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 100%;
             `;
         })
         let imgBgS = document.querySelectorAll(".img-bg");

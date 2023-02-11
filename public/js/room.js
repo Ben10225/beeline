@@ -20,6 +20,10 @@ if(authExist === "exist"){
     auth = (parseInt(params.auth) === 0);
 }
 
+if(auth === USER_ID){
+    auth = true;
+}
+
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
@@ -112,7 +116,7 @@ let connectPeer = () => {
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
-}).then( stream => {
+}).then( async stream => {
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
 
         socket = io({transports: ['websocket']});
@@ -190,10 +194,10 @@ navigator.mediaDevices.getUserMedia({
             </div>
         </div>
         <div class="setting-options">
-            <h2>Grooming yourself</h2>
-            <p>If everything is okay...</p>   
+            <h2>請確認你的狀態</h2>
+            <p>如果一切準備就緒...</p>   
             <div class="button-block">
-                <button id="enter-request">Let's go</button>
+                <button id="enter-request">申請加入會議</button>
             </div>
         </div>
         `
@@ -202,6 +206,8 @@ navigator.mediaDevices.getUserMedia({
             video.play();
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
+        await insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
+
 
         const btn = document.querySelector("#enter-request");
         btn.onclick = () => {
@@ -232,8 +238,6 @@ navigator.mediaDevices.getUserMedia({
             // 這邊不要用 onunload 不然頁面轉跳 資料庫就直接拿掉了
             // refuseUserInRoom(ROOM_ID, USER_ID);
         }
-
-        insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
     }
 
     socket.on('user-connected', async uuid => {
@@ -260,7 +264,7 @@ navigator.mediaDevices.getUserMedia({
                 groupLst = groupData[0];
                 host = groupData[1];
 
-                console.log(groupLst)
+                // console.log(groupLst)
 
                 if (Object.keys(userInRoomObj).length >= groupLst.length 
                     && userInRoomObj[USER_ID]){
@@ -277,7 +281,11 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-disconnected', async uuid => {
         console.log("out meeting: ", uuid);
 
-        if (userInRoomObj[uuid]) delete userInRoomObj[uuid];
+        if (userInRoomObj[uuid]){
+            delete userInRoomObj[uuid];
+            console.log(userInRoomObj);
+            groupNumber.textContent = Object.keys(userInRoomObj).length;
+        } 
 
         if(userInRoomObj[USER_ID] && uuid !== USER_ID){
             if (document.querySelector(".allow-click")) return
@@ -302,15 +310,16 @@ navigator.mediaDevices.getUserMedia({
                         // sendWrapper.classList.remove("add-disabled");
                         // sendMessageInput.disabled = false;
                     }
+                    newAuthGroupSetting();
+                    alertNewAuth(newHostUuid);
+
                 }else{
                     auth = false;
                 }
-
-                let hostTag = `<div class="user-host"></div>`;
-                document.querySelector(`#group-${newHostUuid} .user-micro`).insertAdjacentHTML("beforebegin", hostTag);
-
-                alertNewAuth(newHostUuid);
-
+                if(!document.querySelector(".bee-gif")){
+                    let hostTag = `<div class="bee-gif"></div>`;
+                    document.querySelector(`#group-${newHostUuid} .user-host`).insertAdjacentHTML("beforeend", hostTag);
+                }
             }, 1000)
         }
 
@@ -411,9 +420,9 @@ let InRoomSocketInit = async () => {
             let html = `
             <div class="alert-block" id="alert-user-${clientUuid}">
                 ${imgSetting}
-                <h3><span>${clientName}</span>wants to join this room.</h3>
-                <h3 class="allow">Allow</h3>
-                <h3 class="refuse">Deny</h3>
+                <h3><span>${clientName}</span>想加入此會議</h3>
+                <h3 class="allow">准許</h3>
+                <h3 class="refuse">拒絕</h3>
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
@@ -460,9 +469,21 @@ let InRoomSocketInit = async () => {
     // chat room
     socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
         if(ROOM_ID === roomId){
+
+            let currentdate = new Date().toLocaleTimeString();
+            let time = currentdate.slice(0,2);
+            let clock = currentdate.slice(2,-3);
+            let hour = clock.split(":")[0];
+
+            if(time === "上午" && hour <= 6){
+                time = "凌晨";
+            }else if(time === "下午" && hour >= 18){
+                time = "晚上";
+            }
+
             if(tmpMessageName === clientName 
-            && tmpMessageClock === timeSlice[0]
-            && tmpMessageTime === timeSlice[1]){
+            && tmpMessageClock === clock
+            && tmpMessageTime === time){
                 let tag = `<div class="message-content">${message}</div>`
                 let messageBlockS = document.querySelectorAll(".message-block");
                 messageBlockS.forEach((block, i) => {
@@ -475,8 +496,8 @@ let InRoomSocketInit = async () => {
                 <div class="message-block">
                     <div class="message-title">
                         <span class="message-name">${clientName}</span>
-                        <span class="message-clock">${timeSlice[0]}</span>
-                        <span class="message-time">${timeSlice[1]}</span>
+                        <span class="message-time">${time}</span>
+                        <span class="message-clock">${clock}</span>
                     </div>
                     <div class="message-content">${message}</div>
                 </div> 
@@ -484,8 +505,8 @@ let InRoomSocketInit = async () => {
                 messageWrapper.insertAdjacentHTML("beforeend", html);
             }
             tmpMessageName = clientName;
-            tmpMessageClock = timeSlice[0];
-            tmpMessageTime = timeSlice[1];
+            tmpMessageClock = clock;
+            tmpMessageTime = time;
 
             messageWrapper.scrollTo(0, messageWrapper.scrollHeight);
         }
@@ -509,15 +530,17 @@ let InRoomSocketInit = async () => {
     // auth change
     socket.on('auth-change-set', async (roomId, oldUuid, newUuid) => {
         if(ROOM_ID === roomId){
+            let originHostDom = document.querySelector(`#group-${oldUuid} .user-host`);
+            originHostDom.replaceChildren();
+
             if(USER_ID === newUuid){
                 auth = true;
             }else{
                 auth = false;
             }
 
-            let hostTag = `<div class="user-host"></div>`;
-            document.querySelector(`#group-${oldUuid} .user-host`).remove();
-            document.querySelector(`#group-${newUuid} .user-micro`).insertAdjacentHTML("beforebegin", hostTag);
+            let hostTag = `<div class="bee-gif"></div>`;
+            document.querySelector(`#group-${newUuid} .user-host`).insertAdjacentHTML("beforeend", hostTag);
 
             if(USER_ID === oldUuid){
                 let blocks = document.querySelectorAll(`.auth-check-block`);
@@ -535,26 +558,7 @@ let InRoomSocketInit = async () => {
             }
             if(USER_ID === newUuid){
                 // group
-                let uuidDoms = document.querySelectorAll(".user-one");
-                let uuids = []
-                uuidDoms.forEach(dom => {
-                    let uuid = dom.id.split("-")[1];
-                    uuids.push(uuid);
-                })
-
-                let nameBtns = document.querySelectorAll(`.group .user-name`);
-                nameBtns.forEach((name, index)=> {
-                    if (index === 0 ) return
-                    name.classList.add("can-auth");
-                    let html = `
-                    <div class="auth-check-block">
-                        <p>Assign <span>${name.textContent}</span> to be the host ?</p>
-                        <p class="auth-allow">Yes</p>
-                    </div>
-                    `;
-                    name.insertAdjacentHTML("afterend", html);
-                    NameBtnInit(uuids[index]);
-                })
+                newAuthGroupSetting();
 
                 // chat room
                 let data = await resetAuthData(ROOM_ID, USER_ID);
@@ -632,7 +636,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         let player = `
         <div class="video-container">
             <div class="username-wrapper-room local">
-                <span class="user-name">You</span>
+                <span class="user-name">你</span>
             </div>
             <div class="video-player" id="user-${USER_ID}">
                 <div class="micro-status-icon local"></div>
@@ -748,10 +752,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             document.querySelector(`#wrapper-${remoteUuid} .username-wrapper-room`).classList.add("bg-none");
         }
 
+        let groupData = await extension.getGroupInfo(ROOM_ID);
+        groupLst = groupData[0];
+        host = groupData[1];
+
         if(clientFirstLoad && !auth){
-            let groupData = await extension.getGroupInfo(ROOM_ID);
-            groupLst = groupData[0];
-            host = groupData[1];
             if (Object.keys(userInRoomObj).length >= groupLst.length){
                 // console.log("cc")
                 createGroupDom(groupLst, host, USER_ID);
@@ -993,11 +998,6 @@ let messageSubmit = async (e) => {
     sendMessageInput.value = "";
     socket.emit('chat', ROOM_ID, USER_NAME, message);
     sendImg.classList.remove("entering");
-
-    // let currentdate = new Date().toLocaleTimeString();
-    // let time = currentdate.slice(0,2);
-    // let clock = currentdate.slice(2,-3)
-    // if (time === "下午") time = "晚上"
 }
 
 extension.rightIconsInit();
@@ -1059,7 +1059,7 @@ let getRoomChatStatus = async (roomId) => {
 let addAllowClick = () => {
     let html = `
     <div class="allow-click">
-        <p>Let everyone send messages</p>
+        <p>允許所有人傳送訊息</p>
         <div class="switch-button">
             <input type="checkbox" id="switch" checked>
             <label for="switch">
@@ -1138,17 +1138,17 @@ let NameBtnInit = (uuid) => {
     }
 }
 
-
 let groupHtml = (user, host, localUuid) => {
+    // if (!userInRoomObj[user.uuid]) return
     let hostTag = "";
     let audioTag = "";
     let nameTag = "";
     if(user.uuid === host){
-        hostTag = `<div class="user-host"></div>`;
+        hostTag = `<div class="bee-gif"></div>`;
     }
     if(user.uuid === localUuid || !auth){
         if(user.uuid === localUuid){
-            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]} (you)</div>`;
+            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]} (你)</div>`;
         }else{
             nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]}</div>`;
         }
@@ -1156,8 +1156,8 @@ let groupHtml = (user, host, localUuid) => {
         nameTag = `
         <div class="user-name">${userInRoomObj[user.uuid][0]}</div>
         <div class="auth-check-block">
-            <p>Assign <span>${userInRoomObj[user.uuid][0]}</span> to be the host ?</p>
-            <p class="auth-allow">Yes</p>
+            <p>是否指定 <span>${userInRoomObj[user.uuid][0]}</span> 為會議主辦人？</p>
+            <p class="auth-allow">是</p>
         </div>
         `
     }
@@ -1185,7 +1185,9 @@ let groupHtml = (user, host, localUuid) => {
     <div class="user-one" id="group-${user.uuid}">
         ${imgSetting}
         ${nameTag}
-        ${hostTag}
+        <div class="user-host">
+            ${hostTag}
+        </div>
         <div class="user-micro ${audioTag}">
             <i class="fa-solid fa-microphone-slash"></i>
             <i class="fa-solid fa-microphone"></i>
@@ -1198,7 +1200,7 @@ let groupHtml = (user, host, localUuid) => {
 let alertNewAuth = (uuid) => {
     let html = `
     <div class="alert-block" id="auth-alert-${uuid}">
-        <h3 class="change-auth-h3">You are assigned to be the host !</h3>
+        <h3 class="change-auth-h3">您已被指派為會議主辦人</h3>
     </div>
     `;
     document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
@@ -1213,3 +1215,25 @@ let alertNewAuth = (uuid) => {
     }, 3500)
 }
 
+let newAuthGroupSetting = () => {
+    let uuidDoms = document.querySelectorAll(".user-one");
+    let uuids = []
+    uuidDoms.forEach(dom => {
+        let uuid = dom.id.split("-")[1];
+        uuids.push(uuid);
+    })
+
+    let nameBtns = document.querySelectorAll(`.group .user-name`);
+    nameBtns.forEach((name, index)=> {
+        if (index === 0 ) return
+        name.classList.add("can-auth");
+        let html = `
+        <div class="auth-check-block">
+            <p>是否指定 <span>${name.textContent}</span> 為會議主辦人？</p>
+            <p class="auth-allow">是</p>
+        </div>
+        `;
+        name.insertAdjacentHTML("afterend", html);
+        NameBtnInit(uuids[index]);
+    })
+}

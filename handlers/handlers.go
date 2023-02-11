@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"beeline/models"
 	"beeline/utils"
 	"net/http"
 
@@ -55,6 +56,13 @@ func Room(c *gin.Context) {
 			"userName":   payload.Name,
 			"userImgUrl": payload.ImgUrl,
 		})
+		return
+	}
+
+	status := models.FindRoom(c, roomPayload.RoomId)
+	if !status {
+		c.SetCookie("roomT", "", -1, "/", "", false, true)
+		c.Redirect(http.StatusFound, "/")
 		return
 	}
 

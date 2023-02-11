@@ -27,11 +27,12 @@ type UserResponse struct {
 
 type User struct {
 	// Id       primitive.ObjectID `json:"id,omitempty"`
-	Uuid     string `json:"uuid,omitempty" validate:"required"`
-	Name     string `json:"name,omitempty" validate:"required"`
-	Email    string `json:"email,omitempty" validate:"required"`
-	Password string `json:"password,omitempty" validate:"required"`
-	ImgUrl   string `json:"imgurl,omitempty"`
+	Uuid        string `json:"uuid,omitempty" validate:"required"`
+	Name        string `json:"name,omitempty" validate:"required"`
+	Email       string `json:"email,omitempty" validate:"required"`
+	Password    string `json:"password,omitempty" validate:"required"`
+	ImgUrl      string `json:"imgurl,omitempty"`
+	CreatedTime string `json:"createdtime,omitempty"`
 }
 
 type ImageUpload struct {

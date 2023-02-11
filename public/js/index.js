@@ -392,7 +392,7 @@ function toDataURL(url, callback) {
     xhr.send();
 }
 
-
+// document.querySelector(".pic").style = `z-index: -2`;
 
 utils.auth("index");
 signTwoBlockButtonInit();

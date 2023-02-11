@@ -61,7 +61,7 @@ body{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    // padding: 10px;
     width: 100%;
     height: 100vh;
 }
@@ -71,6 +71,7 @@ body{
     margin-top: 10px;
     z-index: 300;
     transition: 0.6s;
+    user-select: none;
     &.go-left{
         transform: translateX(-158px);
     }
@@ -133,18 +134,18 @@ body{
             color: #444;
             // color: red;
             letter-spacing: 0.04em;
-            font-size: 16px;
+            font-size: 14px;
             vertical-align: middle;
             span{
                 font-weight: 400;
-                margin-right: 16px;
+                margin-right: 14px;
                 letter-spacing: 0.1em;
             }
             &.change-auth-h3{
                 text-align: center;
                 margin-right: 0;
                 color: #444;
-                font-size: 16px;
+                font-size: 14px;
                 padding-left: 5px;
                 padding-right: 5px;
             }
@@ -152,7 +153,7 @@ body{
         .allow, .refuse{
             cursor: pointer;
             opacity: 0.4;
-            font-size: 16px;
+            font-size: 14px;
             transition: 0.3s;
         }
         .allow{
@@ -176,7 +177,7 @@ body{
     display: flex;
     flex-direction: row;
     position: relative;
-    top: -7%;
+    // top: -7%;
     background-color: #fff;
     padding: 70px;
     border-radius: 15px;
@@ -220,6 +221,7 @@ body{
                 height: 100%;
                 object-fit: cover;
                 border-radius: 5px;
+                transform: scaleX(-1);
             }
             .micro-status-icon{
                 width: 50px;
@@ -249,6 +251,7 @@ body{
                 align-items: center;
                 display: none;
                 border-radius: 5px;
+                z-index: 150;
                 &.show{
                     display: block;
                 }
@@ -342,7 +345,7 @@ body{
                 margin-top: 20px;
                 padding: 8px 10px;
                 cursor: pointer;
-                font-size: 18px;
+                font-size: 15px;
                 border-radius: 7px;
                 border: none;
                 background-color: #df9c4a;
@@ -364,7 +367,7 @@ body{
                 background-size: cover;
                 display: inline-block;
                 position: absolute;
-                left: 100px;
+                left: 120px;
                 top: 20px;
                 opacity: 0.8;
                 transform: scale(0.8);
@@ -380,15 +383,16 @@ body{
     // background-color: red;
     max-width: 1200px;
     width: 80vw;
-    margin-top: 80px;
+    // margin-top: 80px;
+    padding: 40px;
     min-width: -webkit-min-content;
     position: relative;
-
+    // height: 100%;
 
     // flex-direction: row;
     // flex-wrap: wrap;
     // width: 50%;
-    // height: calc(100vh - 230px);
+    height: calc(100vh - 90px);
     // margin: 0 auto;
     // display: grid;
     // grid-template-columns: 1fr 1fr;
@@ -397,12 +401,13 @@ body{
         justify-content: center;
         align-items: center;
         flex-wrap: nowrap;
-        gap: 20px;
+        // gap: 20px;
         // flex-shrink: 1;
         // flex-direction: row;
         // grid-template-columns: 1fr 1fr;
         width: 100%;
-        height: calc(100vh - 265px);
+        height: 100%;
+        // height: calc(100vh - 265px);
         transition: 0.6s;
         &.go-left{
             transform: translateX(-158px);
@@ -419,8 +424,9 @@ body{
             border-radius: 8px;
             background-color: #444;
             position: relative;
+            margin: 15px;
             // width: 80%;
-            max-height: 600px;
+            // max-height: 600px;
             // height: calc(100% * 3 / 4);
             .username-wrapper-room{
                 position: absolute;
@@ -473,6 +479,7 @@ body{
                     justify-content: center;
                     align-items: center;
                     display: none;
+                    z-index: 150;
                     &.show{
                         display: block;
                     }
@@ -510,6 +517,7 @@ body{
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
+                    transform: scaleX(-1);
                 }
             }
         }
@@ -548,6 +556,7 @@ body{
     right: 15px;
     z-index: 100;
     position: fixed;
+    margin-top: 11px;
     // justify-content: center;
     // align-items: center;
     .extension-box{
@@ -598,6 +607,7 @@ body{
                 margin-top: 20px;
                 font-size: 18px;
                 margin-left: 10px;
+                font-weight: 400;
             }
             .info-details{
                 margin-top: 45px;
@@ -631,7 +641,8 @@ body{
                     p{  
                         display: inline-block;
                         font-size: 13px;
-                        font-weight: 400;
+                        font-weight: 300;
+                        letter-spacing: 0.05;
                         color: #367cea;
                     }
                 }
@@ -655,6 +666,7 @@ body{
                 margin-left: 10px;
                 font-size: 18px;
                 margin-bottom: 25px;
+                font-weight: 400;
             }
             .search-bar{
                 margin-left: 8px;
@@ -775,16 +787,18 @@ body{
                         }
                     }
                     .user-host{
-                        width: 40px;
-                        height: 40px;
-                        display: inline-block;
-                        background-image: url('/public/images/bee-host-2.gif');
-                        background-position: center;
-                        background-repeat: no-repeat;
-                        background-size: contain;
-                        vertical-align: middle;
                         position: absolute;
                         top: -7px;
+                        display: inline-block;
+                        .bee-gif{
+                            width: 40px;
+                            height: 40px;
+                            background-image: url('/public/images/bee-host-2.gif');
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            background-size: contain;
+                            vertical-align: middle;
+                        }
                     }
                     .user-micro{
                         display: inline-block;
@@ -834,6 +848,7 @@ body{
                 margin-top: 20px;
                 margin-left: 10px;
                 font-size: 18px;
+                font-weight: 400;
             }
             .allow-click{
                 margin-top: 15px;
@@ -849,6 +864,7 @@ body{
                     font-weight: 300;
                     font-size: 10px;
                     text-align: left;
+                    margin-left: 3px;
                 }
                 .switch-button{
                     position: absolute;
@@ -915,7 +931,7 @@ body{
                 justify-content: center;
                 align-items: center;
                 border-radius: 8px;
-                padding: 10px 12px;
+                padding: 10px 10px;
                 p{
                     font-weight: 300;
                     font-size: 10px;
@@ -938,26 +954,30 @@ body{
                 .message-block{
                     font-size: 13px;
                     margin-bottom: 20px;
+                    word-wrap: break-word;
+                    white-space: normal;
                     .message-title{
                         margin-bottom: 5px;
+                        .message-time{
+                            font-size: 5px;
+                            font-weight: 200;
+                            color: #444;
+                            letter-spacing: 0.05em;
+                            margin-left: 6px;
+                        }   
                         .message-clock{
-                            margin-left: 5px;
+                            margin-left: -2px;
                             font-size: 6px;
                             font-weight: 200;
-                            letter-spacing: 0.05em;
+                            letter-spacing: 0.1em;
                             margin-right: 0px;
                             color: #444;
-                        }    
-                        .message-time{
-                            font-size: 6px;
-                            font-weight: 200;
-                            color: #444;
-                            letter-spacing: 0.05em;
-                        }                    
+                        }                     
                     }
                     .message-content{
                         font-weight: 200;
                         margin-bottom: 10px;
+                        line-height: 20px;
                     }
                 }
             }
@@ -978,6 +998,10 @@ body{
                     border: none;
                     width: 240px;
                     position: absolute;
+                }
+                #send-message::-webkit-input-placeholder {
+                    font-weight: 300;
+                    opacity: 0.7;
                 }
                 #send-messagebg{
                     outline: none;
@@ -1164,7 +1188,8 @@ body{
 //捲軸底色
 ::-webkit-scrollbar-track {
     // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    background-color: #fff;
+    // background-color: #fff;
+    background-color: transparent;
 }
 //捲軸寬度
 ::-webkit-scrollbar {
