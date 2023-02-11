@@ -477,6 +477,9 @@ let InRoomSocketInit = async () => {
 
             if(time === "上午" && hour <= 6){
                 time = "凌晨";
+            }else if(time === "上午" && hour == 12){
+                clock = "0" + clock.slice(2);
+                time = "凌晨";
             }else if(time === "下午" && hour >= 18){
                 time = "晚上";
             }
