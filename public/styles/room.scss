@@ -209,9 +209,9 @@ body{
         position: relative;
         width: 55%;
         height: 400px;
-        .username-wrapper{
-            font-size: 22px;
-        }
+        // .username-wrapper{
+        //     font-size: 22px;
+        // }
         .setup-player{
             width: 100%;
             height: 100%;
@@ -258,7 +258,6 @@ body{
                 }
                 .auto-img{
                     position: relative;
-                    cursor: pointer;
                     width: 100%;
                     height: 100%;
                     display: flex;
@@ -439,6 +438,7 @@ body{
                 border-radius: 5px;
                 font-size: 20px;
                 letter-spacing: 0.05em;
+                z-index: 160;
                 color: #fff;
                 &.bg-none{
                     background-color: rgba(0,0,0,0);
@@ -463,7 +463,6 @@ body{
                     position: absolute;
                     right: 5px;
                     top: 0;
-                    z-index: 10;
                     display: none;
                     z-index: 160;
                     &.show{
@@ -487,7 +486,6 @@ body{
                     }
                     .auto-img{
                         position: relative;
-                        cursor: pointer;
                         width: 100%;
                         height: 100%;
                         display: flex;
@@ -526,19 +524,19 @@ body{
     }
 }
 
-.username-wrapper{
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 100;
-    background-color: rgba(0,0,0, 0.3);
-    padding: 4px 6px 4px 7px;
-    border-radius: 5px;
-    font-size: 18px;
-    text-align: center;
-    letter-spacing: 0.05em;
-    color: #fff;
-}
+// .username-wrapper{
+//     position: absolute;
+//     top: 10px;
+//     left: 10px;
+//     background-color: rgba(0,0,0, 0.3);
+//     padding: 4px 6px 4px 7px;
+//     border-radius: 5px;
+//     font-size: 18px;
+//     text-align: center;
+//     letter-spacing: 0.05em;
+//     color: #fff;
+//     z-index: 160;
+// }
 
 .video-player > * {
     border-radius: 8px;

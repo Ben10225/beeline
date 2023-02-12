@@ -36,6 +36,7 @@ const sendWrapper = document.querySelector(".send-wrapper");
 const sendMessageInput = document.querySelector("#send-message");
 const sendImg =  document.querySelector(".send-img");
 const groupNumber = document.querySelector(".group-number");
+const searchBar = document.querySelector("#search");
 
 
 let enterRoom = false;
@@ -1014,6 +1015,7 @@ sendMessageInput.addEventListener("input", ()=>{
     }
 })
 
+searchBar.addEventListener("input", extension.searchUser);  
 
 let switchInputInit = () => {
     const switchInput = document.querySelector("#switch");

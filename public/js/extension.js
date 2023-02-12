@@ -11,6 +11,7 @@ const group = document.querySelector(".group");
 const chat = document.querySelector(".chat");
 const exitIcon = document.querySelector(".exit");
 const alertWrapper = document.querySelector(".client-alert");
+const searchBar = document.querySelector("#search");
 
 const extensionDomLst = [info, group, chat];
 const iconLst = [infoIcon, groupIcon, chatIcon];
@@ -174,11 +175,28 @@ let assignNewAuth = async (roomId, oldUuid, newUuid) => {
     // return [data.data, data.host];
 }
 
+let searchUser = async () => {
+    let value = searchBar.value;
+    let domS = document.querySelectorAll(".user-one");
+    domS.forEach((dom, index) => {
+        let txt = dom.childNodes[3].textContent;
+        if(index === 0){
+            txt = txt.slice(0,-4);
+        }
+        if(!txt.includes(value)){
+            dom.style = "display: none";
+        }else{
+            dom.style = "display: block";
+        }
+    })
+}
+
 
 export default {
     rightIconsInit,
     getGroupInfo,
     assignNewAuth,
+    searchUser,
 }
 
 

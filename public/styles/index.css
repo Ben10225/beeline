@@ -157,6 +157,7 @@ body {
   justify-content: center;
   flex-direction: column;
   font-weight: 500;
+  z-index: 10;
 }
 .wrapper main #form-container img {
   display: block;
