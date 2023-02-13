@@ -727,7 +727,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
         let remoteAudioStatus = data.audioStatus;
         let remoteVideoStatus = data.videoStatus;
 
-        userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
 
         document.querySelector(`#wrapper-${remoteUuid} span`).textContent = remoteName;
         if(remoteImgUrl[0] !== "#"){
@@ -749,11 +748,15 @@ let addVideoStream = async (video, stream, islocal, remoteUuid) => {
             document.querySelector(`#wrapper-${remoteUuid} .username-wrapper-room`).classList.add("bg-none");
         }
 
-        let groupData = await extension.getGroupInfo(ROOM_ID);
-        groupLst = groupData[0];
-        host = groupData[1];
+        if(!userInRoomObj[remoteUuid]){
+            let groupData = await extension.getGroupInfo(ROOM_ID);
+            groupLst = groupData[0];
+            host = groupData[1];
+    
+            createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
+            userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
+        }
 
-        createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
 
         // if(clientFirstLoad && !auth){
         //     if (Object.keys(userInRoomObj).length >= groupLst.length){
@@ -1109,8 +1112,6 @@ let addAllowClick = () => {
 } 
 
 let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) => {
-    groupNumber.textContent = Object.keys(userInRoomObj).length;
-
     let hostTag = "";
     let audioTag = "";
     let nameTag = "";
@@ -1136,7 +1137,7 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
         audioTag = "micro-off"
     }
     let imgSetting = "";
-    if(imgUrl !== "#"){
+    if(imgUrl[0] !== "#"){
         imgSetting = `
         <div class="user-img" style="
             background-image: url('${imgUrl}');
@@ -1166,6 +1167,9 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
     </div>
     `;
     document.querySelector(".user-wrapper").insertAdjacentHTML(position, txt);
+
+    // groupNumber.textContent = Object.keys(userInRoomObj).length;
+    groupNumber.textContent = document.querySelectorAll(".user-one").length;
 
     if(auth){
         if (uuid === USER_ID) return;

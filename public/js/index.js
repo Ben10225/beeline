@@ -394,6 +394,15 @@ function toDataURL(url, callback) {
 
 // document.querySelector(".pic").style = `z-index: -2`;
 
+navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+}).then( stream => {
+    stream.getTracks()[1].stop();
+    stream.getTracks()[0].stop();
+})
+
+
 utils.auth("index");
 signTwoBlockButtonInit();
 inputEmailSignin.addEventListener("input", checkEmailSignin);
@@ -409,10 +418,4 @@ formSignup.addEventListener("submit", signupSubmit);
 
 inputImg.addEventListener("change", uploadImg)
 
-navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true
-}).then( stream => {
-    stream.getTracks()[1].stop();
-    stream.getTracks()[0].stop();
-})
+
