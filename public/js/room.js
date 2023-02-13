@@ -5,11 +5,24 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
-let auth;
+let pct = 0;
+let enterRoom = false;
 
+let pageTimer = setInterval(() => {
+    pct ++;
+    if(pct === 2000){
+        clearInterval(pageTimer);
+        if(!enterRoom){
+            history.go(0);
+        }
+    }
+}, 1);
+
+let auth;
 let authData = await utils.checkIfAuthAlready(ROOM_ID);
 let authExist = authData[0];
 let authUuid = authData[1];
+
 
 if(authExist === "exist"){
     auth = false;
@@ -39,7 +52,6 @@ const groupNumber = document.querySelector(".group-number");
 const searchBar = document.querySelector("#search");
 
 
-let enterRoom = false;
 let disconnect = true;
 
 let tmpMessageClock = null;
@@ -72,21 +84,11 @@ let tempRemoteMediaStreamId = null;
 
 const peers = {}
 
-// let connectPeer = () => {
-//     myPeer.on('open', async id => {
-//         socket.emit('join-room', ROOM_ID, id);
-//     })
-// }
-
 
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( async stream => {
-
-
-    // connectPeer();
-
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
         // socket = io({transports: ['websocket']});
         // tryEnterRoom(USER_ID);        
@@ -244,10 +246,16 @@ navigator.mediaDevices.getUserMedia({
                 // }
             }
             if(auth || CLIENT){
+                let audioStatus;
                 let groupData = await extension.getGroupInfo(ROOM_ID);
                 groupLst = groupData[0];
                 host = groupData[1];
-                createGroupDomNew(USER_NAME, host, USER_ID, USER_IMG, true, "afterbegin");
+                groupLst.forEach(user => {
+                    if(user.uuid === USER_ID){
+                        audioStatus = user.audioStatus;
+                    }
+                })
+                createGroupDomNew(USER_NAME, host, USER_ID, USER_IMG, audioStatus, "afterbegin");
             }
 
             enterRoom = true;
