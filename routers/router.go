@@ -27,7 +27,7 @@ func Routers(router *gin.Engine) {
 	room := router.Group("/room")
 	{
 		room.POST("/setusertoroom", api.SetUserRoomData)
-		room.POST("/deleteuserfromroom", api.SetUserLeaveTrue)
+		room.POST("/setLeaveTrueOrDeleteRoom", api.SetUserLeaveTrue)
 		room.POST("/deleteUserArray", api.RefuseUserInRoom)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)

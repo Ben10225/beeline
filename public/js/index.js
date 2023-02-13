@@ -409,3 +409,10 @@ formSignup.addEventListener("submit", signupSubmit);
 
 inputImg.addEventListener("change", uploadImg)
 
+navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+}).then( stream => {
+    stream.getTracks()[1].stop();
+    stream.getTracks()[0].stop();
+})

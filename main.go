@@ -29,19 +29,23 @@ func main() {
 	})
 
 	uuidMap := map[string]string{}
+	roomMap := map[string]string{}
 
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
 		// s.SetContext(roomId)
+		log.Println(uuid, "join room")
 		s.Join(roomId)
 		uuidMap[s.ID()] = uuid
+		roomMap[uuid] = roomId
 		server.BroadcastToRoom("/", roomId, "user-connected", uuid)
 		// s.Emit("user-connected", uuid)
+	})
 
-		server.OnDisconnect("", func(s socketio.Conn, msg string) {
-			// s.Emit("user-disconnected", uuid)
-			server.BroadcastToRoom("/", roomId, "user-disconnected", uuidMap[s.ID()])
-			log.Println("disconnect", s.ID())
-		})
+	server.OnDisconnect("", func(s socketio.Conn, msg string) {
+		// s.Emit("user-disconnected", uuid)
+		roomId := roomMap[uuidMap[s.ID()]]
+		server.BroadcastToRoom("/", roomId, "user-disconnected", uuidMap[s.ID()])
+		log.Println("disconnect", s.ID(), roomId)
 	})
 
 	// video & audio

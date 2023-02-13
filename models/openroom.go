@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,12 +20,16 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 	var result structs.RoomInfo
 	findFilter := bson.D{{"roomId", roomId}}
 	resError := coll.FindOne(context.TODO(), findFilter).Decode(&result)
+
+	var tpZone = time.FixedZone("GMT", 8*3600)
+
 	if resError != nil {
 		docs := []interface{}{
 			gin.H{
-				"roomId":   roomId,
-				"chatOpen": true,
-				"user":     []structs.RoomUserData{},
+				"roomId":      roomId,
+				"chatOpen":    true,
+				"roomCreated": time.Now().In(tpZone).Format("2006-01-02 15:04:05"),
+				"user":        []structs.RoomUserData{},
 				// User:   []interface{}{uuid, audio, video, true},
 			},
 		}
@@ -43,6 +48,17 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 	}
 
 	filter := bson.D{{"roomId", roomId}}
+	// userInfo := bson.D{{
+	// 	"$push", bson.D{{
+	// 		"user", bson.D{
+	// 			{"uuid", uuid},
+	// 			{"audioStatus", audio},
+	// 			{"videoStatus", video},
+	// 			{"auth", auth},
+	// 			{"leave", false},
+	// 		},
+	// 	}},
+	// }}
 	userInfo := bson.M{
 		"$push": bson.M{
 			"user": bson.D{
@@ -87,7 +103,7 @@ func UserLeaveTrue(c *gin.Context, roomId, uuid string, auth bool) bool {
 	var result structs.RoomInfo
 	er := coll.FindOne(context.TODO(), filter).Decode(&result)
 	if er != nil {
-		log.Println(er)
+		log.Println(roomId, er)
 	}
 	user := result.User
 

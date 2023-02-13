@@ -50,7 +50,8 @@ type RoomUserData struct {
 }
 
 type RoomInfo struct {
-	RoomId   string
-	ChatOpen bool
-	User     []RoomUserData
+	RoomId      string
+	ChatOpen    bool
+	User        []RoomUserData
+	RoomCreated string
 }
