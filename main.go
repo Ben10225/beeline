@@ -91,6 +91,11 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "close-screen-set", roomId)
 	})
 
+	// audio ani
+	server.OnEvent("/", "audio-ani", func(s socketio.Conn, roomId, uuid string, b bool) {
+		server.BroadcastToRoom("/", roomId, "audio-ani-set", roomId, uuid, b)
+	})
+
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
 	})

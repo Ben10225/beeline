@@ -34,7 +34,7 @@ body{
     height: 100%;
     position: fixed;
     background-color: #333;
-    z-index: 200;
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -446,7 +446,7 @@ body{
             // height: 100%;
             // border: 3px solid rgb(227, 138, 162);
             border-radius: 8px;
-            background-color: #444;
+            // background-color: #444;
             position: relative;
             // display: inline-block;
             // margin: 15px;
@@ -479,6 +479,88 @@ body{
                 // position: relative;
                 height: 100%;
                 position: relative;
+                .micro-ani-block{
+                    position: absolute;
+                    right: 15px;
+                    top: 15px;
+                    width: 35px;
+                    height: 35px;
+                    background-color: rgba(#912e5e, 0.7);
+                    z-index: 160;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
+                    opacity: 1;
+                    visibility: visible;
+                    &.hide{
+                        opacity: 0;
+                        visibility: hidden;
+                    }
+                    .dot{
+                        width: 5px;
+                        height: 4px;
+                        border-radius: 5px;
+                        background-color: #fff;
+                        position: relative;
+                        margin: 0 2px;
+                        &.d-left{
+                            &.ani{
+                                animation: dotLeft 1.2s both infinite;
+                            }
+                            @keyframes dotLeft {
+                                0%{height: 12px;}
+                                10%{height: 10px;}
+                                20%{height: 9px;}
+                                30%{height: 13px;}
+                                40%{height: 12px;}
+                                50%{height: 14px;}
+                                60%{height: 11px;}
+                                70%{height: 15px;}
+                                80%{height: 12px;}
+                                90%{height: 11px;}
+                                100%{height: 14px;}
+                            }
+                        }
+                        &.d-middle{
+                            &.ani{
+                                animation: dotMiddle 1.2s both infinite;
+                            }
+                            @keyframes dotMiddle {
+                                0%{height: 21px;}
+                                10%{height: 17px;}
+                                20%{height: 22px;}
+                                30%{height: 18px;}
+                                40%{height: 21px;}
+                                50%{height: 23px;}
+                                60%{height: 20px;}
+                                70%{height: 19px;}
+                                80%{height: 22px;}
+                                90%{height: 18px;}
+                                100%{height: 20px;}
+                            }
+                        }
+                        &.d-right{
+                            &.ani{
+                                animation: dotRight 1.2s both infinite;
+                            }
+                            @keyframes dotRight {
+                                0%{height: 10px;}
+                                10%{height: 8px;}
+                                20%{height: 7px;}
+                                30%{height: 9px;}
+                                40%{height: 11px;}
+                                50%{height: 10px;}
+                                60%{height: 7px;}
+                                70%{height: 11px;}
+                                80%{height: 13px;}
+                                90%{height: 9px;}
+                                100%{height: 8px;}
+                            }
+                        }
+                    }
+                    
+                }
                 .micro-status-icon{
                     width: 50px;
                     height: 50px;
@@ -487,8 +569,8 @@ body{
                     background-repeat: no-repeat;
                     background-size: cover;
                     position: absolute;
-                    right: 5px;
-                    top: 0;
+                    right: 8px;
+                    top: 8px;
                     display: none;
                     z-index: 160;
                     &.show{
@@ -832,7 +914,7 @@ body{
                     }
                     .user-host{
                         position: absolute;
-                        top: -7px;
+                        top: -8px;
                         display: inline-block;
                         .bee-gif{
                             width: 40px;
@@ -843,6 +925,89 @@ body{
                             background-size: contain;
                             vertical-align: middle;
                         }
+                    }
+                    .micro-ani-block{
+                        position: absolute;
+                        right: -5px;
+                        top: -3px;
+                        width: 35px;
+                        height: 35px;
+                        background-color: rgba(#ffb7ac, 1);
+                        z-index: 160;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 50%;
+                        opacity: 1;
+                        visibility: visible;
+                        transform: scale(0.7);
+                        &.hide{
+                            opacity: 0;
+                            visibility: hidden;
+                        }
+                        .dot{
+                            width: 5px;
+                            height: 4px;
+                            border-radius: 5px;
+                            background-color: #fff;
+                            position: relative;
+                            margin: 0 2px;
+                            &.d-left{
+                                &.ani{
+                                    animation: dotLeft 1.2s both infinite;
+                                }
+                                @keyframes dotLeft {
+                                    0%{height: 12px;}
+                                    10%{height: 10px;}
+                                    20%{height: 9px;}
+                                    30%{height: 13px;}
+                                    40%{height: 12px;}
+                                    50%{height: 14px;}
+                                    60%{height: 11px;}
+                                    70%{height: 15px;}
+                                    80%{height: 12px;}
+                                    90%{height: 11px;}
+                                    100%{height: 14px;}
+                                }
+                            }
+                            &.d-middle{
+                                &.ani{
+                                    animation: dotMiddle 1.2s both infinite;
+                                }
+                                @keyframes dotMiddle {
+                                    0%{height: 21px;}
+                                    10%{height: 17px;}
+                                    20%{height: 22px;}
+                                    30%{height: 18px;}
+                                    40%{height: 21px;}
+                                    50%{height: 23px;}
+                                    60%{height: 20px;}
+                                    70%{height: 19px;}
+                                    80%{height: 22px;}
+                                    90%{height: 18px;}
+                                    100%{height: 20px;}
+                                }
+                            }
+                            &.d-right{
+                                &.ani{
+                                    animation: dotRight 1.2s both infinite;
+                                }
+                                @keyframes dotRight {
+                                    0%{height: 10px;}
+                                    10%{height: 8px;}
+                                    20%{height: 7px;}
+                                    30%{height: 9px;}
+                                    40%{height: 11px;}
+                                    50%{height: 10px;}
+                                    60%{height: 7px;}
+                                    70%{height: 11px;}
+                                    80%{height: 13px;}
+                                    90%{height: 9px;}
+                                    100%{height: 8px;}
+                                }
+                            }
+                        }
+                        
                     }
                     .user-micro{
                         display: inline-block;

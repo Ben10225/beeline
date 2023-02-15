@@ -79,6 +79,15 @@ let tmpNewStreamCt = null;
 let needLoadAgain = false;
 let currentPeer;
 
+let voiceNow = false;
+let wait = false;
+let slowAni = true;
+let vFirst = 0;
+let vSecond = 0;
+let vThird = 0;
+let stopToken = 0;
+let aniToken = 0;
+// let timerAni;
 // let socket;
 
 const socket = io({transports: ['websocket']});
@@ -141,6 +150,67 @@ navigator.mediaDevices.getUserMedia({
                 addVideoStream(video, userVideoStream, false, remoteUuid)
             })
         })
+
+        setTimeout(()=>{
+            const audioContext = new AudioContext();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+        
+            analyser.smoothingTimeConstant = 0.8;
+            analyser.fftSize = 1024;
+        
+            microphone.connect(analyser);
+            analyser.connect(scriptProcessor);
+            scriptProcessor.connect(audioContext.destination);
+            scriptProcessor.onaudioprocess = function() {
+                if(!audioBtn.classList.contains("disable")){
+                    const array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                    const arraySum = array.reduce((a, value) => a + value, 0);
+                    const average = arraySum / array.length;
+                    let number = Math.round(average);
+                    
+                    if(!wait){
+                        vThird = vSecond;
+                        vSecond = vFirst;
+                        vFirst = number;
+                    }
+        
+                    if((vThird-vFirst > 3 && voiceNow)){
+                        stopToken ++;
+                        if(stopToken > 3){
+                            socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+                            voiceNow = false;
+                            wait = true;
+        
+                            setTimeout(()=>{
+                                wait = false;
+                            }, 700)
+                        }
+                    }else{
+                        stopToken = 0;
+                    }
+        
+                    if(number < 10 && voiceNow){
+                        socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+                        voiceNow = false;
+                    }
+    
+                    if(!voiceNow && !wait){
+                        if(number >= 10 && vFirst - vThird > 2){
+                            aniToken ++ ;
+                            if(aniToken > 1){
+                                voiceNow = true;
+                                socket.emit("audio-ani", ROOM_ID, USER_ID, true);
+                            }
+                        }else{
+                            aniToken = 0;
+                        }
+                    }
+                }
+            };
+        }, 2000)
 
 
         // nPeer.on('call', function(call){
@@ -389,16 +459,23 @@ let InRoomSocketInit = async () => {
             }
         }else if(options === "audio"){
             let remoteDiv = document.querySelector(`#wrapper-${uuid} .micro-status-icon`)
+            let remoteAudioAni = document.querySelector(`#user-${uuid} .micro-ani-block`);
             if(remoteDiv && b){
                 remoteDiv.classList.remove("show");
+                remoteAudioAni.classList.remove("hide");
             }else if(remoteDiv && !b){
                 remoteDiv.classList.add("show");
+                remoteAudioAni.classList.add("hide");
             }
             let remoteGroupMicro = document.querySelector(`#group-${uuid} .user-micro`);
+            let remoteGroupAudioAni = document.querySelector(`#group-${uuid} .micro-ani-block`);
+
             if(remoteGroupMicro && b){
                 remoteGroupMicro.classList.remove("micro-off");
+                remoteGroupAudioAni.classList.remove("hide");
             }else if(remoteGroupMicro && !b){
                 remoteGroupMicro.classList.add("micro-off");
+                remoteGroupAudioAni.classList.add("hide");
             }
         }
     })
@@ -605,13 +682,20 @@ let InRoomSocketInit = async () => {
         }
     })
 
+    // close screen
     socket.on('close-screen-set', async (roomId) => {
         if(ROOM_ID === roomId){
             document.querySelector("#screen-wrapper").remove();
             utils.settingVideoSize();
         }
     })
-    
+
+    // audio animation
+    socket.on('audio-ani-set', async (roomId, uuid, b) => {
+        if(ROOM_ID === roomId){
+            extension.audioAni(uuid, b);
+        }
+    })
 }
 
 
@@ -720,6 +804,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 <span class="user-name">你</span>
             </div>
             <div class="video-player" id="user-${USER_ID}">
+                <div class="micro-ani-block">
+                    <div class="dot d-left"></div>
+                    <div class="dot d-middle"></div>
+                    <div class="dot d-right"></div>
+                </div>
                 <div class="micro-status-icon local"></div>
                 <div class="user-block local">
                     <div class="auto-img">
@@ -749,6 +838,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             if(!localAudioStatus){
                 stream.getTracks()[0].enabled = false;
                 document.querySelector(`#user-${USER_ID} .micro-status-icon`).classList.add("show");
+                document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.add("hide");
                 audioBtn.classList.add("disable");
             }
             if(!localVideoStatus){
@@ -831,6 +921,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 <span class="user-name"></span>
             </div>
             <div class="video-player" id="user-${remoteUuid}">
+                <div class="micro-ani-block">
+                    <div class="dot d-left"></div>
+                    <div class="dot d-middle"></div>
+                    <div class="dot d-right"></div>
+                </div>
                 <div class="micro-status-icon"></div>
                 <div class="user-block">
                     <div class="auto-img">
@@ -878,6 +973,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         }
         if(!remoteAudioStatus){
             document.querySelector(`#wrapper-${remoteUuid} .micro-status-icon`).classList.add("show");
+            document.querySelector(`#user-${remoteUuid} .micro-ani-block`).classList.add("hide");
         }
         if(!remoteVideoStatus){
             document.querySelector(`#wrapper-${remoteUuid} .user-block`).classList.add("show");
@@ -1029,6 +1125,8 @@ let toggleAudio = async (stream, dom) => {
         document.querySelector(".micro-status-icon.local").classList.add("show");
         if(auth || CLIENT){
             document.querySelector(`#group-${USER_ID} .user-micro`).classList.add("micro-off");
+            document.querySelector(`#group-${USER_ID} .micro-ani-block`).classList.add("hide");
+            document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.add("hide");
         }
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
@@ -1039,6 +1137,8 @@ let toggleAudio = async (stream, dom) => {
         document.querySelector(".micro-status-icon.local").classList.remove("show");
         if(auth || CLIENT){
             document.querySelector(`#group-${USER_ID} .user-micro`).classList.remove("micro-off");
+            document.querySelector(`#group-${USER_ID} .micro-ani-block`).classList.remove("hide");
+            document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.remove("hide");
         }
         socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
@@ -1337,6 +1437,7 @@ let addAllowClick = () => {
 let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) => {
     let hostTag = "";
     let audioTag = "";
+    let audioTag2 = "";
     let nameTag = "";
     if(uuid === host){
         hostTag = `<div class="bee-gif"></div>`;
@@ -1357,7 +1458,8 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
         `
     }
     if(!audioStatus){
-        audioTag = "micro-off"
+        audioTag = "hide";
+        audioTag2 = " micro-off";
     }
     let imgSetting = "";
     if(imgUrl[0] !== "#"){
@@ -1383,9 +1485,13 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
         <div class="user-host">
             ${hostTag}
         </div>
-        <div class="user-micro ${audioTag}">
+        <div class="micro-ani-block ${audioTag}">
+            <div class="dot d-left"></div>
+            <div class="dot d-middle"></div>
+            <div class="dot d-right"></div>
+        </div>
+        <div class="user-micro ${audioTag2}">
             <i class="fa-solid fa-microphone-slash"></i>
-            <i class="fa-solid fa-microphone"></i>
         </div>
     </div>
     `;
