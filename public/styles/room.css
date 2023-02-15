@@ -371,7 +371,7 @@ body .bg {
 
 #video-streams {
   max-width: 1200px;
-  width: 80vw;
+  width: 100vw;
   padding: 40px;
   min-width: -webkit-min-content;
   position: relative;
@@ -389,6 +389,21 @@ body .bg {
 }
 #video-streams .user-container.go-left {
   transform: translateX(-158px);
+}
+#video-streams .user-container #screen-wrapper {
+  position: relative;
+  width: 100%;
+}
+#video-streams .user-container #screen-wrapper h4 {
+  position: absolute;
+  font-size: 20px;
+  color: #fff;
+  top: -45px;
+  font-weight: 400;
+}
+#video-streams .user-container #screen-wrapper video {
+  width: 100%;
+  height: 100%;
 }
 #video-streams .user-container .video-container {
   border-radius: 8px;
@@ -413,6 +428,7 @@ body .bg {
 }
 #video-streams .user-container .video-container .video-player {
   height: 100%;
+  position: relative;
 }
 #video-streams .user-container .video-container .video-player .micro-status-icon {
   width: 50px;
@@ -476,9 +492,15 @@ body .bg {
      -moz-user-select: none;
           user-select: none;
 }
+#video-streams .user-container .video-container .video-player .video-block {
+  width: 99.9%;
+  height: 99.9%;
+  position: absolute;
+  background-color: #fff;
+}
 #video-streams .user-container .video-container .video-player video {
-  width: 100%;
-  height: 100%;
+  width: 99.9%;
+  height: 99.9%;
   -o-object-fit: cover;
      object-fit: cover;
   transform: scaleX(-1);
@@ -976,7 +998,7 @@ body .bg {
   bottom: 0;
   background-color: #DBA39A;
   height: 90px;
-  z-index: 100;
+  z-index: 500;
 }
 #controls-wrapper #room-url-wrapper {
   position: absolute;
@@ -1010,7 +1032,7 @@ body .bg {
   transition: 0.3s;
 }
 .control-icon:hover {
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 #audio-btn {
@@ -1025,6 +1047,10 @@ body .bg {
 }
 #camera-btn.disable {
   background-image: url("/public/images/camera_disable_icon.svg");
+}
+
+#screen-share-btn {
+  background-image: url("/public/images/screen-share.svg");
 }
 
 #leave-btn {

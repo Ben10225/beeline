@@ -123,6 +123,7 @@ let settingVideoSize = () => {
     let videoContainerS = document.querySelectorAll(".video-container");
 
     if(videoContainerS.length == 1){
+        // containerWrapper.style.gridTemplateColumns = "1fr";
         containerWrapper.style.flexWrap = "nowrap";
         videoContainerS.forEach(container => {
             container.style = `
@@ -133,7 +134,6 @@ let settingVideoSize = () => {
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 100%;
             `;
         })
     }else if(videoContainerS.length == 2){
@@ -147,7 +147,6 @@ let settingVideoSize = () => {
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 100%;
             `;
         })
     }else if(videoContainerS.length == 3 || videoContainerS.length == 4){

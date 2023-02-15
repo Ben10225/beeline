@@ -86,10 +86,10 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "auth-change-set", roomId, oldUuid, newUuid)
 	})
 
-	// reconnect
-	// server.OnEvent("/", "reconnect", func(s socketio.Conn, roomId, uuid string) {
-	// 	server.BroadcastToRoom("/", roomId, "user-reconnect", uuid)
-	// })
+	// close screen
+	server.OnEvent("/", "close-screen", func(s socketio.Conn, roomId string) {
+		server.BroadcastToRoom("/", roomId, "close-screen-set", roomId)
+	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
