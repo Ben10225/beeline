@@ -133,10 +133,7 @@ navigator.mediaDevices.getUserMedia({
                 // console.log("stream", userVideoStream)
                 addVideoStream(video, userVideoStream, false, remoteUuid)
             })
-        })
-
-        audioSetInit(stream);
-        
+        })        
 
         // nPeer.on('call', function(call){
         //     call.answer(stream);
@@ -244,26 +241,8 @@ navigator.mediaDevices.getUserMedia({
 
             if(auth){
                 await insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
-
-                // if (Object.keys(userInRoomObj).length >= groupLst.length){
-                //     // console.log("aa")
-                //     createGroupDom(groupLst, host, USER_ID);
-                // }
-
             }else if(CLIENT){
                 await setBackRoomLeaveStatus(ROOM_ID, uuid);
-
-                // let groupData = await extension.getGroupInfo(ROOM_ID);
-                // groupLst = groupData[0];
-                // host = groupData[1];
-
-                // console.log(groupLst)
-
-                // if (Object.keys(userInRoomObj).length >= groupLst.length 
-                //     && userInRoomObj[USER_ID]){
-                //     // console.log("bb")
-                //     createGroupDom(groupLst, host, USER_ID);
-                // }
             }
             if(auth || CLIENT){
                 let audioStatus;
@@ -276,6 +255,7 @@ navigator.mediaDevices.getUserMedia({
                     }
                 })
                 createGroupDomNew(USER_NAME, host, USER_ID, USER_IMG, audioStatus, "afterbegin");
+                audioSetInit(stream);
             }
 
             enterRoom = true;
