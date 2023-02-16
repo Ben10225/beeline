@@ -86,7 +86,7 @@ const userContainer = document.querySelector(".user-container");
 // const myPeer = new Peer()
 // const myPeer = new Peer(USER_ID)
 const myPeer = new Peer(USER_ID, {
-    host: "https://beelinetw.com/myapp",
+    host: "172.31.23.35",
     port: 9000,
     path: "/myapp",
 })
@@ -1506,7 +1506,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
         sct ++;
         // nPeer = new Peer(`${USER_ID}-screen-${sct}`)
         nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
-            host: "https://beelinetw.com/",
+            host: "172.31.23.35/",
             port: 9000,
             path: "/myapp",
         })
