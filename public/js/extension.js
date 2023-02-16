@@ -191,6 +191,7 @@ let searchUser = async () => {
 }
 
 let audioAni = (uuid, bool) => {
+    if (!document.querySelector(`#user-${uuid} .d-left`)) return;
     if(bool){
         document.querySelector(`#user-${uuid} .d-left`).classList.add("ani");
         document.querySelector(`#user-${uuid} .d-middle`).classList.add("ani");

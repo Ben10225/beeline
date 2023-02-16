@@ -34,20 +34,6 @@ if(auth){
     }
 }
 
-
-// if(authExist === "exist"){
-//     auth = false;
-//     if(authUuid === USER_ID){
-//         auth = true;
-//     }
-// }else{
-//     auth = (parseInt(params.auth) === 0);
-// }
-
-// if(auth === USER_ID){
-//     auth = true;
-// }
-
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
@@ -98,7 +84,11 @@ const socket = io({transports: ['websocket']});
 const userContainer = document.querySelector(".user-container");
 
 // const myPeer = new Peer()
-const myPeer = new Peer(USER_ID)
+const myPeer = new Peer(USER_ID, {
+    host: "localhost",
+    port: 9000,
+    path: "/myapp",
+})
 
 const myVideo = document.createElement("video")
 myVideo.muted = true;
@@ -112,17 +102,11 @@ let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
 
 
-
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( async stream => {
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-        // socket = io({transports: ['websocket']});
-        // tryEnterRoom(USER_ID);        
-
-        // connectPeer();
-
         InRoomSocketInit();
 
         body.style.backgroundColor = "#000";
@@ -141,7 +125,6 @@ navigator.mediaDevices.getUserMedia({
             call.answer(stream)
             const video = document.createElement("video")
             let remoteUuid = call.peer;
-
             call.on("stream", userVideoStream => {
                 currentPeer = call.peerConnection;
 
@@ -151,82 +134,18 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
-        setTimeout(()=>{
-            const audioContext = new AudioContext();
-            const analyser = audioContext.createAnalyser();
-            const microphone = audioContext.createMediaStreamSource(stream);
-            const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+        audioSetInit(stream);
         
-            analyser.smoothingTimeConstant = 0.8;
-            analyser.fftSize = 1024;
-        
-            microphone.connect(analyser);
-            analyser.connect(scriptProcessor);
-            scriptProcessor.connect(audioContext.destination);
-            scriptProcessor.onaudioprocess = function() {
-                if(!audioBtn.classList.contains("disable")){
-                    const array = new Uint8Array(analyser.frequencyBinCount);
-                    analyser.getByteFrequencyData(array);
-                    const arraySum = array.reduce((a, value) => a + value, 0);
-                    const average = arraySum / array.length;
-                    let number = Math.round(average);
-                    
-                    if(!wait){
-                        vThird = vSecond;
-                        vSecond = vFirst;
-                        vFirst = number;
-                    }
-        
-                    if((vThird-vFirst > 3 && voiceNow)){
-                        stopToken ++;
-                        if(stopToken > 3){
-                            socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-                            voiceNow = false;
-                            wait = true;
-        
-                            setTimeout(()=>{
-                                wait = false;
-                            }, 700)
-                        }
-                    }else{
-                        stopToken = 0;
-                    }
-        
-                    if(number < 10 && voiceNow){
-                        socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-                        voiceNow = false;
-                    }
-    
-                    if(!voiceNow && !wait){
-                        if(number >= 10 && vFirst - vThird > 2){
-                            aniToken ++ ;
-                            if(aniToken > 1){
-                                voiceNow = true;
-                                socket.emit("audio-ani", ROOM_ID, USER_ID, true);
-                            }
-                        }else{
-                            aniToken = 0;
-                        }
-                    }
-                }
-            };
-        }, 2000)
-
 
         // nPeer.on('call', function(call){
         //     call.answer(stream);
         //     console.log(stream)
-        //     const video = document.createElement("video")
-        //     addVideoStream(video, userVideoStream, false, remoteUuid, "screen")
+        //     // const video = document.createElement("video")
+        //     // addVideoStream(video, userVideoStream, false, remoteUuid, "screen")
         // })
 
     }else if(!auth){
-
-        // socket = io({transports: ['websocket']});
         WaitingSocketInit();
-        // tryEnterRoom(USER_ID);
-
-        // connectPeer();
 
         document.querySelector("#video-streams").remove();
         document.querySelector("#controls-wrapper").remove();
@@ -412,17 +331,20 @@ navigator.mediaDevices.getUserMedia({
             disconnect = true;
             checkNeedReconnect(ROOM_ID, USER_ID);
         }
-        // let outUserDiv = document.querySelector(`#wrapper-${userId}`);
-        // if(outUserDiv){
-        //     outUserDiv.remove();
-        // }
-        // if (peers[userId]) peers[userId].close();
     })
+
+    socket.emit('join-room', ROOM_ID, USER_ID);
     
-    myPeer.on('open', async id => {
-        console.log("before emit join room");
-        socket.emit('join-room', ROOM_ID, id);
-    })
+    // var conn = myPeer.connect(USER_ID);
+    // on open will be launch when you successfully connect to PeerServer
+    // conn.on('open', function(){
+    //     // here you have conn.id
+    // });
+
+    // myPeer.on('open', async id => {
+    //     console.log("before emit join room");
+    //     socket.emit('join-room', ROOM_ID, id);
+    // })
 })
 
 
@@ -704,22 +626,22 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
 
-    // if(screen === "screen"){
-    //     // document.querySelector(".user-container").style.width = "20%";
+    if(screen === "screen"){
+        // document.querySelector(".user-container").style.width = "20%";
 
-    //     let html = `<div id="screen-warpper"></div>`;
-    //     document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html)
-    //     video.addEventListener("loadedmetadata", () => {
-    //         video.play();
-    //     })
-    //     document.querySelector(`#screen-warpper`).append(video);
+        // let html = `<div id="screen-warpper"></div>`;
+        // document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html)
+        // video.addEventListener("loadedmetadata", () => {
+        //     video.play();
+        // })
+        // document.querySelector(`#screen-warpper`).append(video);
 
-    //     utils.settingVideoSize();
-    //     console.log("dd")
-    //     // document.querySelector(".video-container").style.width = "20%";
-    //     // document.querySelector(".video-container").style.height = "20%";
-    //     return
-    // }
+        // utils.settingVideoSize();
+        // console.log("dd")
+        // document.querySelector(".video-container").style.width = "20%";
+        // document.querySelector(".video-container").style.height = "20%";
+        return
+    }
 
     if(islocal){
         /*
@@ -746,7 +668,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             return
         }
         */
-
         userInRoomObj[remoteUuid] = [USER_NAME, USER_IMG];
 
         tempMediaStreamId = stream.id;
@@ -1029,6 +950,7 @@ let toggleCamera = async (stream, dom) => {
         document.querySelector(".user-block.local").classList.add("show");
         stream.getTracks()[1].enabled = false;
         // stream.getTracks()[1].stop();
+        // stream.getVideoTracks()[0].stop();
         socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
 
@@ -1046,25 +968,37 @@ let toggleCamera = async (stream, dom) => {
         socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
+        /*
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+        }).then( newStream => {
 
-        // navigator.mediaDevices.getUserMedia({
-        //     video: true,
-        //     audio: true
-        // }).then( newStream => {
-        //     const currentSenders = newStream.getSenders();
-        //     console.log(currentSenders)
-        //     // const [videoTrack] = newStream.getVideoTracks();
-        //     // console.log(videoTrack);
-        //     // stream.replaceTrack(videoTrack);
+            let videoTrack = newStream.getVideoTracks()[0];
+            // let videoTrack = newStream.getTracks()[1];
+            // console.log(currentPeer)
+            let sender = currentPeer.getSenders().find(function(s){
+                return s.track.kind == videoTrack.kind;
+            });
+            sender.replaceTrack(videoTrack);
+            
+            myVideo.srcObject = newStream;
 
-        //     // PCs.forEach((pc) => {
-        //     //     const sender = pc.getSenders().find((s) => s.track.kind === videoTrack.kind);
-        //     //     console.log('Found sender:', sender);
-        //     //     sender.replaceTrack(videoTrack);
-        //     // });
-        //     // let originTrack = stream.getTracks()[1];
-        //     // originTrack.addTrack(newStream.getTracks()[1]);
-        // })
+            cameraBtn.onclick = () => {
+                toggleCamera(newStream, cameraBtn);
+            }
+
+            // audioBtn.onclick = () => {
+            //     toggleAudio(newStream, audioBtn);
+            // }
+
+            // if(auth || CLIENT){
+            //     if(document.querySelector("#audio-btn").classList.contains("disable")){
+            //         newStream.getTracks()[0].enabled = false;
+            //     }
+            // }
+        })
+        */
 
         /*
         stream.getTracks().forEach(function(track) {
@@ -1589,10 +1523,13 @@ screenShareBtn.addEventListener("click", function addScreen(){
         audio: false
     }).then(stream => {
         sct ++;
-        nPeer = new Peer(`${USER_ID}-screen-${sct}`)
+        nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
+            host: "localhost",
+            port: 9000,
+            path: "/myapp",
+        })
 
         nPeer.on('open', async id => {
-            console.log(id)
             socket.emit('join-room', ROOM_ID, id);
         })
 
@@ -1622,6 +1559,68 @@ screenShareBtn.addEventListener("click", function addScreen(){
     // });
     // sender.replaceTrack(videoTrack);
 })
+
+let audioSetInit = async (stream) => {
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    const microphone = audioContext.createMediaStreamSource(stream);
+    const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+
+    analyser.smoothingTimeConstant = 0.8;
+    analyser.fftSize = 1024;
+
+    microphone.connect(analyser);
+    analyser.connect(scriptProcessor);
+    scriptProcessor.connect(audioContext.destination);
+    scriptProcessor.onaudioprocess = function() {
+        if(!audioBtn.classList.contains("disable")){
+            const array = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(array);
+            const arraySum = array.reduce((a, value) => a + value, 0);
+            const average = arraySum / array.length;
+            let number = Math.round(average);
+            
+            if(!wait){
+                vThird = vSecond;
+                vSecond = vFirst;
+                vFirst = number;
+            }
+
+            if((vThird-vFirst > 3 && voiceNow)){
+                stopToken ++;
+                if(stopToken > 3){
+                    socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+                    voiceNow = false;
+                    wait = true;
+
+                    setTimeout(()=>{
+                        wait = false;
+                    }, 700)
+                }
+            }else{
+                stopToken = 0;
+            }
+
+            if(number < 10 && voiceNow){
+                socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+                voiceNow = false;
+            }
+
+            if(!voiceNow && !wait){
+                if(number >= 10 && vFirst - vThird > 2){
+                    aniToken ++ ;
+                    if(aniToken > 1){
+                        voiceNow = true;
+                        socket.emit("audio-ani", ROOM_ID, USER_ID, true);
+                    }
+                }else{
+                    aniToken = 0;
+                }
+            }
+        }
+    };
+
+}
 
 
 
