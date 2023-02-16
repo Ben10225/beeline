@@ -84,11 +84,12 @@ const socket = io({transports: ['websocket']});
 const userContainer = document.querySelector(".user-container");
 
 // const myPeer = new Peer()
-const myPeer = new Peer(USER_ID, {
-    host: "localhost",
-    port: 9000,
-    path: "/myapp",
-})
+const myPeer = new Peer(USER_ID)
+// const myPeer = new Peer(USER_ID, {
+//     host: "localhost",
+//     port: 9000,
+//     path: "/myapp",
+// })
 
 const myVideo = document.createElement("video")
 myVideo.muted = true;
@@ -1523,11 +1524,12 @@ screenShareBtn.addEventListener("click", function addScreen(){
         audio: false
     }).then(stream => {
         sct ++;
-        nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
-            host: "localhost",
-            port: 9000,
-            path: "/myapp",
-        })
+        nPeer = new Peer(`${USER_ID}-screen-${sct}`)
+        // nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
+        //     host: "localhost",
+        //     port: 9000,
+        //     path: "/myapp",
+        // })
 
         nPeer.on('open', async id => {
             socket.emit('join-room', ROOM_ID, id);
