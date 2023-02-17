@@ -808,6 +808,9 @@ body .bg {
   margin-bottom: 22px;
   position: relative;
 }
+.extension-wrapper .extension-box .group .user-wrapper .user-one.can-auth {
+  cursor: pointer;
+}
 .extension-wrapper .extension-box .group .user-wrapper .user-one .user-img {
   width: 25px;
   height: 25px;
@@ -838,9 +841,6 @@ body .bg {
   font-size: 14px;
   margin-right: 20px;
   position: relative;
-}
-.extension-wrapper .extension-box .group .user-wrapper .user-one .user-name.can-auth {
-  cursor: pointer;
 }
 .extension-wrapper .extension-box .group .user-wrapper .user-one .auth-check-block {
   position: absolute;
@@ -887,6 +887,7 @@ body .bg {
   position: absolute;
   top: -8px;
   display: inline-block;
+  right: 50px;
 }
 .extension-wrapper .extension-box .group .user-wrapper .user-one .user-host .bee-gif {
   width: 40px;

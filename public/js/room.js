@@ -5,18 +5,18 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
-let pct = 0;
 let enterRoom = false;
 
-let pageTimer = setInterval(() => {
-    pct ++;
+// let pct = 0;
+// let pageTimer = setInterval(() => {
+    // pct ++;
     // if(pct === 1300){
     //     clearInterval(pageTimer);
     //     if(!enterRoom){
     //         history.go(0);
     //     }
     // }
-}, 1);
+// }, 1);
 
 let auth;
 
@@ -84,7 +84,7 @@ const socket = io({transports: ['websocket']});
 const userContainer = document.querySelector(".user-container");
 
 // const myPeer = new Peer()
-const myPeer = new Peer(USER_ID)
+const myPeer = new Peer(USER_ID);
 // const myPeer = new Peer(USER_ID, {
 //     host: "beelinetw.com",
 //     port: 9000,
@@ -440,7 +440,7 @@ let InRoomSocketInit = async () => {
             <div class="alert-block" id="alert-user-${clientUuid}">
                 ${imgSetting}
                 <h3><span>${clientName}</span>想加入此會議</h3>
-                <h3 class="allow">准許</h3>
+                <h3 class="allow">同意</h3>
                 <h3 class="refuse">拒絕</h3>
             </div>
             `;
@@ -569,9 +569,9 @@ let InRoomSocketInit = async () => {
                 blocks.forEach(block => {
                     block.remove();
                 })
-                let nameBtns = document.querySelectorAll(`.user-name`);
-                nameBtns.forEach(name => {
-                    name.classList.remove("can-auth");
+                let blcokOnes = document.querySelectorAll(`.user-one`);
+                blcokOnes.forEach(one => {
+                    one.classList.remove("can-auth");
                 })
 
                 // chat room
@@ -1078,7 +1078,7 @@ let toggleAudio = async (stream, dom) => {
 let tryEnterRoom = (uuid) => {
     if(uuid){
         if(!enterRoom){
-            let ct = 0
+            let ct = 0;
             let timer = setInterval(() => {
                 ct ++;
                 if(disconnect){
@@ -1434,23 +1434,24 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
     if(auth){
         if (uuid === USER_ID) return;
         NameBtnInit(uuid);
-        document.querySelector(`#group-${uuid} .user-name`).classList.add("can-auth");
+        document.querySelector(`#group-${uuid}.user-one`).classList.add("can-auth");
     }
 }
 
 let NameBtnInit = (uuid) => {
     let extensionBox = document.querySelector(".extension-box");
-    let nameBtn = document.querySelector(`#group-${uuid} .user-name`);
+    let userOne = document.querySelector(`#group-${uuid}.user-one`);
+    // let nameBtn = document.querySelector(`#group-${uuid} .user-name`);
     let block = document.querySelector(`#group-${uuid} .auth-check-block`);
     let yesBtn = document.querySelector(`#group-${uuid} .auth-allow`);
 
-    nameBtn.addEventListener("click",() => {
+    userOne.addEventListener("click",() => {
         block.classList.add("show");
         let ct = 0
         extensionBox.addEventListener("click", function blockShow(e){
             ct ++;
             if (!block.contains(e.target) 
-                && !nameBtn.contains(e.target) 
+                && !userOne.contains(e.target) 
                 && ct > 1) {
                 block.classList.remove("show");
                 this.removeEventListener("click", blockShow);
@@ -1489,9 +1490,12 @@ let alertNewAuth = (uuid) => {
 let newAuthGroupSetting = () => {
     let uuidDoms = document.querySelectorAll(".user-one");
     let uuids = []
-    uuidDoms.forEach(dom => {
+    uuidDoms.forEach((dom, index) => {
         let uuid = dom.id.split("-")[1];
         uuids.push(uuid);
+        if (index !== 0 ){
+            dom.classList.add("can-auth");
+        }
     })
 
     let nameBtns = document.querySelectorAll(`.group .user-name`);
@@ -1618,7 +1622,6 @@ let audioSetInit = async (stream) => {
             }
         }
     };
-
 }
 
 

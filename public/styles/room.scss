@@ -832,6 +832,10 @@ body{
                 .user-one{
                     margin-bottom: 22px;
                     position: relative;
+
+                    &.can-auth{
+                        cursor: pointer;
+                    }
                     .user-img{
                         width: 25px;
                         height: 25px;
@@ -865,9 +869,9 @@ body{
                         margin-right: 20px;
                         position: relative;
                         // user-select: none;
-                        &.can-auth{
-                            cursor: pointer;
-                        }
+                        // &.can-auth{
+                        //     cursor: pointer;
+                        // }
                     }
                     .auth-check-block{
                         position: absolute;
@@ -916,6 +920,7 @@ body{
                         position: absolute;
                         top: -8px;
                         display: inline-block;
+                        right: 50px;
                         .bee-gif{
                             width: 40px;
                             height: 40px;
