@@ -10,12 +10,12 @@ let enterRoom = false;
 
 let pageTimer = setInterval(() => {
     pct ++;
-    if(pct === 1300){
-        clearInterval(pageTimer);
-        if(!enterRoom){
-            history.go(0);
-        }
-    }
+    // if(pct === 1300){
+    //     clearInterval(pageTimer);
+    //     if(!enterRoom){
+    //         history.go(0);
+    //     }
+    // }
 }, 1);
 
 let auth;
@@ -1084,7 +1084,8 @@ let tryEnterRoom = (uuid) => {
                 if(disconnect){
                     if(ct > 700){
                         // window.location.reload();
-                        history.go(0);
+
+                        // history.go(0);
                     }
                 }else{
                     console.log("conn establish");
