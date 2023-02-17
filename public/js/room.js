@@ -342,8 +342,9 @@ navigator.mediaDevices.getUserMedia({
     //     console.log("before emit join room");
     //     socket.emit('join-room', ROOM_ID, id);
     // })
+}).catch(err => {
+    console.log("unable to get display media" + err);
 })
-
 
 let WaitingSocketInit = async () => {
     socket.on('client-action', async (roomId, clientName, b) => {
