@@ -101,6 +101,7 @@ const peers = {}
 
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
+console.log("in page");
 
 
 navigator.mediaDevices.getUserMedia({
@@ -108,6 +109,8 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then( async stream => {
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+        console.log("get user media");
+
         InRoomSocketInit();
 
         body.style.backgroundColor = "#000";
@@ -124,14 +127,14 @@ navigator.mediaDevices.getUserMedia({
         addVideoStream(myVideo, stream, true, USER_ID);
         myPeer.on('call', function(call){
             call.answer(stream)
-            const video = document.createElement("video")
+            const video = document.createElement("video");
             let remoteUuid = call.peer;
             call.on("stream", userVideoStream => {
                 currentPeer = call.peerConnection;
 
-                if (USER_ID === userVideoStream.id) return
+                if (USER_ID === userVideoStream.id) return;
                 // console.log("stream", userVideoStream)
-                addVideoStream(video, userVideoStream, false, remoteUuid)
+                addVideoStream(video, userVideoStream, false, remoteUuid);
             })
         })        
 
@@ -313,6 +316,15 @@ navigator.mediaDevices.getUserMedia({
             checkNeedReconnect(ROOM_ID, USER_ID);
         }
     })
+
+    console.log("roomId", ROOM_ID);
+    console.log("userId", USER_ID);
+    console.log("userName", USER_NAME);
+    console.log("userImg", USER_IMG);
+    console.log("enterRoomId", ENTER_ROOM_ID);
+    console.log("client", CLIENT);
+    console.log("auth", auth);
+    console.log("before emit");
 
     socket.emit('join-room', ROOM_ID, USER_ID);
     
@@ -1511,9 +1523,10 @@ screenShareBtn.addEventListener("click", function addScreen(){
         //     path: "/myapp",
         // })
 
-        nPeer.on('open', async id => {
-            socket.emit('join-room', ROOM_ID, id);
-        })
+        // nPeer.on('open', async id => {
+        // })
+
+        socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
 
         nPeer.on('call', function(call){
             call.answer(stream);
