@@ -103,12 +103,23 @@ let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
 console.log("in page");
 
+console.log("roomId", ROOM_ID);
+console.log("userId", USER_ID);
+console.log("userName", USER_NAME);
+console.log("userImg", USER_IMG);
+console.log("enterRoomId", ENTER_ROOM_ID);
+console.log("client", CLIENT);
+console.log("auth", auth);
+
 
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( async stream => {
-    if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+
+    console.log(stream);
+    // if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+    if(true){
         console.log("get user media");
 
         InRoomSocketInit();
@@ -317,13 +328,6 @@ navigator.mediaDevices.getUserMedia({
         }
     })
 
-    console.log("roomId", ROOM_ID);
-    console.log("userId", USER_ID);
-    console.log("userName", USER_NAME);
-    console.log("userImg", USER_IMG);
-    console.log("enterRoomId", ENTER_ROOM_ID);
-    console.log("client", CLIENT);
-    console.log("auth", auth);
     console.log("before emit");
 
     socket.emit('join-room', ROOM_ID, USER_ID);
