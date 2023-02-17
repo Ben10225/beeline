@@ -116,6 +116,7 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then( stream => {
     console.log("get user media");
+    console.log(stream);
 
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
     // if(true){
