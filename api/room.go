@@ -194,15 +194,16 @@ func RoomChatStatus(c *gin.Context) {
 	})
 }
 
-func GetRoomChatStatus(c *gin.Context) {
+func GetRoomChatAndShare(c *gin.Context) {
 	var req structs.RoomInfo
 	c.BindJSON(&req)
 
 	roomId := req.RoomId
-	chatOpen := models.GetRoomChat(c, roomId)
+	chatOpen, screenShare := models.GetRoomChatAndShareStatus(c, roomId)
 
 	c.JSON(http.StatusOK, gin.H{
-		"chatOpen": chatOpen,
+		"chatOpen":    chatOpen,
+		"screenShare": screenShare,
 	})
 }
 
@@ -254,6 +255,20 @@ func AssignNewAuth(c *gin.Context) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func SetScreenShareBool(c *gin.Context) {
+	var req structs.RoomInfo
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	screenShare := req.ScreenShare
+
+	models.SetScreenShare(c, roomId, screenShare)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,

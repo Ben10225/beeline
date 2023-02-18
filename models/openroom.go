@@ -28,6 +28,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 			gin.H{
 				"roomId":      roomId,
 				"chatOpen":    true,
+				"screenShare": false,
 				"roomCreated": time.Now().In(tpZone).Format("2006-01-02 15:04:05"),
 				"user":        []structs.RoomUserData{},
 				// User:   []interface{}{uuid, audio, video, true},
@@ -59,6 +60,13 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 	// 		},
 	// 	}},
 	// }}
+	var leaveStatus bool
+	if auth {
+		leaveStatus = false
+	} else {
+		leaveStatus = true
+	}
+
 	userInfo := bson.M{
 		"$push": bson.M{
 			"user": bson.D{
@@ -66,7 +74,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 				{"audioStatus", audio},
 				{"videoStatus", video},
 				{"auth", auth},
-				{"leave", false},
+				{"leave", leaveStatus},
 			},
 		},
 	}
@@ -158,6 +166,24 @@ func PullUserData(c *gin.Context, roomId, uuid string) {
 	_, err := coll.UpdateOne(context.TODO(), filter, userInfo)
 	if err != nil {
 		log.Println(err)
+	}
+
+	var result structs.RoomInfo
+	er := coll.FindOne(context.TODO(), filter).Decode(&result)
+	if er != nil {
+		log.Println(roomId, er)
+	}
+	user := result.User
+	if len(user) != 0 {
+		for _, v := range user {
+			if !v.Leave {
+				return
+			}
+		}
+	}
+	_, err = coll.DeleteOne(context.TODO(), bson.M{"roomId": roomId})
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 
@@ -277,7 +303,7 @@ func SetRoomChatStatus(c *gin.Context, roomId string, b bool) {
 	}
 }
 
-func GetRoomChat(c *gin.Context, roomId string) bool {
+func GetRoomChatAndShareStatus(c *gin.Context, roomId string) (bool, bool) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	err := coll.FindOne(context.TODO(), filter).Decode(&room)
@@ -285,8 +311,9 @@ func GetRoomChat(c *gin.Context, roomId string) bool {
 		fmt.Println(err)
 	}
 
-	b := room.ChatOpen
-	return b
+	chat := room.ChatOpen
+	screenShare := room.ScreenShare
+	return chat, screenShare
 }
 
 func GetGroupInfoData(c *gin.Context, roomId string) ([]gin.H, string) {
@@ -345,6 +372,15 @@ func AssignNewAuthFunc(c *gin.Context, roomId, oldUuid, newUuid string) string {
 		}),
 	)
 	return "ok"
+}
+
+func SetScreenShare(c *gin.Context, roomId string, b bool) {
+	filter := bson.D{{"roomId", roomId}}
+	update := bson.D{{"$set", bson.D{{"screenShare", b}}}}
+	_, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 /*

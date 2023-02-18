@@ -485,7 +485,7 @@ body{
                     top: 15px;
                     width: 35px;
                     height: 35px;
-                    background-color: rgba(#912e5e, 0.7);
+                    background-color: rgba(#2b85b8, 0.9);
                     z-index: 160;
                     display: flex;
                     justify-content: center;
@@ -688,8 +688,8 @@ body{
     .extension-box{
         background-color: #ffffff;
         width: 300px;
-        // height: 100%;
-        height: calc(100vh - 115px);
+        height: 89vh;
+        // height: calc(100vh - 115px);
         border-radius: 8px;
         display: flex;
         justify-content: center;
@@ -1156,7 +1156,8 @@ body{
             .message-wrapper{
                 padding-left: 10px;
                 margin-top: 20px;
-                height: calc(100vh - 353px);
+                // height: calc(100vh - 353px);
+                height: calc(100vh - 343px);
                 overflow-y: scroll;
                 pointer-events: auto;
                 user-select: auto;
@@ -1266,7 +1267,7 @@ body{
     bottom: 0;
     background-color: #DBA39A;
     // background-color: #474747;
-    height: 90px;
+    height: 8%;
     z-index: 500;
     #room-url-wrapper{
         position: absolute;
@@ -1320,6 +1321,17 @@ body{
 
 #screen-share-btn{
     background-image: url('/public/images/screen-share.svg');
+    cursor: pointer;
+    pointer-events: auto;
+    &.stopShareClick{
+        background-image: url('/public/images/screen-share-stop-click.svg');
+        cursor: default;
+        pointer-events: none;
+    }
+    &.userShare{
+        background-image: url('/public/images/screen-share-ing.svg');
+        cursor: default;
+    }
 }
 
 #leave-btn{
@@ -1354,10 +1366,12 @@ body{
         &:hover{
             background-color: rgba(#cfcfcf, 0.2);
         }
-        .fa-circle-info{
+        // .fa-circle-info{
+        .fa-link{
             position: relative;
             top: -1px;
-            font-size: 25px;
+            // font-size: 25px;
+            font-size: 23px;
             color: rgba(82, 75, 75, 0.5);
             cursor: pointer;
             transition: 0.4s;

@@ -1,5 +1,6 @@
 const userContainer = document.querySelector(".user-container");
-const infoIcon =  document.querySelector(".fa-circle-info");
+// const infoIcon =  document.querySelector(".fa-circle-info");
+const infoIcon =  document.querySelector(".fa-link");
 const infoIconBlock = document.querySelector(".icon-right-solo.ic-info");
 const groupIcon =  document.querySelector(".fa-user-group");
 const groupIconBlock = document.querySelector(".icon-right-solo.ic-group");

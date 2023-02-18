@@ -87,8 +87,8 @@ func main() {
 	})
 
 	// close screen
-	server.OnEvent("/", "close-screen", func(s socketio.Conn, roomId string) {
-		server.BroadcastToRoom("/", roomId, "close-screen-set", roomId)
+	server.OnEvent("/", "close-screen", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/", roomId, "close-screen-set", roomId, uuid)
 	})
 
 	// audio ani

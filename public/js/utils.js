@@ -188,12 +188,34 @@ let settingVideoSize = () => {
     }
 }
 
+let setScreenShareBool = async (roomId, bool) => {
+    let response = await fetch(`/room/setScreenShareBool`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "screenShare": bool,
+        })
+    });
+    let data = await response.json();
+}
+
+// let disableScreenShare = () => {
+//     document.querySelector("#screen-share-btn").style = `
+//     background-image: url('/public/images/screen-share-stop-click.svg');
+//     cursor: default;
+//     pointer-events: none;
+//     `;
+// }
 
 export default {
     auth,
     checkIfAuthAlready,
     generateShortLink,
     settingVideoSize,
+    setScreenShareBool,
 }
 
 

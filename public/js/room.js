@@ -101,7 +101,7 @@ const peers = {}
 
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
-console.log("in page");
+// console.log("in page");
 
 // console.log("roomId", ROOM_ID);
 // console.log("userId", USER_ID);
@@ -115,8 +115,7 @@ navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then( stream => {
-    console.log("get user media");
-    console.log(stream);
+    // console.log("get user media");
 
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
     // if(true){
@@ -145,7 +144,7 @@ navigator.mediaDevices.getUserMedia({
                 // console.log("stream", userVideoStream)
                 addVideoStream(video, userVideoStream, false, remoteUuid);
             })
-        })        
+        })
 
         // nPeer.on('call', function(call){
         //     call.answer(stream);
@@ -294,7 +293,7 @@ navigator.mediaDevices.getUserMedia({
                 if(USER_ID === newHostUuid){
                     auth = true;
                     addAllowClick();
-                    document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
+                    document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
                     if(!chatOpen){
                         // messageWrapper.classList.add("add-disabled");
                         // sendWrapper.classList.add("add-disabled");
@@ -326,9 +325,11 @@ navigator.mediaDevices.getUserMedia({
         }
     })
 
-    console.log("before emit");
+    // console.log("before emit");
 
     socket.emit('join-room', ROOM_ID, USER_ID);
+
+
     
     // var conn = myPeer.connect(USER_ID);
     // on open will be launch when you successfully connect to PeerServer
@@ -576,7 +577,7 @@ let InRoomSocketInit = async () => {
 
                 // chat room
                 document.querySelector(".allow-click").remove();
-                document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
+                document.querySelector(".message-wrapper").style.height = "calc(100vh - 293px)";
             }
             if(USER_ID === newUuid){
                 // group
@@ -587,7 +588,7 @@ let InRoomSocketInit = async () => {
                 let chatOpen = data[1];
 
                 addAllowClick();
-                document.querySelector(".message-wrapper").style.height = "calc(100vh - 353px)";
+                document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
 
                 if(!chatOpen){
                     let switchInput = document.querySelector("#switch");
@@ -601,10 +602,16 @@ let InRoomSocketInit = async () => {
     })
 
     // close screen
-    socket.on('close-screen-set', async (roomId) => {
+    socket.on('close-screen-set', async (roomId, uuid) => {
         if(ROOM_ID === roomId){
-            document.querySelector("#screen-wrapper").remove();
-            utils.settingVideoSize();
+            if(document.querySelector("#screen-wrapper")){
+                document.querySelector("#screen-wrapper").remove();
+                utils.settingVideoSize();
+            }
+
+            if(uuid !== USER_ID){
+                screenShareBtn.classList.remove("stopShareClick");
+            }
         }
     })
 
@@ -766,18 +773,24 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 cameraBtn.classList.add("disable");
             }
             
-            let chatOpen = await getRoomChatStatus(ROOM_ID);
+            let roomStatus = await getRoomChatAndShare(ROOM_ID);
+            let chatOpen = roomStatus[0];
+            let screenShare = roomStatus[1];
             if(!chatOpen){
                 messageWrapper.classList.add("add-disabled");
                 sendWrapper.classList.add("add-disabled");
                 sendMessageInput.disabled = true;
             }
+            if(!screenShare){
+                screenShareBtn.classList.remove("stopShareClick");
+            }
 
             document.querySelector(".allow-click").remove();
-            document.querySelector(".message-wrapper").style.height = "calc(100vh - 303px)";
+            document.querySelector(".message-wrapper").style.height = "calc(100vh - 293px)";
 
         }else{
             switchInputInit();
+            screenShareBtn.classList.remove("stopShareClick");
         }
 
     }else{
@@ -794,6 +807,10 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 video.play();
             })
             document.querySelector(`#screen-wrapper`).append(video);
+            console.log(remoteUuid.split("-")[0])
+            if(remoteUuid.split("-")[0] !== USER_ID){
+                screenShareBtn.classList.add("stopShareClick");
+            }
     
             utils.settingVideoSize();
             return
@@ -1333,8 +1350,8 @@ let setRoomChatStatus = async (roomId, b) => {
     let data = await response.json();
 }
 
-let getRoomChatStatus = async (roomId) => {
-    let response = await fetch(`/room/getRoomChatStatus`, {
+let getRoomChatAndShare = async (roomId) => {
+    let response = await fetch(`/room/getRoomChatAndShare`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
@@ -1345,7 +1362,7 @@ let getRoomChatStatus = async (roomId) => {
     });
     let data = await response.json();
     if(data){
-        return data.chatOpen;
+        return [data.chatOpen, data.screenShare];
     }
 }
 
@@ -1522,7 +1539,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
             cursor: "always"
         },
         audio: false
-    }).then(stream => {
+    }).then(async stream => {
         sct ++;
         nPeer = new Peer(`${USER_ID}-screen-${sct}`)
         // nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
@@ -1540,15 +1557,16 @@ screenShareBtn.addEventListener("click", function addScreen(){
             call.answer(stream);
         })
 
-        this.removeEventListener("click", addScreen)
-        this.style.backgroundImage = "url('/public/images/screen-share-ing.svg')";
-        this.style.cursor = "default";
+        await utils.setScreenShareBool(ROOM_ID, true);
+
+        this.removeEventListener("click", addScreen);
+        this.classList.add("userShare");
 
         let videoTrack = stream.getVideoTracks()[0];
-        videoTrack.onended = function() {
-            screenShareBtn.style.backgroundImage = "url('/public/images/screen-share.svg')";
-            screenShareBtn.style.cursor = "pointer";
-            socket.emit('close-screen', ROOM_ID);
+        videoTrack.onended = async () => {
+            await utils.setScreenShareBool(ROOM_ID, false);
+            screenShareBtn.classList.remove("userShare");
+            socket.emit('close-screen', ROOM_ID, USER_ID);
             screenShareBtn.addEventListener("click", addScreen);
         }
     }).catch(err => {

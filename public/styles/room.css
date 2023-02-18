@@ -435,7 +435,7 @@ body .bg {
   top: 15px;
   width: 35px;
   height: 35px;
-  background-color: rgba(145, 46, 94, 0.7);
+  background-color: rgba(43, 133, 184, 0.9);
   z-index: 160;
   display: flex;
   justify-content: center;
@@ -661,7 +661,7 @@ body .bg {
 .extension-wrapper .extension-box {
   background-color: #ffffff;
   width: 300px;
-  height: calc(100vh - 115px);
+  height: 89vh;
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -1172,7 +1172,7 @@ body .bg {
 .extension-wrapper .extension-box .chat .message-wrapper {
   padding-left: 10px;
   margin-top: 20px;
-  height: calc(100vh - 353px);
+  height: calc(100vh - 343px);
   overflow-y: scroll;
   pointer-events: auto;
   -webkit-user-select: auto;
@@ -1280,7 +1280,7 @@ body .bg {
   position: fixed;
   bottom: 0;
   background-color: #DBA39A;
-  height: 90px;
+  height: 8%;
   z-index: 500;
 }
 #controls-wrapper #room-url-wrapper {
@@ -1334,6 +1334,17 @@ body .bg {
 
 #screen-share-btn {
   background-image: url("/public/images/screen-share.svg");
+  cursor: pointer;
+  pointer-events: auto;
+}
+#screen-share-btn.stopShareClick {
+  background-image: url("/public/images/screen-share-stop-click.svg");
+  cursor: default;
+  pointer-events: none;
+}
+#screen-share-btn.userShare {
+  background-image: url("/public/images/screen-share-ing.svg");
+  cursor: default;
 }
 
 #leave-btn {
@@ -1370,15 +1381,15 @@ body .bg {
 .icon-right-block .icon-right-solo:hover {
   background-color: rgba(207, 207, 207, 0.2);
 }
-.icon-right-block .icon-right-solo .fa-circle-info {
+.icon-right-block .icon-right-solo .fa-link {
   position: relative;
   top: -1px;
-  font-size: 25px;
+  font-size: 23px;
   color: rgba(82, 75, 75, 0.5);
   cursor: pointer;
   transition: 0.4s;
 }
-.icon-right-block .icon-right-solo .fa-circle-info.clicked {
+.icon-right-block .icon-right-solo .fa-link.clicked {
   color: rgb(48, 48, 48);
 }
 .icon-right-block .icon-right-solo .group-num-block {

@@ -53,5 +53,6 @@ type RoomInfo struct {
 	RoomId      string
 	ChatOpen    bool
 	User        []RoomUserData
+	ScreenShare bool
 	RoomCreated string
 }
