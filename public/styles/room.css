@@ -1344,7 +1344,6 @@ body .bg {
 }
 #screen-share-btn.userShare {
   background-image: url("/public/images/screen-share-ing.svg");
-  cursor: default;
 }
 
 #leave-btn {

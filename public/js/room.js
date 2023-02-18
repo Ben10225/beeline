@@ -800,7 +800,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 video.play();
             })
             document.querySelector(`#screen-wrapper`).append(video);
-            console.log(remoteUuid.split("-")[0])
+            // console.log(remoteUuid.split("-")[0])
             if(remoteUuid.split("-")[0] !== USER_ID){
                 screenShareBtn.classList.add("stopShareClick");
             }
@@ -1554,6 +1554,16 @@ screenShareBtn.addEventListener("click", function addScreen(){
         this.removeEventListener("click", addScreen);
         this.classList.add("userShare");
 
+        this.addEventListener("click", async function stopShare(){
+            stream.getTracks().forEach(track => track.stop());
+            await utils.setScreenShareBool(ROOM_ID, false);
+            screenShareBtn.classList.remove("userShare");
+            socket.emit('close-screen', ROOM_ID, USER_ID);
+
+            this.removeEventListener("click", stopShare);
+            this.addEventListener("click", addScreen);
+        })
+
         let videoTrack = stream.getVideoTracks()[0];
         videoTrack.onended = async () => {
             await utils.setScreenShareBool(ROOM_ID, false);
@@ -1561,6 +1571,8 @@ screenShareBtn.addEventListener("click", function addScreen(){
             socket.emit('close-screen', ROOM_ID, USER_ID);
             screenShareBtn.addEventListener("click", addScreen);
         }
+
+
     }).catch(err => {
         console.log("unable to get display media" + err);
     })
