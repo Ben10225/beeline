@@ -101,15 +101,6 @@ const peers = {}
 
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
-// console.log("in page");
-
-// console.log("roomId", ROOM_ID);
-// console.log("userId", USER_ID);
-// console.log("userName", USER_NAME);
-// console.log("userImg", USER_IMG);
-// console.log("enterRoomId", ENTER_ROOM_ID);
-// console.log("client", CLIENT);
-// console.log("auth", auth);
 
 navigator.mediaDevices.getUserMedia({
     video: true,
@@ -128,8 +119,6 @@ navigator.mediaDevices.getUserMedia({
         document.querySelector("#user-setup").remove();
 
         utils.generateShortLink();
-
-        // console.log("bb");
 
         // 進房時監聽
         addVideoStream(myVideo, stream, true, USER_ID);
@@ -274,63 +263,10 @@ navigator.mediaDevices.getUserMedia({
         }
     })
     
-    socket.on('user-disconnected', async uuid => {
-        console.log("out meeting: ", uuid);
+    // disconnect
 
-        if (userInRoomObj[uuid]){
-            delete userInRoomObj[uuid];
-            // console.log(userInRoomObj);
-            groupNumber.textContent = Object.keys(userInRoomObj).length;
-        } 
+    // socket.emit('join-room', ROOM_ID, USER_ID);
 
-        if(userInRoomObj[USER_ID] && uuid !== USER_ID){
-            if (document.querySelector(".allow-click")) return
-            setTimeout(async()=>{
-                let data = await resetAuthData(ROOM_ID, USER_ID);
-                let newHostUuid = data[0];
-                let chatOpen = data[1];
-                // console.log("chatOpen: ", chatOpen);
-                if(USER_ID === newHostUuid){
-                    auth = true;
-                    addAllowClick();
-                    document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
-                    if(!chatOpen){
-                        // messageWrapper.classList.add("add-disabled");
-                        // sendWrapper.classList.add("add-disabled");
-                        // sendMessageInput.disabled = true;
-    
-                        let switchInput = document.querySelector("#switch");
-                        switchInput.checked = false;
-                    }else{
-                        // messageWrapper.classList.remove("add-disabled");
-                        // sendWrapper.classList.remove("add-disabled");
-                        // sendMessageInput.disabled = false;
-                    }
-                    newAuthGroupSetting();
-                    alertNewAuth(newHostUuid);
-
-                }else{
-                    auth = false;
-                }
-                if(!document.querySelector(".bee-gif")){
-                    let hostTag = `<div class="bee-gif"></div>`;
-                    document.querySelector(`#group-${newHostUuid} .user-host`).insertAdjacentHTML("beforeend", hostTag);
-                }
-            }, 1000)
-        }
-
-        if(uuid === USER_ID){
-            disconnect = true;
-            checkNeedReconnect(ROOM_ID, USER_ID);
-        }
-    })
-
-    // console.log("before emit");
-
-    socket.emit('join-room', ROOM_ID, USER_ID);
-
-
-    
     // var conn = myPeer.connect(USER_ID);
     // on open will be launch when you successfully connect to PeerServer
     // conn.on('open', function(){
@@ -344,6 +280,12 @@ navigator.mediaDevices.getUserMedia({
 }).catch(err => {
     console.log("unable to get display media" + err);
 })
+
+
+myPeer.on('open', async id => {
+    socket.emit('join-room', ROOM_ID, USER_ID);
+})
+
 
 let WaitingSocketInit = async () => {
     socket.on('client-action', async (roomId, clientName, b) => {
@@ -619,6 +561,57 @@ let InRoomSocketInit = async () => {
     socket.on('audio-ani-set', async (roomId, uuid, b) => {
         if(ROOM_ID === roomId){
             extension.audioAni(uuid, b);
+        }
+    })
+
+    socket.on('user-disconnected', async uuid => {
+        console.log("out meeting: ", uuid);
+
+        if (userInRoomObj[uuid]){
+            delete userInRoomObj[uuid];
+            // console.log(userInRoomObj);
+            groupNumber.textContent = Object.keys(userInRoomObj).length;
+        } 
+
+        if(userInRoomObj[USER_ID] && uuid !== USER_ID){
+            if (document.querySelector(".allow-click")) return
+            setTimeout(async()=>{
+                let data = await resetAuthData(ROOM_ID, USER_ID);
+                let newHostUuid = data[0];
+                let chatOpen = data[1];
+                // console.log("chatOpen: ", chatOpen);
+                if(USER_ID === newHostUuid){
+                    auth = true;
+                    addAllowClick();
+                    document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
+                    if(!chatOpen){
+                        // messageWrapper.classList.add("add-disabled");
+                        // sendWrapper.classList.add("add-disabled");
+                        // sendMessageInput.disabled = true;
+    
+                        let switchInput = document.querySelector("#switch");
+                        switchInput.checked = false;
+                    }else{
+                        // messageWrapper.classList.remove("add-disabled");
+                        // sendWrapper.classList.remove("add-disabled");
+                        // sendMessageInput.disabled = false;
+                    }
+                    newAuthGroupSetting();
+                    alertNewAuth(newHostUuid);
+
+                }else{
+                    auth = false;
+                }
+                if(!document.querySelector(".bee-gif")){
+                    let hostTag = `<div class="bee-gif"></div>`;
+                    document.querySelector(`#group-${newHostUuid} .user-host`).insertAdjacentHTML("beforeend", hostTag);
+                }
+            }, 1000)
+        }
+
+        if(uuid === USER_ID){
+            disconnect = true;
+            checkNeedReconnect(ROOM_ID, USER_ID);
         }
     })
 }
@@ -1101,7 +1094,6 @@ let tryEnterRoom = (uuid) => {
                 if(disconnect){
                     if(ct > 700){
                         // window.location.reload();
-
                         // history.go(0);
                     }
                 }else{
@@ -1534,27 +1526,27 @@ let newAuthGroupSetting = () => {
 
 let sct = 0;
 screenShareBtn.addEventListener("click", function addScreen(){
+    sct ++;
+
     navigator.mediaDevices.getDisplayMedia({
         video: {
             cursor: "always"
         },
         audio: false
     }).then(async stream => {
-        sct ++;
-        nPeer = new Peer(`${USER_ID}-screen-${sct}`)
         // nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
         //     host: "beelinetw.com",
         //     port: 9000,
         //     path: "/myapp",
         // })
-
-        // nPeer.on('open', async id => {
-        // })
-
-        socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+        nPeer = new Peer(`${USER_ID}-screen-${sct}`);
 
         nPeer.on('call', function(call){
             call.answer(stream);
+        })
+    
+        nPeer.on('open', async id => {
+            socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
         })
 
         await utils.setScreenShareBool(ROOM_ID, true);
@@ -1573,6 +1565,8 @@ screenShareBtn.addEventListener("click", function addScreen(){
         console.log("unable to get display media" + err);
     })
 
+    // socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+
     // 更換 videoTrack
     // let videoTrack = stream.getVideoTracks()[0];
     // let sender = currentPeer.getSenders().find(function(s){
@@ -1580,6 +1574,8 @@ screenShareBtn.addEventListener("click", function addScreen(){
     // });
     // sender.replaceTrack(videoTrack);
 })
+
+
 
 let audioSetInit = async (stream) => {
     const audioContext = new AudioContext();

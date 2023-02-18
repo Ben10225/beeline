@@ -202,14 +202,6 @@ let setScreenShareBool = async (roomId, bool) => {
     let data = await response.json();
 }
 
-// let disableScreenShare = () => {
-//     document.querySelector("#screen-share-btn").style = `
-//     background-image: url('/public/images/screen-share-stop-click.svg');
-//     cursor: default;
-//     pointer-events: none;
-//     `;
-// }
-
 export default {
     auth,
     checkIfAuthAlready,
