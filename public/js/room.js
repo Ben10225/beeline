@@ -1608,53 +1608,56 @@ let audioSetInit = async (stream) => {
             const arraySum = array.reduce((a, value) => a + value, 0);
             const average = arraySum / array.length;
             let number = Math.round(average);
-            
-            if(!wait){
-                vThird = vSecond;
-                vSecond = vFirst;
-                vFirst = number;
-            }
 
-            if((vThird-vFirst > 3 && voiceNow)){
-                stopToken ++;
-                if(stopToken > 3){
-                    socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-                    voiceNow = false;
-                    wait = true;
-
-                    setTimeout(()=>{
-                        wait = false;
-                    }, 700)
-                }
-            }else{
-                stopToken = 0;
-            }
-
-            if(number < 10 && voiceNow){
+            if(number < 10){
                 socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-                voiceNow = false;
+            }else{
+                socket.emit("audio-ani", ROOM_ID, USER_ID, true);
             }
+            
+            // if(!wait){
+            //     vThird = vSecond;
+            //     vSecond = vFirst;
+            //     vFirst = number;
+            // }
 
-            if(!voiceNow && !wait){
-                if(number >= 10 && vFirst - vThird > 2){
-                    aniToken ++ ;
-                    if(aniToken > 1){
-                        voiceNow = true;
-                        socket.emit("audio-ani", ROOM_ID, USER_ID, true);
-                    }
-                }else{
-                    aniToken = 0;
-                }
-            }
+            // if((vThird-vFirst > 3 && voiceNow)){
+            //     stopToken ++;
+            //     if(stopToken > 3){
+            //         socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+            //         voiceNow = false;
+            //         wait = true;
+
+            //         setTimeout(()=>{
+            //             wait = false;
+            //         }, 700)
+            //     }
+            // }else{
+            //     stopToken = 0;
+            // }
+
+            // if(number < 7 && voiceNow){
+            // if(number < 10){
+            //     socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+            //     // voiceNow = false;
+            // }else{
+            //     socket.emit("audio-ani", ROOM_ID, USER_ID, true);
+            // }
+
+            // if(!voiceNow && !wait){
+            //     if(number >= 9 && vFirst - vThird > 2){
+            //         aniToken ++ ;
+            //         if(aniToken > 0){
+            //             voiceNow = true;
+            //             socket.emit("audio-ani", ROOM_ID, USER_ID, true);
+            //         }
+            //     }else{
+            //         aniToken = 0;
+            //     }
+            // }
         }
     };
 }
-
-
-
-// screenShareBtn.addEventListener("click", screenShare);
-
-
 
 
 /*
