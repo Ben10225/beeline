@@ -47,6 +47,7 @@ type RoomUserData struct {
 	VideoStatus bool
 	Auth        bool
 	Leave       bool
+	Sec         float64
 }
 
 type RoomInfo struct {
@@ -55,4 +56,9 @@ type RoomInfo struct {
 	User        []RoomUserData
 	ScreenShare bool
 	RoomCreated string
+}
+
+type Game struct {
+	Uuid string
+	Sec  float64
 }

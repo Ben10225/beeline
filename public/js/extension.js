@@ -1,135 +1,43 @@
 const userContainer = document.querySelector(".user-container");
-// const infoIcon =  document.querySelector(".fa-circle-info");
+
 const infoIcon =  document.querySelector(".fa-link");
 const infoIconBlock = document.querySelector(".icon-right-solo.ic-info");
 const groupIcon =  document.querySelector(".fa-user-group");
 const groupIconBlock = document.querySelector(".icon-right-solo.ic-group");
 const chatIcon =  document.querySelector(".fa-message");
 const chatIconBlock = document.querySelector(".icon-right-solo.ic-message");
+const shapeIcon = document.querySelector(".fa-shapes");
+const shapeIconBlock = document.querySelector(".icon-right-solo.ic-shape");
+
 const extensionBox = document.querySelector(".extension-box");
 const info = document.querySelector(".info");
 const group = document.querySelector(".group");
 const chat = document.querySelector(".chat");
+const service = document.querySelector(".service");
 const exitIcon = document.querySelector(".exit");
 const alertWrapper = document.querySelector(".client-alert");
 const searchBar = document.querySelector("#search");
 
-const extensionDomLst = [info, group, chat];
-const iconLst = [infoIcon, groupIcon, chatIcon];
+const gameBlock = document.querySelector("#game-block");
+
+const extensionDomLst = [info, group, chat, service];
+const iconLst = [infoIcon, groupIcon, chatIcon, shapeIcon];
 
 let rightIconsInit = () => {
     infoIconBlock.onclick = () => {
-        if(!infoIcon.classList.contains("clicked")){
-            iconLst.forEach(icon => {
-                if(icon === infoIcon){
-                    icon.classList.add("clicked");
-                }else{
-                    icon.classList.remove("clicked");
-                }
-            })
-            extensionDomLst.forEach(section => {
-                if(section === info){
-                    section.classList.add("show");
-                }else{
-                    section.classList.remove("show");
-                }
-            })
-            if(!extensionBox.classList.contains("show")){
-                extensionBox.classList.add("show");
-                setTimeout(() => {
-                    userContainer.classList.add("go-left");
-                    alertWrapper.classList.add("go-left");
-                }, 100);
-            }
-        }else{
-            infoIcon.classList.remove("clicked");
-            setTimeout(() => {
-                info.classList.remove("show");
-            }, 300)
-            if(extensionBox.classList.contains("show")){
-                extensionBox.classList.remove("show");
-                setTimeout(() => {
-                    userContainer.classList.remove("go-left");
-                    alertWrapper.classList.remove("go-left");
-                }, 100);
-            }
-        }
+        iconBlockClick(infoIcon, info);
     }
 
     groupIconBlock.onclick = () => {
-        if(!groupIcon.classList.contains("clicked")){
-            iconLst.forEach(icon => {
-                if(icon === groupIcon){
-                    icon.classList.add("clicked");
-                }else{
-                    icon.classList.remove("clicked");
-                }
-            })
-            extensionDomLst.forEach(section => {
-                if(section === group){
-                    section.classList.add("show");
-                }else{
-                    section.classList.remove("show");
-                }
-            })
-            if(!extensionBox.classList.contains("show")){
-                extensionBox.classList.add("show");
-                setTimeout(() => {
-                    userContainer.classList.add("go-left");
-                    alertWrapper.classList.add("go-left");
-                }, 100);
-            }
-        }else{
-            groupIcon.classList.remove("clicked");
-            setTimeout(() => {
-                group.classList.remove("show");
-            }, 300)
-            if(extensionBox.classList.contains("show")){
-                extensionBox.classList.remove("show");
-                setTimeout(() => {
-                    userContainer.classList.remove("go-left");
-                    alertWrapper.classList.remove("go-left");
-                }, 100);
-            }
-        }
+        iconBlockClick(groupIcon, group);
     }
     
     chatIconBlock.onclick = () => {
-        if(!chatIcon.classList.contains("clicked")){
-            iconLst.forEach(icon => {
-                if(icon === chatIcon){
-                    icon.classList.add("clicked");
-                }else{
-                    icon.classList.remove("clicked");
-                }
-            })
-            extensionDomLst.forEach(section => {
-                if(section === chat){
-                    section.classList.add("show");
-                }else{
-                    section.classList.remove("show");
-                }
-            })
-            if(!extensionBox.classList.contains("show")){
-                extensionBox.classList.add("show");
-                setTimeout(() => {
-                    userContainer.classList.add("go-left");
-                    alertWrapper.classList.add("go-left");
-                }, 100);
-            }
-        }else{
-            chatIcon.classList.remove("clicked");
-            setTimeout(() => {
-                chat.classList.remove("show");
-            }, 300)
-            if(extensionBox.classList.contains("show")){
-                extensionBox.classList.remove("show");
-                setTimeout(() => {
-                    userContainer.classList.remove("go-left");
-                    alertWrapper.classList.remove("go-left");
-                }, 100);
-            }
-        }
+        iconBlockClick(chatIcon, chat);
+    }
+
+    shapeIconBlock.onclick = () => {
+        iconBlockClick(shapeIcon, service);
     }
 
     exitIcon.onclick = () => {
@@ -142,6 +50,44 @@ let rightIconsInit = () => {
             alertWrapper.classList.remove("go-left");
         }, 100);
 
+    }
+}
+
+let iconBlockClick = (iconDom, extensionBlock) => {
+    if(!iconDom.classList.contains("clicked")){
+        iconLst.forEach(icon => {
+            if(icon === iconDom){
+                icon.classList.add("clicked");
+            }else{
+                icon.classList.remove("clicked");
+            }
+        })
+        extensionDomLst.forEach(section => {
+            if(section === extensionBlock){
+                section.classList.add("show");
+            }else{
+                section.classList.remove("show");
+            }
+        })
+        if(!extensionBox.classList.contains("show")){
+            extensionBox.classList.add("show");
+            setTimeout(() => {
+                userContainer.classList.add("go-left");
+                alertWrapper.classList.add("go-left");
+            }, 100);
+        }
+    }else{
+        iconDom.classList.remove("clicked");
+        setTimeout(() => {
+            extensionBlock.classList.remove("show");
+        }, 300)
+        if(extensionBox.classList.contains("show")){
+            extensionBox.classList.remove("show");
+            setTimeout(() => {
+                userContainer.classList.remove("go-left");
+                alertWrapper.classList.remove("go-left");
+            }, 100);
+        }
     }
 }
 
@@ -210,12 +156,52 @@ let audioAni = (uuid, bool) => {
     }
 }
 
+let reciprocalAnimation = (text) => {
+    let reciprocal = document.querySelector(".reciprocal");
+    if(reciprocal){
+        reciprocal.remove();
+    }
+    let html = `<h3 class="reciprocal">${text}</h3>`;
+    gameBlock.insertAdjacentHTML("beforeend", html);
+    let newReciprocal = document.querySelector(".reciprocal");
+    newReciprocal.style.animation = "reciprocal-ani 0.7s both";
+    setTimeout(()=>{
+        new Audio("/public/audio/count-down.wav").play();
+    }, 150)
+    setTimeout(()=>{
+        newReciprocal.remove();
+    }, 1000)
+}
+
+let gameStartTextSetting = () => {
+    const gameStartTxt = document.querySelector(".game-start-txt");
+    let txtLst = [
+        "墮", "敷", "遊", "遊",
+        "遊卡", "遊恩", "遊戲", "遊戲",
+        "遊戲贏", "遊戲雅", "遊戲即", "遊戲即",
+        "遊戲即為", "遊戲即翰", "遊戲即將", "遊戲即將",
+        "遊戲即將力", "遊戲即將言", "遊戲即將開", "遊戲即將開",
+        "遊戲即將開瓶", "遊戲即將開師", "遊戲即將開始",
+    ]; 
+    setTimeout(() => {
+        txtLst.forEach((t, index) => {
+            setTimeout(()=>{
+                gameStartTxt.textContent = t;
+            }, index * 160)
+        })
+        new Audio("/public/audio/type.wav").play();
+    },500)
+}
+
+
 export default {
     rightIconsInit,
     getGroupInfo,
     assignNewAuth,
     searchUser,
     audioAni,
+    reciprocalAnimation,
+    gameStartTextSetting,
 }
 
 

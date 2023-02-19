@@ -274,3 +274,29 @@ func SetScreenShareBool(c *gin.Context) {
 		"ok": true,
 	})
 }
+
+func SendUserSec(c *gin.Context) {
+	var req structs.RoomUserData
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+	sec := req.Sec
+	models.SendSec(c, roomId, uuid, sec)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func GetGameResult(c *gin.Context) {
+	var req structs.RoomInfo
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	result := models.GetGameSlice(c, roomId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": result,
+	})
+}

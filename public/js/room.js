@@ -49,6 +49,9 @@ const sendImg =  document.querySelector(".send-img");
 const groupNumber = document.querySelector(".group-number");
 const searchBar = document.querySelector("#search");
 
+const gameBlock = document.querySelector("#game-block");
+const eyeGame = document.querySelector("#eye-game");
+
 
 let disconnect = true;
 
@@ -75,6 +78,11 @@ let stopToken = 0;
 let aniToken = 0;
 // let timerAni;
 // let socket;
+
+let gameLeft = 0;
+let gameTop = 0;
+let gameDelay = 0;
+
 
 const socket = io({transports: ['websocket']});
 // const socket = io({transports: ['websocket'], upgrade: false});
@@ -564,6 +572,74 @@ let InRoomSocketInit = async () => {
         }
     })
 
+    // get game value
+    socket.on('give-game-value', async (roomId, gameValue) => {
+        if(ROOM_ID === roomId){
+            gameLeft = gameValue[0];
+            gameTop = gameValue[1];
+            gameDelay = parseFloat(gameValue[2]);
+            let clicked = false;
+
+            gameStartAni();
+
+            setTimeout(()=>{
+                setTimeout(()=>{
+                    new Audio("/public/audio/bee-show.wav").play();
+                    gameBlock.insertAdjacentHTML("beforeend", `<div class="bee-game-gif"></div>`);
+                    let dom = document.querySelector(".bee-game-gif");
+                    dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
+                    let start = window.performance.now();
+                    dom.addEventListener("click", function sendReactionSecond(){
+                        clicked = true;
+                        let end = window.performance.now();
+                        let sec = roundTo(((end - start) / 1000), 6);
+                        utils.sendUserSecToDB(ROOM_ID, USER_ID, sec);
+                        this.removeEventListener("click", sendReactionSecond);
+                        this.remove();
+    
+                        let waitHtml = `
+                        <div class="game-wait">
+                            <h1>請稍候</h1>
+                            <div class="game-wait-gif"></div>
+                        </div>
+                        `;
+                        gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
+                    })
+                    setTimeout(() => {
+                        if(auth){
+                           socket.emit("five-sec-end-game", ROOM_ID);
+                        }
+                        if(!clicked){
+                            utils.sendUserSecToDB(ROOM_ID, USER_ID, 5);
+                            dom.remove();
+                            let waitHtml = `
+                            <div class="game-wait">
+                                <h1>請稍候</h1>
+                                <div class="game-wait-gif"></div>
+                            </div>
+                            `;
+                            gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
+                        }
+                    }, 5000)
+                }, gameDelay * 1000)
+            }, 8000)
+        }
+    })
+
+    // 5 end
+    socket.on('five-end', async (roomId) => {
+        if(ROOM_ID === roomId){
+            setTimeout(() => {
+                utils.getGameResult(ROOM_ID);
+                let wait =  document.querySelector(".game-wait");
+                if(wait){
+                    wait.remove();
+                }
+            }, 500)
+        }
+    })
+
+    // disconnect
     socket.on('user-disconnected', async uuid => {
         console.log("out meeting: ", uuid);
 
@@ -1659,6 +1735,48 @@ let audioSetInit = async (stream) => {
     };
 }
 
+let gameStartAni = () => {
+    let html = `
+    <div class="game-bg"></div>
+    <h3 class="game-start-txt"></h3>
+    <h3 class="reciprocal"></h3>
+    `;
+
+    gameBlock.insertAdjacentHTML("beforeend", html);
+    const gameStartTxt = document.querySelector(".game-start-txt");
+    gameBlock.classList.add("show");
+    extension.gameStartTextSetting();
+
+    setTimeout(()=>{
+        gameStartTxt.style.opacity = "0" ;
+        setTimeout(()=>{
+            gameStartTxt.remove();
+        }, 500)
+    }, 5000)
+
+    let content = 3;
+    setTimeout(()=>{
+        let timer = setInterval(()=>{
+            extension.reciprocalAnimation(content);
+            content --;
+            if(content === 0){
+                clearInterval(timer);
+            }
+        }, 1000)
+    }, 4000)
+}
+
+let eyeGameInit = async () => {
+    eyeGame.onclick = () => {
+        socket.emit("start-game", ROOM_ID);
+    }
+}
+
+eyeGameInit();
+
+let roundTo = ( num, decimal ) => {
+    return Math.round( ( num + Number.EPSILON ) * Math.pow( 10, decimal ) ) / Math.pow( 10, decimal ); 
+}
 
 /*
 let createGroupDom = async (gLst, host, localUuid) => {

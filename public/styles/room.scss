@@ -486,7 +486,7 @@ body{
                     width: 35px;
                     height: 35px;
                     background-color: rgba(#2b85b8, 0.9);
-                    z-index: 160;
+                    z-index: 90;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -572,7 +572,7 @@ body{
                     right: 8px;
                     top: 8px;
                     display: none;
-                    z-index: 160;
+                    z-index: 90;
                     &.show{
                         display: block;
                     }
@@ -1252,7 +1252,150 @@ body{
                 }
             }
         }
+        .service{
+            position: absolute;
+            width: 270px;
+            opacity: 0;
+            visibility: hidden;
+            &.show{
+                opacity: 1;
+                visibility: visible;
+            }
+            h2{
+                margin-top: 20px;
+                font-size: 18px;
+                margin-left: 10px;
+                font-weight: 400;
+            }
+            h5{
+                margin-top: 20px;
+                font-size: 13px;
+                margin-left: 10px;
+                font-weight: 400;
+                margin-bottom: 20px;
+            }
+            .service-wrapper{
+                // margin-left: 10px;
+
+                .service-block{
+                    margin: 5px auto;
+                    position: relative;
+                    cursor: pointer;
+                    background-color: rgba(#777, 0);
+                    transition: 0.3s;
+                    padding: 5px;
+                    &:hover{
+                        background-color: rgba(#777, 0.1);
+                    }
+                    .service-img{
+                        width: 40px;
+                        height: 40px;
+                        background-image: url('/public/images/eye-game.svg');
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-size: cover;
+                        position: absolute;
+                        top: 4px;
+                    }
+                    .service-txt{
+                        margin-left: 50px;
+                        h4{
+                            color: #555;
+                            font-size: 14px;
+                            font-weight: 400;
+                        }
+                        p{
+                            color: #666;
+                            font-size: 8px;
+                            font-weight: 200;
+                        }
+                    }
+                }
+            }
+        }
     } 
+}
+
+#game-block{
+    position: fixed;
+    z-index: 500;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+    &.show{
+        opacity: 1;
+        visibility: visible;
+    }
+    .game-wait{
+        z-index: 550;
+        position: absolute;
+        left: 50%;
+        top: 40%;
+        transform: translateX(-50%);
+        h1{
+            color: #fff;
+            font-size: 50px;
+            display: inline-block;
+            letter-spacing: 0.08em;
+            font-weight: 400;
+        }
+        .game-wait-gif{
+            display: inline-block;
+            width: 65px;
+            height: 65px;
+            background-image: url('/public/images/game-wait2.gif');
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: relative;
+            left: 15px;
+            top: 16px;
+        }
+    }
+    .game-bg{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(#000, 0.9);
+    }
+    h3{
+        color: #fff;
+        position: absolute;
+        left: 50%;
+        top: 40%;
+        transform: translateX(-50%);
+        transition: 0.4s;
+        &.game-start-txt{
+            font-size: 70px;
+            letter-spacing: 0.1em;
+        }
+        &.reciprocal{
+            color: #ff4a4a;
+            font-size: 70px;
+            // animation: reciprocal-ani 0.7s 1s both;
+            @keyframes reciprocal-ani {
+                0%{transform: translateX(-50%) scale(5);opacity: 0;}
+                40%{opacity: 1;}
+                100%{transform: translateX(-50%) scale(3.5);}
+            }
+        }
+    }
+    .bee-game-gif{
+        width: 80px;
+        height: 80px;
+        background-image: url('/public/images/bee-game.gif');
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: absolute;
+        left: 5%;
+        top: 75%;
+        z-index: 550;
+        cursor: pointer;
+    }
+    
 }
 
 
@@ -1350,7 +1493,7 @@ body{
     display: flex;
     align-items: center;
     position: absolute;
-    right: 80px;
+    right: 50px;
     .icon-right-solo{
         width: 50px;
         height: 50px;
@@ -1371,7 +1514,7 @@ body{
             position: relative;
             top: -1px;
             // font-size: 25px;
-            font-size: 23px;
+            font-size: 22px;
             color: rgba(82, 75, 75, 0.5);
             cursor: pointer;
             transition: 0.4s;
@@ -1406,10 +1549,23 @@ body{
             }
         }
         .fa-message{
-            font-size: 23px;
+            font-size: 22px;
             color: rgba(82, 75, 75, 0.5);
             cursor: pointer;
             transition: 0.4s;
+            position: relative;
+            left: 1px;
+            &.clicked{
+                color: rgb(48, 48, 48);
+            }
+        }
+        .fa-shapes{
+            font-size: 25px;
+            color: rgba(82, 75, 75, 0.5);
+            cursor: pointer;
+            transition: 0.4s;
+            position: relative;
+            left: -1px;
             &.clicked{
                 color: rgb(48, 48, 48);
             }

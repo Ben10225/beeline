@@ -202,12 +202,43 @@ let setScreenShareBool = async (roomId, bool) => {
     let data = await response.json();
 }
 
+let sendUserSecToDB = async (roomId, uuid, sec) => {
+    let response = await fetch(`/room/sendUserSecToDB`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "uuid": uuid,
+            "sec": sec,
+        })
+    });
+    let data = await response.json();
+}
+
+let getGameResult = async (roomId) => {
+    let response = await fetch(`/room/getGameResult`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+        })
+    });
+    let data = await response.json();
+    console.log(data);
+}
+
 export default {
     auth,
     checkIfAuthAlready,
     generateShortLink,
     settingVideoSize,
     setScreenShareBool,
+    sendUserSecToDB,
+    getGameResult,
 }
 
 

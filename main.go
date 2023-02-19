@@ -96,6 +96,17 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "audio-ani-set", roomId, uuid, b)
 	})
 
+	// start game
+	server.OnEvent("/", "start-game", func(s socketio.Conn, roomId string) {
+		value := utils.GenerateGameValue()
+		server.BroadcastToRoom("/", roomId, "give-game-value", roomId, value)
+	})
+
+	// 5 sec end game
+	server.OnEvent("/", "five-sec-end-game", func(s socketio.Conn, roomId string) {
+		server.BroadcastToRoom("/", roomId, "five-end", roomId)
+	})
+
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
 	})

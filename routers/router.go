@@ -42,6 +42,7 @@ func Routers(router *gin.Engine) {
 
 		room.POST("/assignNewAuth", api.AssignNewAuth)
 		room.POST("/setScreenShareBool", api.SetScreenShareBool)
-
+		room.POST("/sendUserSecToDB", api.SendUserSec)
+		room.POST("/getGameResult", api.GetGameResult)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -381,6 +382,45 @@ func SetScreenShare(c *gin.Context, roomId string, b bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func SendSec(c *gin.Context, roomId, uuid string, sec float64) {
+	filter := bson.D{{"roomId", roomId}}
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{"user.$[elem].sec": sec}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
+func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+	user := room.User
+	userSec := map[string]float64{}
+
+	for _, v := range user {
+		if !v.Leave {
+			userSec[v.Uuid] = v.Sec
+		}
+	}
+
+	var lst []structs.Game
+	for k, v := range userSec {
+		lst = append(lst, structs.Game{k, v})
+	}
+	sort.Slice(lst, func(i, j int) bool {
+		return lst[i].Sec < lst[j].Sec // 升序
+	})
+
+	return lst
 }
 
 /*
