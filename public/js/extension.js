@@ -165,9 +165,9 @@ let reciprocalAnimation = (text) => {
     gameBlock.insertAdjacentHTML("beforeend", html);
     let newReciprocal = document.querySelector(".reciprocal");
     newReciprocal.style.animation = "reciprocal-ani 0.7s both";
-    setTimeout(()=>{
-        new Audio("/public/audio/count-down.wav").play();
-    }, 150)
+    // setTimeout(()=>{
+    //     new Audio("/public/audio/count-down.wav").play();
+    // }, 150)
     setTimeout(()=>{
         newReciprocal.remove();
     }, 1000)

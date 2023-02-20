@@ -436,7 +436,7 @@ body .bg {
   width: 35px;
   height: 35px;
   background-color: rgba(43, 133, 184, 0.9);
-  z-index: 90;
+  z-index: 160;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -581,7 +581,7 @@ body .bg {
   right: 8px;
   top: 8px;
   display: none;
-  z-index: 90;
+  z-index: 160;
 }
 #video-streams .user-container .video-container .video-player .micro-status-icon.show {
   display: block;
@@ -1410,7 +1410,7 @@ body .bg {
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
-  z-index: 550;
+  z-index: 700;
   cursor: pointer;
 }
 #game-block .record-wrapper {

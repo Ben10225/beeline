@@ -486,7 +486,7 @@ body{
                     width: 35px;
                     height: 35px;
                     background-color: rgba(#2b85b8, 0.9);
-                    z-index: 90;
+                    z-index: 160;
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -572,7 +572,7 @@ body{
                     right: 8px;
                     top: 8px;
                     display: none;
-                    z-index: 90;
+                    z-index: 160;
                     &.show{
                         display: block;
                     }
@@ -1395,7 +1395,7 @@ body{
         position: absolute;
         // left: 5%;
         // top: 75%;
-        z-index: 550;
+        z-index: 700;
         cursor: pointer;
     }
     .record-wrapper{

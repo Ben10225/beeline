@@ -7,16 +7,16 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 
 let enterRoom = false;
 
-// let pct = 0;
-// let pageTimer = setInterval(() => {
-    // pct ++;
-    // if(pct === 1300){
-    //     clearInterval(pageTimer);
-    //     if(!enterRoom){
-    //         history.go(0);
-    //     }
-    // }
-// }, 1);
+let pct = 0;
+let pageTimer = setInterval(() => {
+    pct ++;
+    if(pct === 1300){
+        clearInterval(pageTimer);
+        if(!enterRoom){
+            history.go(0);
+        }
+    }
+}, 1);
 
 let auth;
 
@@ -609,7 +609,7 @@ let InRoomSocketInit = async () => {
             if(gameBg){
                 gameBlock.replaceChildren();
             }
-            
+
             gameStartAni();
 
             setTimeout(()=>{
@@ -620,23 +620,25 @@ let InRoomSocketInit = async () => {
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
                     let start = window.performance.now();
                     userSec = 5;
-                    dom.addEventListener("click", function sendReactionSecond(){
-                        clicked = true;
-                        let end = window.performance.now();
-                        let sec = roundTo(((end - start) / 1000), 6);
-                        userSec = sec;
-                        utils.sendUserSecToDB(ROOM_ID, USER_ID, sec);
-                        this.removeEventListener("click", sendReactionSecond);
-                        this.remove();
-    
-                        let waitHtml = `
-                        <div class="game-wait">
-                            <h1>請稍候</h1>
-                            <div class="game-wait-gif"></div>
-                        </div>
-                        `;
-                        gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
-                    })
+                    setTimeout(() => {
+                        dom.addEventListener("click", function sendReactionSecond(){
+                            clicked = true;
+                            let end = window.performance.now();
+                            let sec = roundTo(((end - start) / 1000), 6);
+                            userSec = sec;
+                            utils.sendUserSecToDB(ROOM_ID, USER_ID, sec);
+                            this.removeEventListener("click", sendReactionSecond);
+                            this.remove();
+        
+                            let waitHtml = `
+                            <div class="game-wait">
+                                <h1>請稍候</h1>
+                                <div class="game-wait-gif"></div>
+                            </div>
+                            `;
+                            gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
+                        })
+                    }, 1)
                     setTimeout(() => {
                         if(auth){
                            socket.emit("five-sec-end-game", ROOM_ID);
