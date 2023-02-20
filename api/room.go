@@ -300,3 +300,17 @@ func GetGameResult(c *gin.Context) {
 		"data": result,
 	})
 }
+
+func CheckUserLeaveFalse(c *gin.Context) {
+	var req structs.RoomUserData
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+
+	leave := models.CheckUserLeave(c, roomId, uuid)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": leave,
+	})
+}

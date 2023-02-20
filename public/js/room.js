@@ -251,6 +251,7 @@ navigator.mediaDevices.getUserMedia({
     socket.on('user-connected', async uuid => {
         console.log(`user ${uuid} enter room ${ROOM_ID}`);
         connectToNewUser(uuid, stream);
+        
 
         if(USER_ID === uuid){
             tryEnterRoom(USER_ID);        
@@ -1805,11 +1806,10 @@ let gameStartAni = () => {
     setTimeout(()=>{
         let timer = setInterval(()=>{
             extension.reciprocalAnimation(content);
-            setTimeout(()=>{
-                let audio = new Audio("/public/audio/count-down.wav");
-                audio.volume = 0.2;
-                audio.play();
-            }, 100)
+            let audio = new Audio("/public/audio/count-down.wav");
+            audio.volume = 0.2;
+            audio.play();
+
             content --;
             if(content === 0){
                 clearInterval(timer);

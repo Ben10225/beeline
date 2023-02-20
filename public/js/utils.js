@@ -233,6 +233,21 @@ let sendUserSecToDB = async (roomId, uuid, sec) => {
     let data = await response.json();
 }
 
+let checkUserLeaveFalse = async (roomId, uuid) => {
+    let response = await fetch(`/room/checkUserLeaveFalse`, {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "roomId": roomId,
+            "uuid": uuid,
+        })
+    });
+    let data = await response.json();
+    return data.data;
+}
+
 let getGameResult = async (roomId) => {
     let response = await fetch(`/room/getGameResult`, {
         method: "POST",
@@ -257,6 +272,7 @@ export default {
     setScreenShareBool,
     sendUserSecToDB,
     getGameResult,
+    checkUserLeaveFalse,
 }
 
 

@@ -430,6 +430,23 @@ func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
 	return lst
 }
 
+func CheckUserLeave(c *gin.Context, roomId, uuid string) bool {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+	user := room.User
+	var b bool
+	for _, v := range user {
+		if v.Uuid == uuid {
+			b = v.Leave
+		}
+	}
+	return b
+}
+
 /*
 func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
 
