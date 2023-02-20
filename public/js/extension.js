@@ -165,9 +165,11 @@ let reciprocalAnimation = (text) => {
     gameBlock.insertAdjacentHTML("beforeend", html);
     let newReciprocal = document.querySelector(".reciprocal");
     newReciprocal.style.animation = "reciprocal-ani 0.7s both";
-    // setTimeout(()=>{
-    //     new Audio("/public/audio/count-down.wav").play();
-    // }, 150)
+    setTimeout(()=>{
+        let audio = new Audio("/public/audio/count-down.wav");
+        audio.volume = 0.4;
+        audio.play();
+    }, 100)
     setTimeout(()=>{
         newReciprocal.remove();
     }, 1000)
@@ -189,7 +191,9 @@ let gameStartTextSetting = () => {
                 gameStartTxt.textContent = t;
             }, index * 160)
         })
-        new Audio("/public/audio/type.wav").play();
+        let audio = new Audio("/public/audio/type.wav");
+        audio.volume = 0.7;
+        audio.play();
     },500)
 }
 

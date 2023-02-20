@@ -404,7 +404,9 @@ let InRoomSocketInit = async () => {
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-            new Audio("/public/audio/client-request.mp3").play();
+            let audio = new Audio("/public/audio/client-request.mp3");
+            audio.volume = 0.3;
+            audio.play();
 
             let alert = document.querySelector(`#alert-user-${clientUuid}`);
             let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
@@ -614,7 +616,9 @@ let InRoomSocketInit = async () => {
 
             setTimeout(()=>{
                 setTimeout(()=>{
-                    new Audio("/public/audio/bee-show.wav").play();
+                    let audio = new Audio("/public/audio/bee-show.wav");
+                    audio.volume = 0.4;
+                    audio.play();
                     gameBlock.insertAdjacentHTML("beforeend", `<div class="bee-game-gif"></div>`);
                     let dom = document.querySelector(".bee-game-gif");
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
@@ -1216,7 +1220,9 @@ let tryEnterRoom = (uuid) => {
                     document.querySelector("#waiting-block").remove();
                     clearInterval(timer);
                     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                        new Audio("/public/audio/enter-room.mp3").play();
+                        let audio = new Audio("/public/audio/enter-room.mp3");
+                        audio.volume = 0.2;
+                        audio.play();
                     }
                 }
             }, 1);
@@ -1600,7 +1606,9 @@ let alertNewAuth = (uuid) => {
     </div>
     `;
     document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-    new Audio("/public/audio/client-request.mp3").play();
+    let audio = new Audio("/public/audio/client-request.mp3");
+    audio.volume = 0.3;
+    audio.play();
 
     let alert = document.querySelector(`#auth-alert-${uuid}`);
     setTimeout(() => {
