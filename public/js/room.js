@@ -622,9 +622,9 @@ let InRoomSocketInit = async () => {
                     gameBlock.insertAdjacentHTML("beforeend", `<div class="bee-game-gif"></div>`);
                     let dom = document.querySelector(".bee-game-gif");
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
-                    let start = window.performance.now();
                     userSec = 5;
                     setTimeout(() => {
+                        let start = window.performance.now();
                         dom.addEventListener("click", function sendReactionSecond(){
                             clicked = true;
                             let end = window.performance.now();
@@ -1805,6 +1805,11 @@ let gameStartAni = () => {
     setTimeout(()=>{
         let timer = setInterval(()=>{
             extension.reciprocalAnimation(content);
+            setTimeout(()=>{
+                let audio = new Audio("/public/audio/count-down.wav");
+                audio.volume = 0.2;
+                audio.play();
+            }, 100)
             content --;
             if(content === 0){
                 clearInterval(timer);

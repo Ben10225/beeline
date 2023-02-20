@@ -166,11 +166,6 @@ let reciprocalAnimation = (text) => {
     let newReciprocal = document.querySelector(".reciprocal");
     newReciprocal.style.animation = "reciprocal-ani 0.7s both";
     setTimeout(()=>{
-        let audio = new Audio("/public/audio/count-down.wav");
-        audio.volume = 0.4;
-        audio.play();
-    }, 100)
-    setTimeout(()=>{
         newReciprocal.remove();
     }, 1000)
 }
