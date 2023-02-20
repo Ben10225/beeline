@@ -420,6 +420,13 @@ func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
 		return lst[i].Sec < lst[j].Sec // 升序
 	})
 
+	if len(lst) > 6 {
+		good := lst[:3]
+		bad := lst[len(lst)-3:]
+		good = append(good, bad...)
+		return good
+	}
+
 	return lst
 }
 

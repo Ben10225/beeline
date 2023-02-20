@@ -168,17 +168,33 @@ let settingVideoSize = () => {
             img.classList.remove("smaller");
         })
     }
-    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
+    else if(videoContainerS.length >= 5 || videoContainerS.length <= 9){
         videoContainerS.forEach(container => {
             container.style = `
-            width: 30%;
+            width: 25%;
             `;
         })
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 100%;
+            `;
+        })
+        let imgBgS = document.querySelectorAll(".img-bg");
+        imgBgS.forEach(img => {
+            img.classList.add("smaller");
+        })
+    }
+    else if(videoContainerS.length >= 10){
+        videoContainerS.forEach(container => {
+            container.style = `
+            width: 5%;
+            `;
+        })
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
             `;
         })
         let imgBgS = document.querySelectorAll(".img-bg");
@@ -228,8 +244,10 @@ let getGameResult = async (roomId) => {
         })
     });
     let data = await response.json();
-    console.log(data);
+    return data.data;
 }
+
+
 
 export default {
     auth,

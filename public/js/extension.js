@@ -193,6 +193,133 @@ let gameStartTextSetting = () => {
     },500)
 }
 
+let createRecordBoard = (resultLst, userObj, userSec) => {
+    let firstBlock = "";
+    let secondBlock = "";
+    let badBlock = "";
+    if(resultLst.length <= 3){
+        resultLst.forEach((data, index) => {
+            let imgSetting = "";
+            if(userObj[data.Uuid][1][0] !== "#"){
+                imgSetting = `
+                <div class="record-img" style="
+                    background-image: url('${userObj[data.Uuid][1]}');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                "></div>
+                `;
+            }else{
+                imgSetting = `
+                <div class="record-img" style="background-color: ${userObj[data.Uuid][1]};">
+                    <h3>${userObj[data.Uuid][0][0]}</h3>
+                </div>
+                `;
+            }
+            let txt = `
+            <div class="one-record">
+                <div class="record-place">${index+1}</div>
+                ${imgSetting}
+                <div class="record-name">${userObj[data.Uuid][0]}</div>
+                <div class="record-sec">${data.Sec}<span> 秒</span></div>
+            </div>
+            `;
+            firstBlock += txt;
+        })
+    }else{
+        resultLst.forEach((data, index) => {
+            let imgSetting = "";
+            if(userObj[data.Uuid][1][0] !== "#"){
+                imgSetting = `
+                <div class="record-img" style="
+                    background-image: url('${userObj[data.Uuid][1]}');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                "></div>
+                `;
+            }else{
+                imgSetting = `
+                <div class="record-img" style="background-color: ${userObj[data.Uuid][1]};">
+                    <h3>${userObj[data.Uuid][0][0]}</h3>
+                </div>
+                `;
+            }
+
+            if(index < 3){
+                let txt = `
+                <div class="one-record">
+                    <div class="record-place">${index+1}</div>
+                    ${imgSetting}
+                    <div class="record-name">${userObj[data.Uuid][0]}</div>
+                    <div class="record-sec">${data.Sec}<span> 秒</span></div>
+                </div>
+                `;
+                firstBlock += txt;
+            }else{
+                let txt = `
+                <div class="one-record">
+                    <div class="record-place">
+                        <i class="fa-solid fa-skull"></i>
+                    </div>
+                    ${imgSetting}
+                    <div class="record-name">${userObj[data.Uuid][0]}</div>
+                    <div class="record-sec">${data.Sec}<span> 秒</span></div>
+                </div>
+                `;
+                secondBlock += txt;
+            }
+            badBlock = `
+            <div class="last-three record-block">
+                <h2 class="record-title">底 Bee</h2>
+                <div class="record-intro">
+                    <h4 class="intro-place">名次</h4>
+                    <h4 class="intro-name">姓名</h4>
+                    <h4 class="intro-reaction">反應秒數</h4>
+                </div>
+                <hr>
+                <div class="user-record">
+                    ${secondBlock}
+                </div>
+            </div>
+            `;
+        })
+    }
+    let html = `
+    <div class="record-wrapper">
+        <div class="record-exit">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        <div class="first-three record-block">
+            <h2 class="record-title">牛 Bee</h2>
+            <div class="record-intro">
+                <h4 class="intro-place">名次</h4>
+                <h4 class="intro-name">姓名</h4>
+                <h4 class="intro-reaction">反應秒數</h4>
+            </div>
+            <hr>
+            <div class="user-record">
+                ${firstBlock}
+            </div>
+        </div>
+        ${badBlock}
+        <div class="your-block record-block">
+            <div class="your-intro">你的秒數</div>
+            <div>${userSec}<span> 秒</span></div>
+        </div>
+    </div> 
+    `;
+    gameBlock.insertAdjacentHTML("beforeend", html);
+
+    let exit = document.querySelector(".record-exit");
+    exit.onclick = () => {
+        gameBlock.classList.remove("show");
+        setTimeout(() => {
+            gameBlock.replaceChildren();
+        }, 500)
+    }
+}
+
 
 export default {
     rightIconsInit,
@@ -202,6 +329,7 @@ export default {
     audioAni,
     reciprocalAnimation,
     gameStartTextSetting,
+    createRecordBoard,
 }
 
 

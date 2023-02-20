@@ -82,6 +82,7 @@ let aniToken = 0;
 let gameLeft = 0;
 let gameTop = 0;
 let gameDelay = 0;
+let userSec = 5;
 
 
 const socket = io({transports: ['websocket']});
@@ -110,6 +111,14 @@ const peers = {}
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
 
+
+let eyeGameInit = async () => {
+    eyeGame.onclick = () => {
+        socket.emit("start-game", ROOM_ID);
+    }
+}
+
+
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
@@ -126,8 +135,7 @@ navigator.mediaDevices.getUserMedia({
         wrapper.style.justifyContent = "flex-start";
         document.querySelector("#user-setup").remove();
 
-        utils.generateShortLink();
-
+        utils.generateShortLink();        
         // 進房時監聽
         addVideoStream(myVideo, stream, true, USER_ID);
         myPeer.on('call', function(call){
@@ -528,6 +536,19 @@ let InRoomSocketInit = async () => {
                 // chat room
                 document.querySelector(".allow-click").remove();
                 document.querySelector(".message-wrapper").style.height = "calc(100vh - 293px)";
+
+                // game
+                eyeGame.remove();
+                let gameTag = `
+                <div class="service-block" id="eye-game">
+                    <div class="service-img"></div>
+                    <div class="service-txt">
+                        <h4>眼明手快</h4>
+                        <p>需由室長發起遊戲</p>
+                    </div>
+                </div>
+                `;
+                document.querySelector(".service-wrapper").insertAdjacentHTML("afterbegin", gameTag);
             }
             if(USER_ID === newUuid){
                 // group
@@ -547,6 +568,10 @@ let InRoomSocketInit = async () => {
 
                 // alert
                 alertNewAuth(newUuid);
+
+                // game
+                eyeGameInit();
+                document.querySelector("#eye-game .service-txt p").textContent = "點擊發起遊戲";
             }
         }
     })
@@ -580,6 +605,11 @@ let InRoomSocketInit = async () => {
             gameDelay = parseFloat(gameValue[2]);
             let clicked = false;
 
+            let gameBg = document.querySelector(".game-bg");
+            if(gameBg){
+                gameBlock.replaceChildren();
+            }
+            
             gameStartAni();
 
             setTimeout(()=>{
@@ -589,10 +619,12 @@ let InRoomSocketInit = async () => {
                     let dom = document.querySelector(".bee-game-gif");
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
                     let start = window.performance.now();
+                    userSec = 5;
                     dom.addEventListener("click", function sendReactionSecond(){
                         clicked = true;
                         let end = window.performance.now();
                         let sec = roundTo(((end - start) / 1000), 6);
+                        userSec = sec;
                         utils.sendUserSecToDB(ROOM_ID, USER_ID, sec);
                         this.removeEventListener("click", sendReactionSecond);
                         this.remove();
@@ -629,12 +661,13 @@ let InRoomSocketInit = async () => {
     // 5 end
     socket.on('five-end', async (roomId) => {
         if(ROOM_ID === roomId){
-            setTimeout(() => {
-                utils.getGameResult(ROOM_ID);
+            setTimeout(async () => {
+                let result = await utils.getGameResult(ROOM_ID);
                 let wait =  document.querySelector(".game-wait");
                 if(wait){
                     wait.remove();
                 }
+                extension.createRecordBoard(result, userInRoomObj, userSec);
             }, 500)
         }
     })
@@ -856,9 +889,13 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
             document.querySelector(".allow-click").remove();
             document.querySelector(".message-wrapper").style.height = "calc(100vh - 293px)";
+            document.querySelector("#eye-game .service-txt p").textContent = "需由室長發起遊戲";
+
 
         }else{
             switchInputInit();
+            eyeGameInit();
+            document.querySelector("#eye-game .service-txt p").textContent = "點擊發起遊戲";
             screenShareBtn.classList.remove("stopShareClick");
         }
 
@@ -1766,13 +1803,6 @@ let gameStartAni = () => {
     }, 4000)
 }
 
-let eyeGameInit = async () => {
-    eyeGame.onclick = () => {
-        socket.emit("start-game", ROOM_ID);
-    }
-}
-
-eyeGameInit();
 
 let roundTo = ( num, decimal ) => {
     return Math.round( ( num + Number.EPSILON ) * Math.pow( 10, decimal ) ) / Math.pow( 10, decimal ); 
