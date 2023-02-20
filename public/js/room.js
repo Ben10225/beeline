@@ -50,7 +50,7 @@ const groupNumber = document.querySelector(".group-number");
 const searchBar = document.querySelector("#search");
 
 const gameBlock = document.querySelector("#game-block");
-const eyeGame = document.querySelector("#eye-game");
+// const eyeGame = document.querySelector("#eye-game");
 
 
 let disconnect = true;
@@ -113,7 +113,7 @@ let nPeer = new Peer();
 
 
 let eyeGameInit = async () => {
-    eyeGame.onclick = () => {
+    document.querySelector("#eye-game").onclick = () => {
         socket.emit("start-game", ROOM_ID);
     }
 }
@@ -541,7 +541,7 @@ let InRoomSocketInit = async () => {
                 document.querySelector(".message-wrapper").style.height = "calc(100vh - 293px)";
 
                 // game
-                eyeGame.remove();
+                document.querySelector("#eye-game").remove();
                 let gameTag = `
                 <div class="service-block" id="eye-game">
                     <div class="service-img"></div>
@@ -714,6 +714,9 @@ let InRoomSocketInit = async () => {
                     }
                     newAuthGroupSetting();
                     alertNewAuth(newHostUuid);
+
+                    eyeGameInit();
+                    document.querySelector("#eye-game .service-txt p").textContent = "點擊發起遊戲";
 
                 }else{
                     auth = false;
