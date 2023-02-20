@@ -7,16 +7,16 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 
 let enterRoom = false;
 
-let pct = 0;
-let pageTimer = setInterval(() => {
-    pct ++;
-    if(pct === 1300){
-        clearInterval(pageTimer);
-        if(!enterRoom){
-            history.go(0);
-        }
-    }
-}, 1);
+// let pct = 0;
+// let pageTimer = setInterval(() => {
+//     pct ++;
+//     if(pct === 1300){
+//         clearInterval(pageTimer);
+//         if(!enterRoom){
+//             history.go(0);
+//         }
+//     }
+// }, 1);
 
 let auth;
 
