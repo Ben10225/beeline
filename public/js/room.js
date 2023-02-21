@@ -68,26 +68,27 @@ let tmpNewStreamCt = null;
 let needLoadAgain = false;
 let currentPeer;
 
-let voiceNow = false;
-let wait = false;
-let slowAni = true;
-let vFirst = 0;
-let vSecond = 0;
-let vThird = 0;
-let stopToken = 0;
-let aniToken = 0;
-// let timerAni;
-// let socket;
 
 let gameLeft = 0;
 let gameTop = 0;
 let gameDelay = 0;
 let userSec = 5;
 
+let socket;
+let s2;
 
-const socket = io({transports: ['websocket']});
+if(auth){
+    socket = io({transports: ['websocket']});
+    s2 = io("/enter", {transports: ['websocket']});
+}else if(CLIENT){
+    socket = io({transports: ['websocket']});
+}else{
+    s2 = io("/enter", {transports: ['websocket']});
+}
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
+// const socket = io({transports: ['websocket']});
+
 
 
 const userContainer = document.querySelector(".user-container");
@@ -118,7 +119,6 @@ let eyeGameInit = async () => {
     }
 }
 
-
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
@@ -127,7 +127,7 @@ navigator.mediaDevices.getUserMedia({
 
     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
     // if(true){
-        InRoomSocketInit();
+        inRoomSocketInit();
 
         body.style.backgroundColor = "#000";
         bg.style.backgroundImage = "url('/public/images/roombg2.svg')";;
@@ -158,8 +158,18 @@ navigator.mediaDevices.getUserMedia({
         //     // addVideoStream(video, userVideoStream, false, remoteUuid, "screen")
         // })
 
-    }else if(!auth){
-        WaitingSocketInit();
+        socketConn(socket, stream)
+
+        socket.emit('join-room', ROOM_ID, USER_ID);
+
+        if(auth){
+            s2InRoomInit();
+            s2.emit('join-room', ROOM_ID, USER_ID);
+        }
+
+
+    }else{
+        waitingSocketInit();
 
         document.querySelector("#video-streams").remove();
         document.querySelector("#controls-wrapper").remove();
@@ -219,7 +229,8 @@ navigator.mediaDevices.getUserMedia({
 
         const btn = document.querySelector("#enter-request");
         btn.onclick = () => {
-            socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
+            // socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
+            s2.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
             btn.style = `pointer-events: none; opacity: 0.3;`;
             let imgTag = `<div class="request-gif"></div>`;
             document.querySelector(".button-block").insertAdjacentHTML("beforeend", imgTag);
@@ -227,12 +238,12 @@ navigator.mediaDevices.getUserMedia({
 
         const settingAudioBtn = document.querySelector("#setting-audio-btn");
         settingAudioBtn.onclick = () => {
-            toggleAudio(stream, settingAudioBtn);
+            toggleAudio(stream, settingAudioBtn, false);
         }
 
         const settingCameraBtn = document.querySelector("#setting-camera-btn");
         settingCameraBtn.onclick = () => {
-            toggleCamera(stream, settingCameraBtn);
+            toggleCamera(stream, settingCameraBtn, false);
         }
 
 
@@ -246,13 +257,48 @@ navigator.mediaDevices.getUserMedia({
             // 這邊不要用 onunload 不然頁面轉跳 資料庫就直接拿掉了
             // refuseUserInRoom(ROOM_ID, USER_ID);
         }
+
+        socketConn(s2, stream)
+        s2.emit('join-room', ROOM_ID, USER_ID);
     }
 
-    socket.on('user-connected', async uuid => {
-        console.log(`user ${uuid} enter room ${ROOM_ID}`);
+    
+    // disconnect
+    // myPeer.on('open', async id => {
+    //     socket.emit('join-room', ROOM_ID, USER_ID);
+    // })
+    // socket.emit('join-room', ROOM_ID, USER_ID);
+
+
+
+}).catch(err => {
+    console.log("unable to get display media" + err);
+})
+
+
+// myPeer.on('open', async id => {
+//     socket.emit('join-room', ROOM_ID, USER_ID);
+// })
+
+
+let waitingSocketInit = async () => {
+    s2.on('client-action', async (roomId, clientName, b) => {
+    // socket.on('client-action', async (roomId, clientName, b) => {
+        if(clientName === USER_NAME && b){
+            await setRoomEnterToken(roomId);
+            window.location.reload();
+            // history.go(0);
+        }else if(clientName === USER_NAME && !b){
+            window.location = "/";
+        }
+    })
+}
+
+let socketConn = async (sk, stream) => {
+    sk.on('user-connected', async uuid => {
+        console.log(`socket user ${uuid} enter room ${ROOM_ID}`);
         connectToNewUser(uuid, stream);
         
-
         if(USER_ID === uuid){
             // tryEnterRoom(USER_ID);        
 
@@ -287,39 +333,87 @@ navigator.mediaDevices.getUserMedia({
             }
         }
     })
-    
-    // disconnect
-    // myPeer.on('open', async id => {
-    //     socket.emit('join-room', ROOM_ID, USER_ID);
-    // })
-    socket.emit('join-room', ROOM_ID, USER_ID);
+}
 
+let s2InRoomInit = async () => {
+    // s2 connect
+    s2.on('user-connected', async uuid => {
+        console.log(`s2 user ${uuid} enter room ${ROOM_ID}`);
+    })
 
+    // get enter request
+    s2.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
+        if(auth){
+            let imgSetting = "";
+            if(clientImg[0] !== "#"){
+                imgSetting = `
+                <div class="alert-user-img" style="
+                    background-image: url('${clientImg}');
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                "></div>
+                `;
+            }else{
+                imgSetting = `
+                <div class="alert-user-img" style="background-color: ${clientImg};">
+                    <h3>${clientName[0]}</h3>
+                </div>
+                `;
+            }
+            let html = `
+            <div class="alert-block" id="alert-user-${clientUuid}">
+                ${imgSetting}
+                <h3><span>${clientName}</span>想加入此會議</h3>
+                <h3 class="allow">同意</h3>
+                <h3 class="refuse">拒絕</h3>
+            </div>
+            `;
+            document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
+            let audio = new Audio("/public/audio/client-request.mp3");
+            audio.volume = 0.3;
+            audio.play();
 
-}).catch(err => {
-    console.log("unable to get display media" + err);
-})
+            let alert = document.querySelector(`#alert-user-${clientUuid}`);
+            let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
+            clientAllow.onclick = () => {
+                alert.classList.add("alert-click");
+                setTimeout(() => {
+                    alert.remove();
+                } ,500)
+                s2.emit("allow-refuse-room", ROOM_ID, clientName, true);
+            }
 
+            let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
+            clientRefuse.onclick = () => {
+                alert.classList.add("alert-click");
+                setTimeout(() => {
+                    alert.remove();
+                } ,500)
+                s2.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
-// myPeer.on('open', async id => {
-//     socket.emit('join-room', ROOM_ID, USER_ID);
-// })
+                // 需要改成 delete 不只設 leave
+                refuseUserInRoom(ROOM_ID, clientUuid);
+                // removeMongoRoomData(ROOM_ID, clientUuid, false);
+            }
 
-
-let WaitingSocketInit = async () => {
-    socket.on('client-action', async (roomId, clientName, b) => {
-        if(clientName === USER_NAME && b){
-            await setRoomEnterToken(roomId);
-            window.location.reload();
-            // history.go(0);
-        }else if(clientName === USER_NAME && !b){
-            window.location = "/";
+            clientAllow.onmouseover = () => {
+                clientAllow.classList.add("hover");
+            }
+            clientAllow.onmouseout = () => {
+                clientAllow.classList.remove("hover");
+            }
+            clientRefuse.onmouseover = () => {
+                clientRefuse.classList.add("hover");
+            }
+            clientRefuse.onmouseout = () => {
+                clientRefuse.classList.remove("hover");
+            }
         }
     })
 }
 
-
-let InRoomSocketInit = async () => {
+let inRoomSocketInit = async () => {
     // camera
     socket.on('set-view', (options, uuid, b) => {
         if (uuid === USER_ID) return
@@ -376,77 +470,6 @@ let InRoomSocketInit = async () => {
             groupUserWrapper.remove();
         }
         utils.settingVideoSize();
-    })
-
-    // get enter request
-    socket.on('sent-to-auth', (clientUuid, clientName, clientImg) => {
-        if(auth){
-            let imgSetting = "";
-            if(clientImg[0] !== "#"){
-                imgSetting = `
-                <div class="alert-user-img" style="
-                    background-image: url('${clientImg}');
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    background-size: cover;
-                "></div>
-                `;
-            }else{
-                imgSetting = `
-                <div class="alert-user-img" style="background-color: ${clientImg};">
-                    <h3>${clientName[0]}</h3>
-                </div>
-                `;
-            }
-            let html = `
-            <div class="alert-block" id="alert-user-${clientUuid}">
-                ${imgSetting}
-                <h3><span>${clientName}</span>想加入此會議</h3>
-                <h3 class="allow">同意</h3>
-                <h3 class="refuse">拒絕</h3>
-            </div>
-            `;
-            document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-            let audio = new Audio("/public/audio/client-request.mp3");
-            audio.volume = 0.3;
-            audio.play();
-
-            let alert = document.querySelector(`#alert-user-${clientUuid}`);
-            let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
-            clientAllow.onclick = () => {
-                alert.classList.add("alert-click");
-                setTimeout(() => {
-                    alert.remove();
-                } ,500)
-                socket.emit("allow-refuse-room", ROOM_ID, clientName, true);
-            }
-
-            let clientRefuse = document.querySelector(`#alert-user-${clientUuid} .refuse`);
-            clientRefuse.onclick = () => {
-                alert.classList.add("alert-click");
-                setTimeout(() => {
-                    alert.remove();
-                } ,500)
-                socket.emit("allow-refuse-room", ROOM_ID, clientName, false);
-
-                // 需要改成 delete 不只設 leave
-                refuseUserInRoom(ROOM_ID, clientUuid);
-                // removeMongoRoomData(ROOM_ID, clientUuid, false);
-            }
-
-            clientAllow.onmouseover = () => {
-                clientAllow.classList.add("hover");
-            }
-            clientAllow.onmouseout = () => {
-                clientAllow.classList.remove("hover");
-            }
-            clientRefuse.onmouseover = () => {
-                clientRefuse.classList.add("hover");
-            }
-            clientRefuse.onmouseout = () => {
-                clientRefuse.classList.remove("hover");
-            }
-        }
     })
 
     // chat room
@@ -790,11 +813,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         tempMediaStreamId = stream.id;
 
         audioBtn.onclick = () => {
-            toggleAudio(stream, audioBtn);
+            toggleAudio(stream, audioBtn, true);
         }
 
         cameraBtn.onclick = () => {
-            toggleCamera(stream, cameraBtn);
+            toggleCamera(stream, cameraBtn, true);
         }
 
         // leave room
@@ -1074,7 +1097,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 }
 
 // camera button
-let toggleCamera = async (stream, dom) => {
+let toggleCamera = async (stream, dom, inRoom) => {
     // let isOpen = stream.getTracks()[1].enabled;
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
@@ -1082,7 +1105,7 @@ let toggleCamera = async (stream, dom) => {
         stream.getTracks()[1].enabled = false;
         // stream.getTracks()[1].stop();
         // stream.getVideoTracks()[0].stop();
-        socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
+        inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
 
         if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
@@ -1096,7 +1119,7 @@ let toggleCamera = async (stream, dom) => {
         }
         dom.classList.remove("disable");
         stream.getTracks()[1].enabled = true;
-        socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
+        inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
         /*
@@ -1182,7 +1205,7 @@ let toggleCamera = async (stream, dom) => {
 }
 
 // audio button
-let toggleAudio = async (stream, dom) => {
+let toggleAudio = async (stream, dom, inRoom) => {
     let isVolumn = stream.getTracks()[0].enabled;
     if(isVolumn){
         dom.classList.add("disable");
@@ -1193,7 +1216,8 @@ let toggleAudio = async (stream, dom) => {
             document.querySelector(`#group-${USER_ID} .micro-ani-block`).classList.add("hide");
             document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.add("hide");
         }
-        socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
+        
+        inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
     }else{
@@ -1205,7 +1229,7 @@ let toggleAudio = async (stream, dom) => {
             document.querySelector(`#group-${USER_ID} .micro-ani-block`).classList.remove("hide");
             document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.remove("hide");
         }
-        socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
+        inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
 }
@@ -1213,14 +1237,14 @@ let toggleAudio = async (stream, dom) => {
 let tryEnterRoom = (uuid) => {
     if(uuid){
         if(!enterRoom){
-            let ct = 0;
+            // let ct = 0;
             let timer = setInterval(() => {
-                ct ++;
+                // ct ++;
                 if(disconnect){
-                    if(ct > 700){
+                    // if(ct > 700){
                         // window.location.reload();
                         // history.go(0);
-                    }
+                    // }
                 }else{
                     console.log("conn establish");
                     document.querySelector("#waiting-block").remove();
@@ -1231,7 +1255,7 @@ let tryEnterRoom = (uuid) => {
                         audio.play();
                     }
                 }
-            }, 1);
+            }, 1000);
         }else{
             let timer = setInterval(() => {
                 if(disconnect){

@@ -41,6 +41,16 @@ func main() {
 		// s.Emit("user-connected", uuid)
 	})
 
+	server.OnEvent("/enter", "join-room", func(s socketio.Conn, roomId, uuid string) {
+		// s.SetContext(roomId)
+		log.Println(uuid, "s2 join room")
+		s.Join(roomId)
+		uuidMap[s.ID()] = uuid
+		roomMap[uuid] = roomId
+		server.BroadcastToRoom("/enter", roomId, "user-connected", uuid)
+		// s.Emit("user-connected", uuid)
+	})
+
 	server.OnDisconnect("", func(s socketio.Conn, msg string) {
 		// s.Emit("user-disconnected", uuid)
 		roomId := roomMap[uuidMap[s.ID()]]
@@ -61,12 +71,12 @@ func main() {
 	})
 
 	// enter room
-	server.OnEvent("/", "send-enter-request", func(s socketio.Conn, roomId, clientUuid, clientName, clientImg string) {
-		server.BroadcastToRoom("/", roomId, "sent-to-auth", clientUuid, clientName, clientImg)
+	server.OnEvent("/enter", "send-enter-request", func(s socketio.Conn, roomId, clientUuid, clientName, clientImg string) {
+		server.BroadcastToRoom("/enter", roomId, "sent-to-auth", clientUuid, clientName, clientImg)
 	})
 
-	server.OnEvent("/", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
-		server.BroadcastToRoom("/", roomId, "client-action", roomId, clientName, b)
+	server.OnEvent("/enter", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
+		server.BroadcastToRoom("/enter", roomId, "client-action", roomId, clientName, b)
 		// server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
 	})
 

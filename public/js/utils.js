@@ -169,6 +169,7 @@ let settingVideoSize = () => {
         })
     }
     else if(videoContainerS.length >= 5 || videoContainerS.length <= 9){
+        containerWrapper.style.flexWrap = "wrap";
         videoContainerS.forEach(container => {
             container.style = `
             width: 25%;
@@ -186,9 +187,10 @@ let settingVideoSize = () => {
         })
     }
     else if(videoContainerS.length >= 10){
+        containerWrapper.style.flexWrap = "wrap";
         videoContainerS.forEach(container => {
             container.style = `
-            width: 5%;
+            width: 20%;
             `;
         })
         let containerWidth = document.querySelector(".video-container").offsetWidth;
