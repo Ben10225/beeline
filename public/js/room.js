@@ -254,7 +254,7 @@ navigator.mediaDevices.getUserMedia({
         
 
         if(USER_ID === uuid){
-            tryEnterRoom(USER_ID);        
+            // tryEnterRoom(USER_ID);        
 
             if(auth){
                 await insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
@@ -277,31 +277,31 @@ navigator.mediaDevices.getUserMedia({
 
             enterRoom = true;
             disconnect = false;
+
+            console.log("conn establish");
+            document.querySelector("#waiting-block").remove();
+            if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
+                let audio = new Audio("/public/audio/enter-room.mp3");
+                audio.volume = 0.2;
+                audio.play();
+            }
         }
     })
     
     // disconnect
+    myPeer.on('open', async id => {
+        socket.emit('join-room', ROOM_ID, USER_ID);
+    })
 
-    // socket.emit('join-room', ROOM_ID, USER_ID);
 
-    // var conn = myPeer.connect(USER_ID);
-    // on open will be launch when you successfully connect to PeerServer
-    // conn.on('open', function(){
-    //     // here you have conn.id
-    // });
-
-    // myPeer.on('open', async id => {
-    //     console.log("before emit join room");
-    //     socket.emit('join-room', ROOM_ID, id);
-    // })
 }).catch(err => {
     console.log("unable to get display media" + err);
 })
 
 
-myPeer.on('open', async id => {
-    socket.emit('join-room', ROOM_ID, USER_ID);
-})
+// myPeer.on('open', async id => {
+//     socket.emit('join-room', ROOM_ID, USER_ID);
+// })
 
 
 let WaitingSocketInit = async () => {
