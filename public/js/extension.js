@@ -197,17 +197,19 @@ let gameStartTextSetting = () => {
     },500)
 }
 
-let createRecordBoard = (resultLst, userObj, userSec) => {
+let createRecordBoard = (datatLst, userSec) => {
     let firstBlock = "";
     let secondBlock = "";
     let badBlock = "";
+    let resultLst = datatLst.result;
+    let infoLst = datatLst.info;
     if(resultLst.length <= 3){
         resultLst.forEach((data, index) => {
             let imgSetting = "";
-            if(userObj[data.Uuid][1][0] !== "#"){
+            if(infoLst[index]["Arr"][1][0] !== "#"){
                 imgSetting = `
                 <div class="record-img" style="
-                    background-image: url('${userObj[data.Uuid][1]}');
+                    background-image: url('${infoLst[index]["Arr"][1]}');
                     background-position: center;
                     background-repeat: no-repeat;
                     background-size: cover;
@@ -215,8 +217,8 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
                 `;
             }else{
                 imgSetting = `
-                <div class="record-img" style="background-color: ${userObj[data.Uuid][1]};">
-                    <h3>${userObj[data.Uuid][0][0]}</h3>
+                <div class="record-img" style="background-color: ${infoLst[index]["Arr"][1]};">
+                    <h3>${infoLst[index]["Arr"][0][0]}</h3>
                 </div>
                 `;
             }
@@ -224,7 +226,7 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
             <div class="one-record">
                 <div class="record-place">${index+1}</div>
                 ${imgSetting}
-                <div class="record-name">${userObj[data.Uuid][0]}</div>
+                <div class="record-name">${infoLst[index]["Arr"][0]}</div>
                 <div class="record-sec">${data.Sec}<span> 秒</span></div>
             </div>
             `;
@@ -233,10 +235,10 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
     }else{
         resultLst.forEach((data, index) => {
             let imgSetting = "";
-            if(userObj[data.Uuid][1][0] !== "#"){
+            if(infoLst[index][1][0] !== "#"){
                 imgSetting = `
                 <div class="record-img" style="
-                    background-image: url('${userObj[data.Uuid][1]}');
+                    background-image: url('${infoLst[index]["Arr"][1]}');
                     background-position: center;
                     background-repeat: no-repeat;
                     background-size: cover;
@@ -244,8 +246,8 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
                 `;
             }else{
                 imgSetting = `
-                <div class="record-img" style="background-color: ${userObj[data.Uuid][1]};">
-                    <h3>${userObj[data.Uuid][0][0]}</h3>
+                <div class="record-img" style="background-color: ${infoLst[index]["Arr"][1]};">
+                    <h3>${infoLst[index]["Arr"][0][0]}</h3>
                 </div>
                 `;
             }
@@ -255,7 +257,7 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
                 <div class="one-record">
                     <div class="record-place">${index+1}</div>
                     ${imgSetting}
-                    <div class="record-name">${userObj[data.Uuid][0]}</div>
+                    <div class="record-name">${infoLst[index]["Arr"][0]}</div>
                     <div class="record-sec">${data.Sec}<span> 秒</span></div>
                 </div>
                 `;
@@ -267,7 +269,7 @@ let createRecordBoard = (resultLst, userObj, userSec) => {
                         <i class="fa-solid fa-skull"></i>
                     </div>
                     ${imgSetting}
-                    <div class="record-name">${userObj[data.Uuid][0]}</div>
+                    <div class="record-name">${infoLst[index]["Arr"][0]}</div>
                     <div class="record-sec">${data.Sec}<span> 秒</span></div>
                 </div>
                 `;

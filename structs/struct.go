@@ -48,6 +48,8 @@ type RoomUserData struct {
 	Auth        bool
 	Leave       bool
 	Sec         float64
+	Name        string
+	ImgUrl      string
 }
 
 type RoomInfo struct {
@@ -61,4 +63,9 @@ type RoomInfo struct {
 type Game struct {
 	Uuid string
 	Sec  float64
+	// Gslice []RoomUserData
+}
+
+type GameInfoArray struct {
+	Arr []string
 }

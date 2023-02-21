@@ -21,8 +21,10 @@ func SetUserRoomData(c *gin.Context) {
 	audioStatus := req.AudioStatus
 	videoStatus := req.VideoStatus
 	auth := req.Auth
+	name := req.Name
+	imgUrl := req.ImgUrl
 
-	models.InsertUserToRoom(c, roomId, uuid, audioStatus, videoStatus, auth)
+	models.InsertUserToRoom(c, roomId, uuid, name, imgUrl, audioStatus, videoStatus, auth)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
@@ -294,10 +296,13 @@ func GetGameResult(c *gin.Context) {
 	c.BindJSON(&req)
 
 	roomId := req.RoomId
-	result := models.GetGameSlice(c, roomId)
+	result, info := models.GetGameSlice(c, roomId)
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": result,
+		"data": gin.H{
+			"result": result,
+			"info":   info,
+		},
 	})
 }
 

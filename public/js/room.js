@@ -112,7 +112,6 @@ const peers = {}
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
 
-
 let eyeGameInit = async () => {
     document.querySelector("#eye-game").onclick = () => {
         socket.emit("start-game", ROOM_ID);
@@ -163,7 +162,7 @@ navigator.mediaDevices.getUserMedia({
         socket.emit('join-room', ROOM_ID, USER_ID);
 
         if(auth){
-            s2InRoomInit();
+            s2InRoomAuthInit();
             s2.emit('join-room', ROOM_ID, USER_ID);
         }
 
@@ -224,7 +223,7 @@ navigator.mediaDevices.getUserMedia({
             video.play();
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
-        insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth);
+        insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth, USER_NAME, USER_IMG);
 
 
         const btn = document.querySelector("#enter-request");
@@ -248,7 +247,6 @@ navigator.mediaDevices.getUserMedia({
 
 
         document.querySelector(".waiting-exit").onclick = () => {
-            // removeMongoRoomData(ROOM_ID, USER_ID, auth);
             refuseUserInRoom(ROOM_ID, USER_ID);
             window.location = "/";
         }
@@ -262,14 +260,12 @@ navigator.mediaDevices.getUserMedia({
         s2.emit('join-room', ROOM_ID, USER_ID);
     }
 
-    
     // disconnect
+
     // myPeer.on('open', async id => {
     //     socket.emit('join-room', ROOM_ID, USER_ID);
     // })
     // socket.emit('join-room', ROOM_ID, USER_ID);
-
-
 
 }).catch(err => {
     console.log("unable to get display media" + err);
@@ -301,9 +297,8 @@ let socketConn = async (sk, stream) => {
         
         if(USER_ID === uuid){
             // tryEnterRoom(USER_ID);        
-
             if(auth){
-                await insertMongoRoomData(ROOM_ID, uuid, true, true, auth);
+                await insertMongoRoomData(ROOM_ID, uuid, true, true, auth, USER_NAME, USER_IMG);
             }else if(CLIENT){
                 await setBackRoomLeaveStatus(ROOM_ID, uuid);
             }
@@ -335,7 +330,7 @@ let socketConn = async (sk, stream) => {
     })
 }
 
-let s2InRoomInit = async () => {
+let s2InRoomAuthInit = async () => {
     // s2 connect
     s2.on('user-connected', async uuid => {
         console.log(`s2 user ${uuid} enter room ${ROOM_ID}`);
@@ -577,8 +572,12 @@ let inRoomSocketInit = async () => {
                 </div>
                 `;
                 document.querySelector(".service-wrapper").insertAdjacentHTML("afterbegin", gameTag);
+                s2.disconnect();
             }
             if(USER_ID === newUuid){
+                s2 = io("/enter", {transports: ['websocket']});
+                s2.emit('join-room', ROOM_ID, USER_ID);
+                s2InRoomAuthInit();
                 // group
                 newAuthGroupSetting();
 
@@ -694,12 +693,12 @@ let inRoomSocketInit = async () => {
     socket.on('five-end', async (roomId) => {
         if(ROOM_ID === roomId){
             setTimeout(async () => {
-                let result = await utils.getGameResult(ROOM_ID);
+                let data = await utils.getGameResult(ROOM_ID);
                 let wait =  document.querySelector(".game-wait");
                 if(wait){
                     wait.remove();
                 }
-                extension.createRecordBoard(result, userInRoomObj, userSec);
+                extension.createRecordBoard(data, userSec);
             }, 500)
         }
     })
@@ -710,7 +709,6 @@ let inRoomSocketInit = async () => {
 
         if (userInRoomObj[uuid]){
             delete userInRoomObj[uuid];
-            // console.log(userInRoomObj);
             groupNumber.textContent = Object.keys(userInRoomObj).length;
         } 
 
@@ -720,7 +718,6 @@ let inRoomSocketInit = async () => {
                 let data = await resetAuthData(ROOM_ID, USER_ID);
                 let newHostUuid = data[0];
                 let chatOpen = data[1];
-                // console.log("chatOpen: ", chatOpen);
                 if(USER_ID === newHostUuid){
                     auth = true;
                     addAllowClick();
@@ -732,16 +729,17 @@ let inRoomSocketInit = async () => {
     
                         let switchInput = document.querySelector("#switch");
                         switchInput.checked = false;
-                    }else{
-                        // messageWrapper.classList.remove("add-disabled");
-                        // sendWrapper.classList.remove("add-disabled");
-                        // sendMessageInput.disabled = false;
                     }
                     newAuthGroupSetting();
                     alertNewAuth(newHostUuid);
 
                     eyeGameInit();
                     document.querySelector("#eye-game .service-txt p").textContent = "點擊發起遊戲";
+
+                    //s2
+                    s2 = io("/enter", {transports: ['websocket']});
+                    s2.emit('join-room', ROOM_ID, USER_ID);
+                    s2InRoomAuthInit();
 
                 }else{
                     auth = false;
@@ -1319,7 +1317,7 @@ let getRemoteUser = async (roomId, remoteUuid) => {
     }
 }
 
-let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth) => {
+let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, userName, userImg) => {
     let response = await fetch(`/room/setusertoroom`, {
         method: "POST",
         headers: {
@@ -1331,6 +1329,8 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth) =
             "audioStatus": audioStatus,
             "videoStatus": videoStatus,
             "auth": auth,
+            "name": userName,
+            "imgUrl": userImg,
         })
     });
     let data = await response.json();

@@ -17,7 +17,7 @@ import (
 
 var coll *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
 
-func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bool) bool {
+func InsertUserToRoom(c *gin.Context, roomId, uuid, name, imgUrl string, audio, video, auth bool) bool {
 	var result structs.RoomInfo
 	findFilter := bson.D{{"roomId", roomId}}
 	resError := coll.FindOne(context.TODO(), findFilter).Decode(&result)
@@ -72,10 +72,13 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video, auth bo
 		"$push": bson.M{
 			"user": bson.D{
 				{"uuid", uuid},
+				{"name", name},
+				{"imgUrl", imgUrl},
 				{"audioStatus", audio},
 				{"videoStatus", video},
 				{"auth", auth},
 				{"leave", leaveStatus},
+				{"sec", 5},
 			},
 		},
 	}
@@ -396,7 +399,7 @@ func SendSec(c *gin.Context, roomId, uuid string, sec float64) {
 	)
 }
 
-func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
+func GetGameSlice(c *gin.Context, roomId string) ([]structs.Game, []structs.GameInfoArray) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	err := coll.FindOne(context.TODO(), filter).Decode(&room)
@@ -405,10 +408,17 @@ func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
 	}
 	user := room.User
 	userSec := map[string]float64{}
+	// userSec := map[string][]structs.RoomUserData{}
+	userInfo := []structs.GameInfoArray{}
 
 	for _, v := range user {
 		if !v.Leave {
 			userSec[v.Uuid] = v.Sec
+			// userSec[v.Uuid] = []structs.RoomUserData{
+			// 	{Sec: v.Sec},
+			// 	{Name: v.Name},
+			// 	{ImgUrl: v.ImgUrl},
+			// }
 		}
 	}
 
@@ -424,10 +434,32 @@ func GetGameSlice(c *gin.Context, roomId string) []structs.Game {
 		good := lst[:3]
 		bad := lst[len(lst)-3:]
 		good = append(good, bad...)
-		return good
+
+		for _, v := range good {
+			for _, userV := range user {
+				if v.Uuid == userV.Uuid {
+					item := []structs.GameInfoArray{
+						{Arr: []string{userV.Name, userV.ImgUrl}},
+					}
+					userInfo = append(userInfo, item...)
+				}
+			}
+		}
+		return good, userInfo
 	}
 
-	return lst
+	for _, v := range lst {
+		for _, userV := range user {
+			if v.Uuid == userV.Uuid {
+				// item := []string{userV.Name, userV.ImgUrl}
+				item := []structs.GameInfoArray{
+					{Arr: []string{userV.Name, userV.ImgUrl}},
+				}
+				userInfo = append(userInfo, item...)
+			}
+		}
+	}
+	return lst, userInfo
 }
 
 func CheckUserLeave(c *gin.Context, roomId, uuid string) bool {
