@@ -289,9 +289,11 @@ navigator.mediaDevices.getUserMedia({
     })
     
     // disconnect
-    myPeer.on('open', async id => {
-        socket.emit('join-room', ROOM_ID, USER_ID);
-    })
+    // myPeer.on('open', async id => {
+    //     socket.emit('join-room', ROOM_ID, USER_ID);
+    // })
+    socket.emit('join-room', ROOM_ID, USER_ID);
+
 
 
 }).catch(err => {
