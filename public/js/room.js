@@ -1,5 +1,6 @@
 import utils from "./utils.js";
 import extension from "./extension.js";
+import board from "./board.js"
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -118,6 +119,12 @@ let eyeGameInit = async () => {
     }
 }
 
+let whiteBoardInit = async () => {
+    document.querySelector("#white-board").onclick = () => {
+        document.querySelector("#white-board-block").classList.add("show");
+    }
+}
+
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
@@ -134,7 +141,11 @@ navigator.mediaDevices.getUserMedia({
         wrapper.style.justifyContent = "flex-start";
         document.querySelector("#user-setup").remove();
 
-        utils.generateShortLink();        
+        utils.generateShortLink();   
+
+        board.boardInit();     
+        whiteBoardInit();
+
         // 進房時監聽
         addVideoStream(myVideo, stream, true, USER_ID);
         myPeer.on('call', function(call){
@@ -620,6 +631,8 @@ let inRoomSocketInit = async () => {
     // audio animation
     socket.on('audio-ani-set', async (roomId, uuid, b) => {
         if(ROOM_ID === roomId){
+            if (!document.querySelector(`#user-${uuid} .micro-ani-block`) ||
+            !document.querySelector(`#user-${uuid} .micro-ani-block`)) return;
             extension.audioAni(uuid, b);
         }
     })
@@ -1754,7 +1767,7 @@ let audioSetInit = async (stream) => {
     microphone.connect(analyser);
     analyser.connect(scriptProcessor);
     scriptProcessor.connect(audioContext.destination);
-    scriptProcessor.onaudioprocess = function() {
+    scriptProcessor.onaudioprocess = function() {        
         if(!audioBtn.classList.contains("disable")){
             const array = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteFrequencyData(array);

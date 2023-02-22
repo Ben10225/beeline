@@ -118,6 +118,34 @@
         </div> 
         -->
     </div>
+    <div id="white-board-block">
+        <div class="board-rows">
+            <div class="white-board-exit">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div class="board-colors">
+                <div class="bd-color red"></div>
+                <div class="bd-color yellow"></div>
+                <div class="bd-color green"></div>
+                <div class="bd-color blue"></div>
+                <div class="bd-color purple"></div>
+                <div class="bd-color black selected"></div>
+            </div>
+            <div class="board-width">
+                <input type="range" id="boardW"
+                min="1" max="50" value="5" step="1">
+                <h3><span class="width-px">5</span><span> px</span></h3>
+            </div>
+            <div class="board-erase">
+                <i class="fa-solid fa-eraser"></i>
+            </div>
+            <div class="board-reflash">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="cursor2"></div>
+    </div>
     <div class="wrapper">
         <div class="client-alert"></div>
 
@@ -224,10 +252,17 @@
                     <h5>線上</h5>
                     <div class="service-wrapper">
                         <div class="service-block" id="eye-game">
-                            <div class="service-img"></div>
+                            <div class="service-img s-game"></div>
                             <div class="service-txt">
                                 <h4>眼明手快</h4>
                                 <p></p>
+                            </div>
+                        </div>
+                        <div class="service-block" id="white-board">
+                            <div class="service-img s-board"></div>
+                            <div class="service-txt">
+                                <h4>白板</h4>
+                                <p>點擊開始與其他白板連線</p>
                             </div>
                         </div>
                     </div>

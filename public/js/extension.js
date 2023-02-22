@@ -138,12 +138,6 @@ let searchUser = async () => {
 }
 
 let audioAni = (uuid, bool) => {
-    if (!document.querySelector(`#user-${uuid} .d-left`) ||
-        !document.querySelector(`#user-${uuid} .d-middle`) ||
-        !document.querySelector(`#user-${uuid} .d-right`) ||
-        !document.querySelector(`#group-${uuid} .d-left`) ||
-        !document.querySelector(`#group-${uuid} .d-middle`) ||
-        !document.querySelector(`#group-${uuid} .d-right`)) return;
     if(bool){
         document.querySelector(`#user-${uuid} .d-left`).classList.add("ani");
         document.querySelector(`#user-${uuid} .d-middle`).classList.add("ani");

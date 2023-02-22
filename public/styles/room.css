@@ -1284,21 +1284,24 @@ body .bg {
   font-size: 18px;
   margin-left: 10px;
   font-weight: 400;
+  letter-spacing: 0.05em;
 }
 .extension-wrapper .extension-box .service h5 {
-  margin-top: 20px;
+  margin-top: 23px;
   font-size: 13px;
   margin-left: 10px;
   font-weight: 400;
   margin-bottom: 20px;
+  letter-spacing: 0.05em;
 }
 .extension-wrapper .extension-box .service .service-wrapper .service-block {
-  margin: 5px auto;
+  margin: 8px auto;
   position: relative;
   cursor: pointer;
   background-color: rgba(119, 119, 119, 0);
   transition: 0.3s;
   padding: 5px;
+  border-radius: 5px;
 }
 .extension-wrapper .extension-box .service .service-wrapper .service-block:hover {
   background-color: rgba(119, 119, 119, 0.1);
@@ -1306,12 +1309,20 @@ body .bg {
 .extension-wrapper .extension-box .service .service-wrapper .service-block .service-img {
   width: 40px;
   height: 40px;
-  background-image: url("/public/images/eye-game.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   position: absolute;
   top: 4px;
+}
+.extension-wrapper .extension-box .service .service-wrapper .service-block .service-img.s-game {
+  background-image: url("/public/images/eye-game.svg");
+}
+.extension-wrapper .extension-box .service .service-wrapper .service-block .service-img.s-board {
+  width: 39px;
+  height: 39px;
+  top: 1px;
+  background-image: url("/public/images/white-board.svg");
 }
 .extension-wrapper .extension-box .service .service-wrapper .service-block .service-txt {
   margin-left: 50px;
@@ -1512,6 +1523,189 @@ body .bg {
   width: 100%;
   position: absolute;
   left: 280px;
+}
+
+#white-board-block {
+  z-index: 400;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: #222222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.4s;
+}
+#white-board-block.show {
+  opacity: 1;
+  visibility: visible;
+}
+#white-board-block .board-rows {
+  position: relative;
+  top: -50px;
+  left: 20px;
+}
+#white-board-block .board-rows .white-board-exit {
+  z-index: 450;
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  color: #fff;
+  font-size: 40px;
+  top: -30px;
+  right: -230px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: 0.4s;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#white-board-block .board-rows .white-board-exit:hover {
+  opacity: 1;
+}
+#white-board-block .board-rows .board-colors {
+  display: inline-block;
+  margin-right: 50px;
+}
+#white-board-block .board-rows .board-colors .bd-color {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: auto 5px;
+  cursor: pointer;
+  outline: 2px solid rgba(255, 255, 255, 0.2);
+  transition: 0.3s;
+  pointer-events: auto;
+}
+#white-board-block .board-rows .board-colors .bd-color.selected {
+  pointer-events: none;
+  outline: 2px solid white;
+}
+#white-board-block .board-rows .board-colors .bd-color:hover {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+}
+#white-board-block .board-rows .board-colors .bd-color.red {
+  background-color: rgb(211, 38, 26);
+}
+#white-board-block .board-rows .board-colors .bd-color.yellow {
+  background-color: rgb(249, 216, 50);
+}
+#white-board-block .board-rows .board-colors .bd-color.green {
+  background-color: green;
+}
+#white-board-block .board-rows .board-colors .bd-color.blue {
+  background-color: rgb(0, 76, 255);
+}
+#white-board-block .board-rows .board-colors .bd-color.purple {
+  background-color: rgb(167, 23, 167);
+}
+#white-board-block .board-rows .board-colors .bd-color.black {
+  background-color: #000;
+}
+#white-board-block .board-rows .board-width {
+  margin-right: 50px;
+  display: inline-block;
+  position: relative;
+  top: -4px;
+}
+#white-board-block .board-rows .board-width input[type=range] {
+  -webkit-appearance: none !important;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  outline: none;
+  position: relative;
+  top: -4px;
+}
+#white-board-block .board-rows .board-width input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  width: 20px;
+  height: 20px;
+  background: #222;
+  border: 2px solid rgb(249, 127, 184);
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+#white-board-block .board-rows .board-width input[type=range]::-webkit-slider-thumb:hover {
+  background: rgb(150, 58, 101);
+}
+#white-board-block .board-rows .board-width h3 {
+  margin-left: 20px;
+  display: inline-block;
+  color: #e8e8e8;
+  width: 55px;
+}
+#white-board-block .board-rows .board-width h3 .width-px {
+  margin-right: 5px;
+}
+#white-board-block .board-rows .board-erase {
+  display: inline-block;
+  margin-right: 30px;
+}
+#white-board-block .board-rows .board-erase i {
+  width: 50px;
+  height: 50px;
+  color: #fff;
+  font-size: 28px;
+  top: 0;
+  right: -60px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.4s;
+}
+#white-board-block .board-rows .board-erase i:hover {
+  opacity: 0.77;
+}
+#white-board-block .board-rows .board-erase i.selected {
+  pointer-events: none;
+  opacity: 1;
+}
+#white-board-block .board-rows .board-reflash {
+  display: inline-block;
+}
+#white-board-block .board-rows .board-reflash i {
+  width: 50px;
+  height: 50px;
+  color: #fff;
+  font-size: 26px;
+  top: 0;
+  right: -60px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: 0.4s;
+}
+#white-board-block .board-rows .board-reflash i:hover {
+  opacity: 1;
+}
+#white-board-block #canvas {
+  position: relative;
+  top: -5%;
+  background-color: #fff;
+  cursor: none;
+}
+#white-board-block .cursor2 {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  background-color: black;
+  opacity: 0.3;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: width 0.3s, height 0.3s, opacity 0.3s;
+}
+#white-board-block .cursor2.erase-style {
+  background-color: #fff;
+  border: 1px solid #333;
+  opacity: 1;
 }
 
 /* --------    ROOM STYLING | Controls    -------- */
