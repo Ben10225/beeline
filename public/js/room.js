@@ -77,12 +77,19 @@ let userSec = 5;
 
 let socket;
 let s2;
+let socketDraw;
+let drawOpen = false;
+
 
 if(auth){
     socket = io({transports: ['websocket']});
     s2 = io("/enter", {transports: ['websocket']});
+    socketDraw = io("/draw", {transports: ['websocket']});
+
 }else if(CLIENT){
     socket = io({transports: ['websocket']});
+    socketDraw = io("/draw", {transports: ['websocket']});
+
 }else{
     s2 = io("/enter", {transports: ['websocket']});
 }
@@ -120,10 +127,15 @@ let eyeGameInit = async () => {
 }
 
 let whiteBoardInit = async () => {
-    document.querySelector("#white-board").onclick = () => {
+    document.querySelector("#white-board").onclick =  () => {
         document.querySelector("#white-board-block").classList.add("show");
+        if(!drawOpen){
+            socketDraw.emit('join-room', ROOM_ID, USER_ID);
+        }
+        drawOpen = true;
     }
 }
+
 
 navigator.mediaDevices.getUserMedia({
     video: true,
@@ -143,8 +155,10 @@ navigator.mediaDevices.getUserMedia({
 
         utils.generateShortLink();   
 
-        board.boardInit();     
+        boardInit();   
         whiteBoardInit();
+        // socketDraw.emit('join-room', ROOM_ID, USER_ID);
+
 
         // 進房時監聽
         addVideoStream(myVideo, stream, true, USER_ID);
@@ -344,7 +358,7 @@ let socketConn = async (sk, stream) => {
 let s2InRoomAuthInit = async () => {
     // s2 connect
     s2.on('user-connected', async uuid => {
-        console.log(`s2 user ${uuid} enter room ${ROOM_ID}`);
+        console.log(`waiter user ${uuid} enter room ${ROOM_ID}`);
     })
 
     // get enter request
@@ -1865,99 +1879,339 @@ let roundTo = ( num, decimal ) => {
     return Math.round( ( num + Number.EPSILON ) * Math.pow( 10, decimal ) ) / Math.pow( 10, decimal ); 
 }
 
-/*
-let createGroupDom = async (gLst, host, localUuid) => {
-    let firstLine = "";
-    let otherLine = "";
-    let html = "";
-    let existUser = document.querySelectorAll(".user-one");
-    let existLst = [];
-    existUser.forEach(dom => {
-        let existId = dom.id.split("-")[1];
-        existLst.push(existId);
-    })
+// let canvas = document.querySelector("#canvas");
 
-    gLst.forEach(user => {
-        if (existLst.includes(user.uuid)) return; // forEach 的 return 相當於使用 continue
-        let txt = groupHtml(user, host, localUuid);
+// canvas.width = 1000;
+// canvas.height = 600;
 
-        if(user.uuid === localUuid){
-            firstLine = txt;
-        }else{
-            otherLine += txt;
+// let ctx = canvas.getContext("2d");
+// ctx.lineCap = "round";
+
+
+// let x;
+// let y;
+// let mouseDown = false;
+// let color = "black";
+// let lineWidth = 5;
+
+// window.onmousedown = () => {
+//     ctx.moveTo(x, y);
+//     socket.emit("down", ROOM_ID, USER_ID, x, y);
+//     mouseDown = true;
+// }
+
+// window.onmouseup = () => {
+//     mouseDown = false;
+// }
+
+// socket.on("ondraw", (roomId, uuid, x, y, c, w) => {
+//     if(roomId === ROOM_ID && uuid !== USER_ID){
+//         ctx.strokeStyle = c;
+//         ctx.lineWidth = w;
+//         ctx.lineTo(x, y);
+//         ctx.stroke();
+//     }
+// })
+
+// socket.on("ondown", (roomId, uuid, x, y) => {
+//     if(roomId === ROOM_ID && uuid !== USER_ID){
+//         ctx.moveTo(x, y);
+//         ctx.beginPath();
+//     }
+// })
+
+// socket.on("onreflash", (roomId, uuid) => {
+//     if(roomId === ROOM_ID && uuid !== USER_ID){
+//         ctx.clearRect(0, 0, canvas.width, canvas.height);
+//         ctx.beginPath();
+//     }
+// })
+
+// // socketDraw.on('user-connected', async uuid => {
+// //     console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
+// // })
+
+// canvas.onmousemove = (e) => {
+// // canvas.onclick = (e) => {
+
+//     let rect = canvas.getBoundingClientRect();
+//     x = e.clientX - rect.left;
+//     y = e.clientY - rect.top;
+
+//     // x = e.clientX;
+//     // y = e.clientY;
+//     // socket.emit("draww", ROOM_ID, USER_ID, x, y)
+
+//     if(mouseDown){
+//         socket.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth)
+//         ctx.strokeStyle = color;
+//         ctx.lineWidth = lineWidth;
+
+//         ctx.lineTo(x, y);
+//         ctx.stroke();
+//     }
+// }
+
+// const btnRed = document.querySelector(".bd-color.red");
+// const btnYellow = document.querySelector(".bd-color.yellow");
+// const btnGreen = document.querySelector(".bd-color.green");
+// const btnBlue = document.querySelector(".bd-color.blue");
+// const btnPurple = document.querySelector(".bd-color.purple");
+// const btnBlack = document.querySelector(".bd-color.black");
+// const btnWhite = document.querySelector(".fa-eraser");
+
+// let colorBtns = [btnRed, btnYellow, btnGreen, btnBlue, btnPurple, btnBlack, btnWhite];
+
+// const cursor = document.querySelector(".cursor2");
+// colorBtns.forEach((btn, index)=> {
+//     btn.onclick = () => {
+//         btn.classList.add("selected");
+//         colorBtns.forEach((b, j) => {
+//             index !== j && b.classList.remove("selected");
+//         })
+//         if(btn === btnRed){
+//             color = "rgb(211, 38, 26)";
+//             cursor.style.backgroundColor = `rgb(211, 38, 26)`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnYellow){
+//             color = "rgb(249, 216, 50)";
+//             cursor.style.backgroundColor = `rgb(249, 216, 50)`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnGreen){
+//             color = "green";
+//             cursor.style.backgroundColor = `green`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnBlue){
+//             color = "rgb(0, 76, 255)";
+//             cursor.style.backgroundColor = `rgb(0, 76, 255)`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnPurple){
+//             color = "rgb(167, 23, 167)";
+//             cursor.style.backgroundColor = `rgb(167, 23, 167)`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnBlack){
+//             color = "#000";
+//             cursor.style.backgroundColor = `#000`;
+//             cursor.classList.remove("erase-style");
+//         }else if(btn === btnWhite){
+//             color = "#fff";
+//             cursor.style.backgroundColor = `#fff`;
+//             cursor.classList.add("erase-style");
+//         }
+//         ctx.beginPath();
+//     }
+// })
+
+// const reflash = document.querySelector(".fa-trash");
+// reflash.onclick = () => {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     ctx.beginPath();
+//     socket.emit("reflash", ROOM_ID, USER_ID);
+// }
+
+// const input = document.querySelector("#boardW");
+// const widthSpan = document.querySelector(".width-px");
+// input.addEventListener("input", ()=>{
+//     if(color !== "#fff"){
+//         cursor.style = `
+//         width: ${parseInt(input.value)+10}px;
+//         height: ${parseInt(input.value)+10}px;
+//         background-color: ${color};
+//         `;
+//         cursor.classList.remove("erase-style");
+//     }else{
+//         cursor.style = `
+//         width: ${parseInt(input.value)+10}px;
+//         height: ${parseInt(input.value)+10}px;
+//         `;
+//         cursor.classList.add("erase-style");
+//     }
+//     widthSpan.textContent = input.value;
+//     lineWidth = parseInt(input.value);
+//     ctx.beginPath();
+// })
+
+// let cursorinner = document.querySelector('.cursor2');
+// canvas.addEventListener('mousemove', function(e){
+//     var x = e.clientX;
+//     var y = e.clientY;
+//     cursorinner.style.left = x + 'px';
+//     cursorinner.style.top = y + 'px';
+// });
+
+// const exit = document.querySelector(".white-board-exit");
+// exit.onclick = () => {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     ctx.beginPath();
+//     document.querySelector("#white-board-block").classList.remove("show");
+// }
+
+
+let boardInit = async () => {
+    let canvas = document.querySelector("#canvas");
+
+    canvas.width = 1000;
+    canvas.height = 600;
+    
+    let ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    
+    
+    let x;
+    let y;
+    let mouseDown = false;
+    let color = "black";
+    let lineWidth = 5;
+    
+    window.onmousedown = () => {
+        ctx.moveTo(x, y);
+        socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
+        mouseDown = true;
+    }
+    
+    window.onmouseup = () => {
+        mouseDown = false;
+    }
+    
+    socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
+        if(roomId === ROOM_ID && uuid !== USER_ID){
+            ctx.strokeStyle = c;
+            ctx.lineWidth = w;
+            ctx.lineTo(x, y);
+            ctx.stroke();
         }
     })
-    html = firstLine + otherLine;
-
-    document.querySelector(".user-wrapper").insertAdjacentHTML("beforeend", html);
-
-    if(auth){
-        gLst.forEach(user => {
-            if (user.uuid === localUuid) return
-            NameBtnInit(user.uuid)
-            document.querySelector(`#group-${user.uuid} .user-name`).classList.add("can-auth");
-        })
-    }
-    groupLst = [];
-    groupNumber.textContent = Object.keys(userInRoomObj).length;
-}
-
-let groupHtml = (user, host, localUuid) => {
-    // if (!userInRoomObj[user.uuid]) return
-    let hostTag = "";
-    let audioTag = "";
-    let nameTag = "";
-    if(user.uuid === host){
-        hostTag = `<div class="bee-gif"></div>`;
-    }
-    if(user.uuid === localUuid || !auth){
-        if(user.uuid === localUuid){
-            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]} (你)</div>`;
-        }else{
-            nameTag = `<div class="user-name">${userInRoomObj[user.uuid][0]}</div>`;
+    
+    socketDraw.on("ondown", (roomId, uuid, x, y) => {
+        if(roomId === ROOM_ID && uuid !== USER_ID){
+            ctx.moveTo(x, y);
+            ctx.beginPath();
         }
-    }else{
-        nameTag = `
-        <div class="user-name">${userInRoomObj[user.uuid][0]}</div>
-        <div class="auth-check-block">
-            <p>是否指定 <span>${userInRoomObj[user.uuid][0]}</span> 為會議主辦人？</p>
-            <p class="auth-allow">是</p>
-        </div>
-        `
+    })
+    
+    socketDraw.on("onreflash", (roomId, uuid) => {
+        if(roomId === ROOM_ID && uuid !== USER_ID){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+        }
+    })
+    
+    socketDraw.on('user-connected', async uuid => {
+        console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
+    })
+    
+    canvas.onmousemove = (e) => {
+    // canvas.onclick = (e) => {
+    
+        let rect = canvas.getBoundingClientRect();
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+    
+        // x = e.clientX;
+        // y = e.clientY;
+        // socket.emit("draww", ROOM_ID, USER_ID, x, y)
+    
+        if(mouseDown){
+            socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth)
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+    
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
     }
-    if(!user.audioStatus){
-        audioTag = "micro-off"
+    
+    const btnRed = document.querySelector(".bd-color.red");
+    const btnYellow = document.querySelector(".bd-color.yellow");
+    const btnGreen = document.querySelector(".bd-color.green");
+    const btnBlue = document.querySelector(".bd-color.blue");
+    const btnPurple = document.querySelector(".bd-color.purple");
+    const btnBlack = document.querySelector(".bd-color.black");
+    const btnWhite = document.querySelector(".fa-eraser");
+    
+    let colorBtns = [btnRed, btnYellow, btnGreen, btnBlue, btnPurple, btnBlack, btnWhite];
+    
+    const cursor = document.querySelector(".cursor2");
+    colorBtns.forEach((btn, index)=> {
+        btn.onclick = () => {
+            btn.classList.add("selected");
+            colorBtns.forEach((b, j) => {
+                index !== j && b.classList.remove("selected");
+            })
+            if(btn === btnRed){
+                color = "rgb(211, 38, 26)";
+                cursor.style.backgroundColor = `rgb(211, 38, 26)`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnYellow){
+                color = "rgb(249, 216, 50)";
+                cursor.style.backgroundColor = `rgb(249, 216, 50)`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnGreen){
+                color = "green";
+                cursor.style.backgroundColor = `green`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnBlue){
+                color = "rgb(0, 76, 255)";
+                cursor.style.backgroundColor = `rgb(0, 76, 255)`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnPurple){
+                color = "rgb(167, 23, 167)";
+                cursor.style.backgroundColor = `rgb(167, 23, 167)`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnBlack){
+                color = "#000";
+                cursor.style.backgroundColor = `#000`;
+                cursor.classList.remove("erase-style");
+            }else if(btn === btnWhite){
+                color = "#fff";
+                cursor.style.backgroundColor = `#fff`;
+                cursor.classList.add("erase-style");
+            }
+            ctx.beginPath();
+        }
+    })
+    
+    const reflash = document.querySelector(".fa-trash");
+    reflash.onclick = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        socketDraw.emit("reflash", ROOM_ID, USER_ID);
     }
-    let imgSetting = "";
-    if(userInRoomObj[user.uuid][1][0] !== "#"){
-        imgSetting = `
-        <div class="user-img" style="
-            background-image: url('${userInRoomObj[user.uuid][1]}');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-        "></div>
-        `;
-    }else{
-        imgSetting = `
-        <div class="user-img" style="background-color: ${userInRoomObj[user.uuid][1]};">
-            <h3>${userInRoomObj[user.uuid][0][0]}</h3>
-        </div>
-        `;
+    
+    const input = document.querySelector("#boardW");
+    const widthSpan = document.querySelector(".width-px");
+    input.addEventListener("input", ()=>{
+        if(color !== "#fff"){
+            cursor.style = `
+            width: ${parseInt(input.value)+10}px;
+            height: ${parseInt(input.value)+10}px;
+            background-color: ${color};
+            `;
+            cursor.classList.remove("erase-style");
+        }else{
+            cursor.style = `
+            width: ${parseInt(input.value)+10}px;
+            height: ${parseInt(input.value)+10}px;
+            `;
+            cursor.classList.add("erase-style");
+        }
+        widthSpan.textContent = input.value;
+        lineWidth = parseInt(input.value);
+        ctx.beginPath();
+    })
+    
+    let cursorinner = document.querySelector('.cursor2');
+    canvas.addEventListener('mousemove', function(e){
+        var x = e.clientX;
+        var y = e.clientY;
+        cursorinner.style.left = x + 'px';
+        cursorinner.style.top = y + 'px';
+    });
+    
+    const exit = document.querySelector(".white-board-exit");
+    exit.onclick = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        document.querySelector("#white-board-block").classList.remove("show");
     }
-    let txt = `
-    <div class="user-one" id="group-${user.uuid}">
-        ${imgSetting}
-        ${nameTag}
-        <div class="user-host">
-            ${hostTag}
-        </div>
-        <div class="user-micro ${audioTag}">
-            <i class="fa-solid fa-microphone-slash"></i>
-            <i class="fa-solid fa-microphone"></i>
-        </div>
-    </div>
-    `;
-    return txt;
 }
-*/

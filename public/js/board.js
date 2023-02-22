@@ -1,3 +1,20 @@
+// let socketDraw;
+
+// socketDraw = io("/draw", {transports: ['websocket']});
+
+// let whiteBoardInit = async () => {
+//     document.querySelector("#white-board").onclick = () => {
+//         document.querySelector("#white-board-block").classList.add("show");
+//         socketDraw = io("/draw", {transports: ['websocket']});
+
+//         socketDraw.emit('join-room', ROOM_ID, USER_ID);
+//     }
+// }
+
+// socketDraw.on('user-connected', async uuid => {
+//     console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
+// })
+
 
 let boardInit = async () => {
     let canvas = document.querySelector("#canvas");

@@ -30,6 +30,8 @@ func main() {
 
 	uuidMap := map[string]string{}
 	roomMap := map[string]string{}
+	enterMap := map[string]string{}
+	drawMap := map[string]string{}
 
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
 		// s.SetContext(roomId)
@@ -42,13 +44,19 @@ func main() {
 	})
 
 	server.OnEvent("/enter", "join-room", func(s socketio.Conn, roomId, uuid string) {
-		// s.SetContext(roomId)
-		log.Println(uuid, "s2 join room")
+		log.Println(uuid, "waiter join room")
 		s.Join(roomId)
 		uuidMap[s.ID()] = uuid
-		roomMap[uuid] = roomId
+		enterMap[uuid] = roomId
 		server.BroadcastToRoom("/enter", roomId, "user-connected", uuid)
-		// s.Emit("user-connected", uuid)
+	})
+
+	server.OnEvent("/draw", "join-room", func(s socketio.Conn, roomId, uuid string) {
+		log.Println(uuid, "drawer join room")
+		s.Join(roomId)
+		uuidMap[s.ID()] = uuid
+		drawMap[uuid] = roomId
+		server.BroadcastToRoom("/draw", roomId, "user-connected", uuid)
 	})
 
 	server.OnDisconnect("", func(s socketio.Conn, msg string) {
@@ -75,6 +83,7 @@ func main() {
 		server.BroadcastToRoom("/enter", roomId, "sent-to-auth", clientUuid, clientName, clientImg)
 	})
 
+	// allow in room
 	server.OnEvent("/enter", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
 		server.BroadcastToRoom("/enter", roomId, "client-action", roomId, clientName, b)
 		// server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
@@ -115,6 +124,19 @@ func main() {
 	// 5 sec end game
 	server.OnEvent("/", "five-sec-end-game", func(s socketio.Conn, roomId string) {
 		server.BroadcastToRoom("/", roomId, "five-end", roomId)
+	})
+
+	// draw
+	server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
+		server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
+	})
+
+	server.OnEvent("/draw", "down", func(s socketio.Conn, roomId, uuid string, x, y float64) {
+		server.BroadcastToRoom("/draw", roomId, "ondown", roomId, uuid, x, y)
+	})
+
+	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {
