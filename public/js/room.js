@@ -1,6 +1,5 @@
 import utils from "./utils.js";
 import extension from "./extension.js";
-import board from "./board.js"
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
