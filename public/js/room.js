@@ -157,6 +157,7 @@ navigator.mediaDevices.getUserMedia({
 
         board.boardInit(socketDraw);   
         whiteBoardInit();
+        extension.emojiBtnInit(socket);
         // socketDraw.emit('join-room', ROOM_ID, USER_ID);
 
 

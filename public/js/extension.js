@@ -23,6 +23,17 @@ const gameBlock = document.querySelector("#game-block");
 const extensionDomLst = [info, group, chat, service];
 const iconLst = [infoIcon, groupIcon, chatIcon, shapeIcon];
 
+const emojiBtn = document.querySelector("#emoji-btn");
+const emojiGood = document.querySelector(".emoji-good");
+const emojiHeart = document.querySelector(".emoji-heart");
+const emojLaugh = document.querySelector(".emoji-laugh");
+const emojiShock = document.querySelector(".emoji-shock");
+const emojiBee = document.querySelector(".emoji-bee");
+const emojiLst = [emojiGood, emojiHeart, emojLaugh, emojiShock, emojiBee];
+
+const emojiAniWrapper = document.querySelector(".emoji-ani-wrapper");
+
+
 let rightIconsInit = () => {
     infoIconBlock.onclick = () => {
         iconBlockClick(infoIcon, info);
@@ -326,6 +337,90 @@ let createRecordBoard = (datatLst, userSec) => {
     }
 }
 
+let emojiBtnInit = (socket) => {
+    emojiBtn.onclick = () => {
+        emojiBtn.classList.toggle("clicked");
+        if(emojiBtn.classList.contains("clicked")){
+            document.querySelector(".emoji-block").classList.add("show");
+        }else{
+            document.querySelector(".emoji-block").classList.remove("show");
+        }
+    }
+    emojiLst.forEach((emoji, index)=> {
+        emoji.onmouseover = () => {
+            emoji.classList.add("hover-style");
+        }
+        emoji.onmouseout = () => {
+            emoji.classList.remove("hover-style");
+        }
+        emoji.onclick = () => {
+            emoji.classList.add("stop-click");
+            emoji.classList.remove("hover-style");
+            createEmojiTag(USER_NAME, index);
+
+            socket.emit("generate-emoji", ROOM_ID, USER_ID, USER_NAME, index);
+
+            setTimeout(() => {
+                emoji.classList.remove("stop-click");
+            },1000)
+        }
+    })
+
+    socket.on("send-emoji", (roomId, uuid, name, index) => {
+        if(roomId === ROOM_ID && uuid !== USER_ID){
+            createEmojiTag(name, index);
+        }
+    })
+}
+
+let createEmojiTag = async (userName, gifIndex) => {
+    let fileName = "";
+    let beeSize = "";
+    let uuidToken = uuid();
+    gifIndex === 0 ? fileName = "good" :
+    gifIndex === 1 ? fileName = "heart" :
+    gifIndex === 2 ? fileName = "laugh" :
+    gifIndex === 3 ? fileName = "shock" : (fileName = "bee", beeSize="transform: scale(1.3);");
+    
+    let html = `
+    <div class="solo-emoji" id="emoji-${uuidToken}" style="left: ${randomInt(0, 180)}px; top: ${randomInt(0, 15)}px;}">
+        <div class="emoji-gif" style="background-image: url('/public/images/emoji-${fileName}.gif'); ${beeSize}"></div>
+        <div class="emoji-name">${userName}</div>
+    </div>
+    `;
+    emojiAniWrapper.insertAdjacentHTML("beforeend", html);
+
+    document.styleSheets[0].insertRule(`\
+            @keyframes emojiRun {\
+                0%{opacity: 0; transform: translateY(0);}\
+                15%{opacity: 1;}\
+                85%{opacity: 1;}\
+                100%{opacity: 0;transform: translateY(${randomInt(-300, -400)}px);}\
+			}`
+		);
+	let div = document.querySelector(`#emoji-${uuidToken}`);
+	div.style.animation = `emojiRun ${randomInt(4, 5)}s both linear`;
+    setTimeout(()=>{
+        div.remove();
+    }, 5500)
+} 
+
+let uuid =() => {
+    let d = Date.now();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+        d += performance.now(); //use high-precision timer if available
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        let r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+let randomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 
 export default {
     rightIconsInit,
@@ -336,6 +431,7 @@ export default {
     reciprocalAnimation,
     gameStartTextSetting,
     createRecordBoard,
+    emojiBtnInit,
 }
 
 

@@ -126,6 +126,11 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "five-end", roomId)
 	})
 
+	// emoji
+	server.OnEvent("/", "generate-emoji", func(s socketio.Conn, roomId, uuid, name string, i int) {
+		server.BroadcastToRoom("/", roomId, "send-emoji", roomId, uuid, name, i)
+	})
+
 	// draw
 	server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
 		server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)

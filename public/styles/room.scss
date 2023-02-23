@@ -1581,6 +1581,7 @@ body{
                 outline: 2px solid rgba(#fff, 0.2);
                 transition: 0.3s;
                 pointer-events: auto;
+                user-select: none;
                 &.selected{
                     pointer-events: none;
                     outline: 2px solid rgba(#fff, 1);
@@ -1745,8 +1746,8 @@ body{
 }
 
 .control-icon{
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     background-position: center;
     background-repeat: no-repeat;
@@ -1775,6 +1776,13 @@ body{
     }
 }
 
+#emoji-btn{
+    background-image: url('/public/images/emoji-icon.svg');
+    &.clicked{
+        background-image: url('/public/images/emoji-icon-click.svg');
+    }
+}
+
 #screen-share-btn{
     background-image: url('/public/images/screen-share.svg');
     cursor: pointer;
@@ -1791,8 +1799,8 @@ body{
 }
 
 #leave-btn{
-    width: 75px;
-    height: 75px;
+    width: 70px;
+    height: 70px;
     opacity: 0.7;
     background-size: contain;
     background-image: url('/public/images/leave_icon.svg');
@@ -1884,6 +1892,135 @@ body{
             }
         }
     }
+}
+
+
+.emoji-wrapper{
+    position: absolute;
+    top: -55px;
+    z-index: 600;
+}
+.emoji-block{
+    padding: 3px 7px;
+    position: relative;
+    left: -10px;
+    background-color: #fff;
+    border-radius: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px) scale(0.5);
+    transition: 0.3s;
+    user-select: none;
+    &.show{
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+    .emoji{
+        width: 33px;
+        height: 33px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        display: inline-block;
+        margin: auto 5px;
+        position: relative;
+        top: 2px;
+        filter: grayscale(100%);
+        cursor: pointer;
+        transition: 0.3s;
+        user-select: none;
+        pointer-events: auto;
+        &.stop-click{
+            pointer-events: none;
+        }
+        &.emoji-good{
+            background-image: url('/public/images/e-good-icon.svg');
+            &.hover-style{
+                filter: grayscale(0%);
+                transform: scale(1.2);
+            }
+        }
+        &.emoji-heart{
+            background-image: url('/public/images/e-heart-icon.svg');
+            &.hover-style{
+                filter: grayscale(0%);
+                transform: scale(1.2);
+            }
+        }
+        &.emoji-laugh{
+            background-image: url('/public/images/e-laugh-icon.svg');
+            &.hover-style{
+                filter: grayscale(0%);
+                transform: scale(1.2);
+            }
+        }
+        &.emoji-shock{
+            background-image: url('/public/images/e-shock-icon.svg');
+            &.hover-style{
+                filter: grayscale(0%);
+                transform: scale(1.2);
+            }
+        }
+        &.emoji-bee{
+            background-image: url('/public/images/e-bee-icon.svg');
+            top: -0.5px;
+            &.hover-style{
+                filter: grayscale(0%);
+                transform: scale(1.2);
+            }
+        }
+    }
+}
+
+.emoji-ani-wrapper{
+    position: absolute;
+    left: 10px;
+    top: -40px;
+    z-index: 600;
+    width: auto;
+    .solo-emoji{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        position: absolute;
+        // left: 150px;
+        width: 150px;
+        opacity: 0;
+        // animation: emojiRun 5s both linear;
+        .emoji-gif{
+            width: 52px;
+            height: 52px;
+            // background-image: url('/public/images/emoji-heart.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            margin-bottom: -2px;
+        }
+        .emoji-name{
+            background-color: rgba(#000, 0.3);
+            color: #fff;
+            padding: 2px 4px;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+    }
+    // @keyframes emojiRun {
+    //     0%{
+    //         opacity: 0;
+    //         transform: translateY(0);
+    //     }
+    //     15%{
+    //         opacity: 1;
+    //     }
+    //     85%{
+    //         opacity: 1;
+    //     }
+    //     100%{
+    //         opacity: 0;
+    //         transform: translateY(-350px);
+    //     }
+    // }
 }
 
 
