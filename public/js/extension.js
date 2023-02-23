@@ -242,7 +242,7 @@ let createRecordBoard = (datatLst, userSec) => {
     }else{
         resultLst.forEach((data, index) => {
             let imgSetting = "";
-            if(infoLst[index][1][0] !== "#"){
+            if(infoLst[index]["Arr"][1][0] !== "#"){
                 imgSetting = `
                 <div class="record-img" style="
                     background-image: url('${infoLst[index]["Arr"][1]}');

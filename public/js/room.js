@@ -1658,6 +1658,8 @@ let NameBtnInit = (uuid) => {
 }
 
 let alertNewAuth = (uuid) => {
+    let exist = document.querySelector("#auth-alert-${uuid}");
+    if (exist) return;
     let html = `
     <div class="alert-block" id="auth-alert-${uuid}">
         <h3 class="change-auth-h3">您已被指派為會議主辦人</h3>
