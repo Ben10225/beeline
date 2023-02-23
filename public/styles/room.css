@@ -1487,9 +1487,13 @@ body .bg {
   opacity: 0.5;
 }
 #game-block .record-wrapper .record-block .user-record .one-record {
-  margin: 4px auto;
+  margin: 8px auto;
   opacity: 0.8;
   position: relative;
+  border-radius: 4px;
+}
+#game-block .record-wrapper .record-block .user-record .one-record.local-user {
+  background-color: rgba(255, 255, 0, 0.15);
 }
 #game-block .record-wrapper .record-block .user-record .one-record div {
   display: inline-block;
@@ -1616,6 +1620,8 @@ body .bg {
 }
 #white-board-block .board-rows .board-width input[type=range] {
   -webkit-appearance: none !important;
+     -moz-appearance: none !important;
+          appearance: none !important;
   height: 2px;
   background: rgba(255, 255, 255, 0.5);
   border: none;

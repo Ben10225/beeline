@@ -1476,9 +1476,13 @@ body{
             }
             .user-record{
                 .one-record{
-                    margin: 4px auto;
+                    margin: 8px auto;
                     opacity: 0.8;
                     position: relative;
+                    border-radius: 4px;
+                    &.local-user{
+                        background-color: rgba(yellow, 0.15);
+                    }
                     div{
                         display: inline-block;
                         margin-right: 50px;
@@ -1610,7 +1614,7 @@ body{
             position: relative;
             top: -4px;
             input[type="range"] {
-                -webkit-appearance:none !important;
+                appearance: none !important;
                 // width: 420px;
                 height: 2px;
                 background: rgba(#fff, 0.5);

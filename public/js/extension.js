@@ -216,8 +216,10 @@ let createRecordBoard = (datatLst, userSec) => {
                 </div>
                 `;
             }
+            let localBg = "";
+            data.Uuid === USER_ID && (localBg = "local-user");
             let txt = `
-            <div class="one-record">
+            <div class="one-record ${localBg}">
                 <div class="record-place">${index+1}</div>
                 ${imgSetting}
                 <div class="record-name">${infoLst[index]["Arr"][0]}</div>
@@ -247,8 +249,10 @@ let createRecordBoard = (datatLst, userSec) => {
             }
 
             if(index < 3){
+                let localBg = "";
+                data.Uuid === USER_ID && (localBg = "local-user");
                 let txt = `
-                <div class="one-record">
+                <div class="one-record ${localBg}">
                     <div class="record-place">${index+1}</div>
                     ${imgSetting}
                     <div class="record-name">${infoLst[index]["Arr"][0]}</div>
@@ -257,8 +261,10 @@ let createRecordBoard = (datatLst, userSec) => {
                 `;
                 firstBlock += txt;
             }else{
+                let localBg = "";
+                data.Uuid === USER_ID && (localBg = "local-user");
                 let txt = `
-                <div class="one-record">
+                <div class="one-record" ${localBg}>
                     <div class="record-place">
                         <i class="fa-solid fa-skull"></i>
                     </div>
