@@ -1878,173 +1878,6 @@ let roundTo = ( num, decimal ) => {
     return Math.round( ( num + Number.EPSILON ) * Math.pow( 10, decimal ) ) / Math.pow( 10, decimal ); 
 }
 
-// let canvas = document.querySelector("#canvas");
-
-// canvas.width = 1000;
-// canvas.height = 600;
-
-// let ctx = canvas.getContext("2d");
-// ctx.lineCap = "round";
-
-
-// let x;
-// let y;
-// let mouseDown = false;
-// let color = "black";
-// let lineWidth = 5;
-
-// window.onmousedown = () => {
-//     ctx.moveTo(x, y);
-//     socket.emit("down", ROOM_ID, USER_ID, x, y);
-//     mouseDown = true;
-// }
-
-// window.onmouseup = () => {
-//     mouseDown = false;
-// }
-
-// socket.on("ondraw", (roomId, uuid, x, y, c, w) => {
-//     if(roomId === ROOM_ID && uuid !== USER_ID){
-//         ctx.strokeStyle = c;
-//         ctx.lineWidth = w;
-//         ctx.lineTo(x, y);
-//         ctx.stroke();
-//     }
-// })
-
-// socket.on("ondown", (roomId, uuid, x, y) => {
-//     if(roomId === ROOM_ID && uuid !== USER_ID){
-//         ctx.moveTo(x, y);
-//         ctx.beginPath();
-//     }
-// })
-
-// socket.on("onreflash", (roomId, uuid) => {
-//     if(roomId === ROOM_ID && uuid !== USER_ID){
-//         ctx.clearRect(0, 0, canvas.width, canvas.height);
-//         ctx.beginPath();
-//     }
-// })
-
-// // socketDraw.on('user-connected', async uuid => {
-// //     console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
-// // })
-
-// canvas.onmousemove = (e) => {
-// // canvas.onclick = (e) => {
-
-//     let rect = canvas.getBoundingClientRect();
-//     x = e.clientX - rect.left;
-//     y = e.clientY - rect.top;
-
-//     // x = e.clientX;
-//     // y = e.clientY;
-//     // socket.emit("draww", ROOM_ID, USER_ID, x, y)
-
-//     if(mouseDown){
-//         socket.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth)
-//         ctx.strokeStyle = color;
-//         ctx.lineWidth = lineWidth;
-
-//         ctx.lineTo(x, y);
-//         ctx.stroke();
-//     }
-// }
-
-// const btnRed = document.querySelector(".bd-color.red");
-// const btnYellow = document.querySelector(".bd-color.yellow");
-// const btnGreen = document.querySelector(".bd-color.green");
-// const btnBlue = document.querySelector(".bd-color.blue");
-// const btnPurple = document.querySelector(".bd-color.purple");
-// const btnBlack = document.querySelector(".bd-color.black");
-// const btnWhite = document.querySelector(".fa-eraser");
-
-// let colorBtns = [btnRed, btnYellow, btnGreen, btnBlue, btnPurple, btnBlack, btnWhite];
-
-// const cursor = document.querySelector(".cursor2");
-// colorBtns.forEach((btn, index)=> {
-//     btn.onclick = () => {
-//         btn.classList.add("selected");
-//         colorBtns.forEach((b, j) => {
-//             index !== j && b.classList.remove("selected");
-//         })
-//         if(btn === btnRed){
-//             color = "rgb(211, 38, 26)";
-//             cursor.style.backgroundColor = `rgb(211, 38, 26)`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnYellow){
-//             color = "rgb(249, 216, 50)";
-//             cursor.style.backgroundColor = `rgb(249, 216, 50)`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnGreen){
-//             color = "green";
-//             cursor.style.backgroundColor = `green`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnBlue){
-//             color = "rgb(0, 76, 255)";
-//             cursor.style.backgroundColor = `rgb(0, 76, 255)`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnPurple){
-//             color = "rgb(167, 23, 167)";
-//             cursor.style.backgroundColor = `rgb(167, 23, 167)`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnBlack){
-//             color = "#000";
-//             cursor.style.backgroundColor = `#000`;
-//             cursor.classList.remove("erase-style");
-//         }else if(btn === btnWhite){
-//             color = "#fff";
-//             cursor.style.backgroundColor = `#fff`;
-//             cursor.classList.add("erase-style");
-//         }
-//         ctx.beginPath();
-//     }
-// })
-
-// const reflash = document.querySelector(".fa-trash");
-// reflash.onclick = () => {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     ctx.beginPath();
-//     socket.emit("reflash", ROOM_ID, USER_ID);
-// }
-
-// const input = document.querySelector("#boardW");
-// const widthSpan = document.querySelector(".width-px");
-// input.addEventListener("input", ()=>{
-//     if(color !== "#fff"){
-//         cursor.style = `
-//         width: ${parseInt(input.value)+10}px;
-//         height: ${parseInt(input.value)+10}px;
-//         background-color: ${color};
-//         `;
-//         cursor.classList.remove("erase-style");
-//     }else{
-//         cursor.style = `
-//         width: ${parseInt(input.value)+10}px;
-//         height: ${parseInt(input.value)+10}px;
-//         `;
-//         cursor.classList.add("erase-style");
-//     }
-//     widthSpan.textContent = input.value;
-//     lineWidth = parseInt(input.value);
-//     ctx.beginPath();
-// })
-
-// let cursorinner = document.querySelector('.cursor2');
-// canvas.addEventListener('mousemove', function(e){
-//     var x = e.clientX;
-//     var y = e.clientY;
-//     cursorinner.style.left = x + 'px';
-//     cursorinner.style.top = y + 'px';
-// });
-
-// const exit = document.querySelector(".white-board-exit");
-// exit.onclick = () => {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     ctx.beginPath();
-//     document.querySelector("#white-board-block").classList.remove("show");
-// }
-
 
 let boardInit = async () => {
     let canvas = document.querySelector("#canvas");
@@ -2054,6 +1887,9 @@ let boardInit = async () => {
     
     let ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
+
+    let udx = canvas.getContext("2d");
+    udx.lineCap = "round";
     
     
     let x;
@@ -2062,36 +1898,36 @@ let boardInit = async () => {
     let color = "black";
     let lineWidth = 5;
     
-    window.onmousedown = () => {
+    canvas.onmousedown = () => {
         ctx.moveTo(x, y);
         socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
         mouseDown = true;
     }
     
-    window.onmouseup = () => {
+    canvas.onmouseup = () => {
         mouseDown = false;
     }
     
     socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            ctx.strokeStyle = c;
-            ctx.lineWidth = w;
-            ctx.lineTo(x, y);
-            ctx.stroke();
+            udx.strokeStyle = c;
+            udx.lineWidth = w;
+            udx.lineTo(x, y);
+            udx.stroke();
         }
     })
     
     socketDraw.on("ondown", (roomId, uuid, x, y) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            ctx.moveTo(x, y);
-            ctx.beginPath();
+            udx.moveTo(x, y);
+            udx.beginPath();
         }
     })
     
     socketDraw.on("onreflash", (roomId, uuid) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
+            udx.clearRect(0, 0, canvas.width, canvas.height);
+            udx.beginPath();
         }
     })
     
@@ -2100,8 +1936,6 @@ let boardInit = async () => {
     })
     
     canvas.onmousemove = (e) => {
-    // canvas.onclick = (e) => {
-    
         let rect = canvas.getBoundingClientRect();
         x = e.clientX - rect.left;
         y = e.clientY - rect.top;
