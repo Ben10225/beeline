@@ -376,16 +376,19 @@ let emojiBtnInit = (socket) => {
 let createEmojiTag = async (userName, gifIndex) => {
     let fileName = "";
     let beeSize = "";
+    let name;
     let uuidToken = uuid();
     gifIndex === 0 ? fileName = "good" :
     gifIndex === 1 ? fileName = "heart" :
     gifIndex === 2 ? fileName = "laugh" :
     gifIndex === 3 ? fileName = "shock" : (fileName = "bee", beeSize="transform: scale(1.3);");
     
+    name = userName === USER_NAME ? "你" : userName
+
     let html = `
     <div class="solo-emoji" id="emoji-${uuidToken}" style="left: ${randomInt(0, 180)}px; top: ${randomInt(0, 15)}px;}">
         <div class="emoji-gif" style="background-image: url('/public/images/emoji-${fileName}.gif'); ${beeSize}"></div>
-        <div class="emoji-name">${userName}</div>
+        <div class="emoji-name">${name}</div>
     </div>
     `;
     emojiAniWrapper.insertAdjacentHTML("beforeend", html);
