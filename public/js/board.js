@@ -16,6 +16,7 @@ let boardInit = async (socketDraw) => {
     let mouseDown = false;
     let color = "black";
     let lineWidth = 5;
+    let storage = [];
     
     canvas.onmousedown = () => {
         ctx.moveTo(x, y);
@@ -25,14 +26,32 @@ let boardInit = async (socketDraw) => {
     
     canvas.onmouseup = () => {
         mouseDown = false;
+        socketDraw.emit("up", ROOM_ID, USER_ID, storage, color, lineWidth);
+        // storage.forEach((position, index)=> {
+        //     udx.lineTo(position.x, position.y);
+        //     udx.stroke();
+        // })
+        storage = [];
     }
-    
-    socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
+
+    socketDraw.on("onup", (roomId, uuid, lst, c, w) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
             udx.strokeStyle = c;
             udx.lineWidth = w;
+            lst.forEach(position => {
+                udx.lineTo(position.x, position.y);
+                udx.stroke();
+            })
+            
+        }
+    })
+    
+    socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
+        if(roomId === ROOM_ID && uuid !== USER_ID){
+        // if(roomId === ROOM_ID){
+            udx.strokeStyle = c;
+            udx.lineWidth = w;
             udx.lineTo(x, y);
-            udx.stroke();
         }
     })
     
@@ -60,10 +79,10 @@ let boardInit = async (socketDraw) => {
         y = e.clientY - rect.top;
     
         if(mouseDown){
-            socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth)
+            socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth);
+            storage.push([x, y]);
             ctx.strokeStyle = color;
             ctx.lineWidth = lineWidth;
-    
             ctx.lineTo(x, y);
             ctx.stroke();
         }

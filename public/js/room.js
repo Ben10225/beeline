@@ -115,7 +115,7 @@ myVideo.muted = true;
 let tempMediaStreamId = null;
 let tempRemoteMediaStreamId = null;
 
-const peers = {}
+const peers = {};
 
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
@@ -1154,19 +1154,29 @@ let toggleCamera = async (stream, dom, inRoom) => {
             audio: false,
         }).then( newStream => {
 
+            // const pc = new RTCPeerConnection();
+
+            // let camVideoTrack = newStream.getVideoTracks()[0];
+            // let videoSender = pc.addTrack(camVideoTrack, newStream);
+
+            // videoSender.replaceTrack(newStream.getVideoTracks()[0]);
+            myVideo.srcObject = newStream;
+
             let videoTrack = newStream.getVideoTracks()[0];
             // let videoTrack = newStream.getTracks()[1];
             // console.log(currentPeer)
-            let sender = currentPeer.getSenders().find(function(s){
-                return s.track.kind == videoTrack.kind;
-            });
-            sender.replaceTrack(videoTrack);
-            
-            myVideo.srcObject = newStream;
+            if(currentPeer){
+                let sender = currentPeer.getSenders().find(function(s){
+                    return s.track.kind == videoTrack.kind;
+                });
+                sender.replaceTrack(videoTrack);
+            }
 
             cameraBtn.onclick = () => {
                 toggleCamera(newStream, cameraBtn);
             }
+
+
 
             // audioBtn.onclick = () => {
             //     toggleAudio(newStream, audioBtn);
@@ -1179,6 +1189,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
             // }
         })
         */
+        
 
         /*
         stream.getTracks().forEach(function(track) {

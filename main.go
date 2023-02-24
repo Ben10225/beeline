@@ -132,6 +132,10 @@ func main() {
 	})
 
 	// draw
+	server.OnEvent("/draw", "up", func(s socketio.Conn, roomId, uuid string, lst interface{}, color string, lineWidth int) {
+		server.BroadcastToRoom("/draw", roomId, "onup", roomId, uuid, lst, color, lineWidth)
+	})
+
 	server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
 		server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
 	})
