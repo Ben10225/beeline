@@ -136,13 +136,15 @@ func main() {
 		server.BroadcastToRoom("/draw", roomId, "onup", roomId, uuid, lst, color, lineWidth)
 	})
 
-	server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
-		server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
-	})
+	/*
+		server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
+			server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
+		})
 
-	server.OnEvent("/draw", "down", func(s socketio.Conn, roomId, uuid string, x, y float64) {
-		server.BroadcastToRoom("/draw", roomId, "ondown", roomId, uuid, x, y)
-	})
+		server.OnEvent("/draw", "down", func(s socketio.Conn, roomId, uuid string, x, y float64) {
+			server.BroadcastToRoom("/draw", roomId, "ondown", roomId, uuid, x, y)
+		})
+	*/
 
 	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
 		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)

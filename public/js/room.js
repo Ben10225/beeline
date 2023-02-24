@@ -646,9 +646,10 @@ let inRoomSocketInit = async () => {
     // audio animation
     socket.on('audio-ani-set', async (roomId, uuid, b) => {
         if(ROOM_ID === roomId){
-            if (!document.querySelector(`#user-${uuid} .micro-ani-block`) ||
-            !document.querySelector(`#user-${uuid} .micro-ani-block`)) return;
-            extension.audioAni(uuid, b);
+            if (document.querySelector(`#user-${uuid} .micro-ani-block`) &&
+            document.querySelector(`#user-${uuid} .micro-ani-block`)){
+                extension.audioAni(uuid, b);
+            }
         }
     })
 
@@ -1669,7 +1670,7 @@ let NameBtnInit = (uuid) => {
 }
 
 let alertNewAuth = (uuid) => {
-    let exist = document.querySelector("#auth-alert-${uuid}");
+    let exist = document.querySelector(`#auth-alert-${uuid}`);
     if (exist) return;
     let html = `
     <div class="alert-block" id="auth-alert-${uuid}">

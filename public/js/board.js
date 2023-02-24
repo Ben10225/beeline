@@ -6,10 +6,6 @@ let boardInit = async (socketDraw) => {
     
     let ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
-
-    let udx = canvas.getContext("2d");
-    udx.lineCap = "round";
-    
     
     let x;
     let y;
@@ -20,52 +16,66 @@ let boardInit = async (socketDraw) => {
     
     canvas.onmousedown = () => {
         ctx.moveTo(x, y);
-        socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
+        // socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
         mouseDown = true;
     }
     
     canvas.onmouseup = () => {
+        ctx.beginPath();
         mouseDown = false;
         socketDraw.emit("up", ROOM_ID, USER_ID, storage, color, lineWidth);
-        // storage.forEach((position, index)=> {
-        //     udx.lineTo(position.x, position.y);
-        //     udx.stroke();
-        // })
         storage = [];
     }
 
     socketDraw.on("onup", (roomId, uuid, lst, c, w) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            udx.strokeStyle = c;
-            udx.lineWidth = w;
-            lst.forEach(position => {
-                udx.lineTo(position.x, position.y);
-                udx.stroke();
+        // if(roomId === ROOM_ID){
+            let utx = canvas.getContext("2d");
+            utx.lineCap = "round";
+            utx.strokeStyle = c;
+            utx.lineWidth = w;
+
+            lst.forEach((position, index) => {
+                // setTimeout(() => {
+                    utx.lineTo(position[0], position[1]);
+                    utx.stroke();
+                // }, index * 10)
             })
+            utx.beginPath();
+
+            // let udx = canvas.getContext("2d");
+            // udx.lineCap = "round";
+            // udx.strokeStyle = c;
+            // udx.lineWidth = w;
+            // lst.forEach(position => {
+            //     udx.lineTo(position.x, position.y);
+            //     // udx.stroke();
+            // })
             
         }
     })
     
     socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
+        console.log(x, y)
         if(roomId === ROOM_ID && uuid !== USER_ID){
         // if(roomId === ROOM_ID){
-            udx.strokeStyle = c;
-            udx.lineWidth = w;
-            udx.lineTo(x, y);
+            ctx.strokeStyle = c;
+            ctx.lineWidth = w;
+            ctx.lineTo(x, y);
         }
     })
     
     socketDraw.on("ondown", (roomId, uuid, x, y) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            udx.moveTo(x, y);
-            udx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.beginPath();
         }
     })
     
     socketDraw.on("onreflash", (roomId, uuid) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-            udx.clearRect(0, 0, canvas.width, canvas.height);
-            udx.beginPath();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
         }
     })
     
@@ -79,7 +89,7 @@ let boardInit = async (socketDraw) => {
         y = e.clientY - rect.top;
     
         if(mouseDown){
-            socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth);
+            // socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth);
             storage.push([x, y]);
             ctx.strokeStyle = color;
             ctx.lineWidth = lineWidth;
