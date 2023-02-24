@@ -48,6 +48,7 @@ let boardInit = async (socketDraw) => {
                 utx.beginPath();
             }else{
                 let checkUserDrawer = setInterval(() => {
+                    console.log(mouseDown);
                     if(!mouseDown){
                         let utx = canvas.getContext("2d");
                         utx.lineCap = "round";
