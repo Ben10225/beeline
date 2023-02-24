@@ -275,7 +275,7 @@ let createRecordBoard = (datatLst, userSec) => {
                 let localBg = "";
                 data.Uuid === USER_ID && (localBg = "local-user");
                 let txt = `
-                <div class="one-record" ${localBg}>
+                <div class="one-record ${localBg}">
                     <div class="record-place">
                         <i class="fa-solid fa-skull"></i>
                     </div>

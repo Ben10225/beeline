@@ -38,11 +38,9 @@ let boardInit = async (socketDraw) => {
                 utx.strokeStyle = c;
                 utx.lineWidth = w;
     
-                lst.forEach((position, index) => {
-                    setTimeout(() => {
-                        utx.lineTo(position[0], position[1]);
-                        utx.stroke();
-                    }, index * 10)
+                lst.forEach(position => {
+                    utx.lineTo(position[0], position[1]);
+                    utx.stroke();
                 })
                 utx.beginPath();
             }else{
@@ -54,10 +52,8 @@ let boardInit = async (socketDraw) => {
                         utx.lineWidth = w;
             
                         lst.forEach((position, index) => {
-                            setTimeout(() => {
-                                utx.lineTo(position[0], position[1]);
-                                utx.stroke();
-                            }, index * 10)
+                            utx.lineTo(position[0], position[1]);
+                            utx.stroke();
                         })
                         utx.beginPath();
                         clearInterval(checkUserDrawer)
