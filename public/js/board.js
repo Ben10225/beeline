@@ -18,7 +18,6 @@ let boardInit = async (socketDraw) => {
         ctx.moveTo(x, y);
         // socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
         mouseDown = true;
-        console.log(mouseDown)
     }
     
     canvas.onmouseup = () => {
@@ -26,7 +25,6 @@ let boardInit = async (socketDraw) => {
         mouseDown = false;
         socketDraw.emit("up", ROOM_ID, USER_ID, storage, color, lineWidth);
         storage = [];
-        console.log(mouseDown)
     }
 
     socketDraw.on("onup", (roomId, uuid, lst, c, w) => {
@@ -75,7 +73,7 @@ let boardInit = async (socketDraw) => {
     })
     
     socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
-        console.log(x, y)
+        // console.log(x, y)
         if(roomId === ROOM_ID && uuid !== USER_ID){
         // if(roomId === ROOM_ID){
             ctx.strokeStyle = c;

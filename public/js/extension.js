@@ -149,21 +149,23 @@ let searchUser = async () => {
 }
 
 let audioAni = (uuid, bool) => {
-    if(bool){
-        document.querySelector(`#user-${uuid} .d-left`).classList.add("ani");
-        document.querySelector(`#user-${uuid} .d-middle`).classList.add("ani");
-        document.querySelector(`#user-${uuid} .d-right`).classList.add("ani");
-        document.querySelector(`#group-${uuid} .d-left`).classList.add("ani");
-        document.querySelector(`#group-${uuid} .d-middle`).classList.add("ani");
-        document.querySelector(`#group-${uuid} .d-right`).classList.add("ani");
-    }else{
-        document.querySelector(`#user-${uuid} .d-left`).classList.remove("ani");
-        document.querySelector(`#user-${uuid} .d-middle`).classList.remove("ani");
-        document.querySelector(`#user-${uuid} .d-right`).classList.remove("ani");
-        document.querySelector(`#group-${uuid} .d-left`).classList.remove("ani");
-        document.querySelector(`#group-${uuid} .d-middle`).classList.remove("ani");
-        document.querySelector(`#group-${uuid} .d-right`).classList.remove("ani");
-    }
+    try{
+        if(bool){
+            document.querySelector(`#user-${uuid} .d-left`).classList.add("ani");
+            document.querySelector(`#user-${uuid} .d-middle`).classList.add("ani");
+            document.querySelector(`#user-${uuid} .d-right`).classList.add("ani");
+            document.querySelector(`#group-${uuid} .d-left`).classList.add("ani");
+            document.querySelector(`#group-${uuid} .d-middle`).classList.add("ani");
+            document.querySelector(`#group-${uuid} .d-right`).classList.add("ani");
+        }else{
+            document.querySelector(`#user-${uuid} .d-left`).classList.remove("ani");
+            document.querySelector(`#user-${uuid} .d-middle`).classList.remove("ani");
+            document.querySelector(`#user-${uuid} .d-right`).classList.remove("ani");
+            document.querySelector(`#group-${uuid} .d-left`).classList.remove("ani");
+            document.querySelector(`#group-${uuid} .d-middle`).classList.remove("ani");
+            document.querySelector(`#group-${uuid} .d-right`).classList.remove("ani");
+        }
+    }catch{}
 }
 
 let reciprocalAnimation = (text) => {
