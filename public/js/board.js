@@ -39,16 +39,14 @@ let boardInit = async (socketDraw) => {
                 utx.lineWidth = w;
     
                 lst.forEach((position, index) => {
-                    // setTimeout(() => {
-    
+                    setTimeout(() => {
                         utx.lineTo(position[0], position[1]);
                         utx.stroke();
-                    // }, index * 10)
+                    }, index * 10)
                 })
                 utx.beginPath();
             }else{
                 let checkUserDrawer = setInterval(() => {
-                    console.log(mouseDown);
                     if(!mouseDown){
                         let utx = canvas.getContext("2d");
                         utx.lineCap = "round";
@@ -56,11 +54,10 @@ let boardInit = async (socketDraw) => {
                         utx.lineWidth = w;
             
                         lst.forEach((position, index) => {
-                            // setTimeout(() => {
-            
+                            setTimeout(() => {
                                 utx.lineTo(position[0], position[1]);
                                 utx.stroke();
-                            // }, index * 10)
+                            }, index * 10)
                         })
                         utx.beginPath();
                         clearInterval(checkUserDrawer)
