@@ -30,18 +30,41 @@ let boardInit = async (socketDraw) => {
     socketDraw.on("onup", (roomId, uuid, lst, c, w) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
         // if(roomId === ROOM_ID){
-            let utx = canvas.getContext("2d");
-            utx.lineCap = "round";
-            utx.strokeStyle = c;
-            utx.lineWidth = w;
+            if(!mouseDown){
+                let utx = userCanvas.getContext("2d");
+                utx.lineCap = "round";
+                utx.strokeStyle = c;
+                utx.lineWidth = w;
+    
+                lst.forEach((position, index) => {
+                    // setTimeout(() => {
+    
+                        utx.lineTo(position[0], position[1]);
+                        utx.stroke();
+                    // }, index * 10)
+                })
+                utx.beginPath();
+            }else{
+                let checkUserDrawer = setInterval(() => {
+                    if(!mouseDown){
+                        let utx = userCanvas.getContext("2d");
+                        utx.lineCap = "round";
+                        utx.strokeStyle = c;
+                        utx.lineWidth = w;
+            
+                        lst.forEach((position, index) => {
+                            // setTimeout(() => {
+            
+                                utx.lineTo(position[0], position[1]);
+                                utx.stroke();
+                            // }, index * 10)
+                        })
+                        utx.beginPath();
+                        clearInterval(checkUserDrawer)
+                    }
+                }, 100)
+            }
 
-            lst.forEach((position, index) => {
-                // setTimeout(() => {
-                    utx.lineTo(position[0], position[1]);
-                    utx.stroke();
-                // }, index * 10)
-            })
-            utx.beginPath();
 
             // let udx = canvas.getContext("2d");
             // udx.lineCap = "round";
