@@ -6,19 +6,13 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
+utils.playAudio("/public/audio/enter-room.mp3", 0);
+utils.playAudio("/public/audio/count-down.wav", 0);
+utils.playAudio("/public/audio/client-request.mp3", 0);
+utils.playAudio("/public/audio/bee-show.wav", 0);
+utils.playAudio("/public/audio/type.wav", 0);
+
 let enterRoom = false;
-
-// let pct = 0;
-// let pageTimer = setInterval(() => {
-//     pct ++;
-//     if(pct === 1300){
-//         clearInterval(pageTimer);
-//         if(!enterRoom){
-//             history.go(0);
-//         }
-//     }
-// }, 1);
-
 let auth;
 
 auth = (parseInt(params.auth) === 0);
@@ -348,9 +342,10 @@ let socketConn = async (sk, stream) => {
             console.log("conn establish");
             document.querySelector("#waiting-block").remove();
             if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                let audio = new Audio("/public/audio/enter-room.mp3");
-                audio.volume = 0.2;
-                audio.play();
+                utils.playAudio("/public/audio/enter-room.mp3", 0.2);
+                // let audio = new Audio("/public/audio/enter-room.mp3");
+                // audio.volume = 0.2;
+                // audio.play();
             }
         }
     })
@@ -391,9 +386,10 @@ let s2InRoomAuthInit = async () => {
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-            let audio = new Audio("/public/audio/client-request.mp3");
-            audio.volume = 0.3;
-            audio.play();
+            utils.playAudio("/public/audio/client-request.mp3", 0.3);
+            // let audio = new Audio("/public/audio/client-request.mp3");
+            // audio.volume = 0.3;
+            // audio.play();
 
             let alert = document.querySelector(`#alert-user-${clientUuid}`);
             let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
@@ -1289,9 +1285,10 @@ let tryEnterRoom = (uuid) => {
                     document.querySelector("#waiting-block").remove();
                     clearInterval(timer);
                     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                        let audio = new Audio("/public/audio/enter-room.mp3");
-                        audio.volume = 0.2;
-                        audio.play();
+                        utils.playAudio("/public/audio/enter-room.mp3", 0.2)
+                        // let audio = new Audio("/public/audio/enter-room.mp3");
+                        // audio.volume = 0.2;
+                        // audio.play();
                     }
                 }
             }, 1000);
@@ -1679,9 +1676,10 @@ let alertNewAuth = (uuid) => {
     </div>
     `;
     document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-    let audio = new Audio("/public/audio/client-request.mp3");
-    audio.volume = 0.3;
-    audio.play();
+    utils.playAudio("/public/audio/client-request.mp3", 0.3)
+    // let audio = new Audio("/public/audio/client-request.mp3");
+    // audio.volume = 0.3;
+    // audio.play();
 
     let alert = document.querySelector(`#auth-alert-${uuid}`);
     setTimeout(() => {
