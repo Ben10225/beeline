@@ -6,12 +6,6 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
-utils.playAudio("/public/audio/enter-room.mp3", 0);
-utils.playAudio("/public/audio/count-down.wav", 0);
-utils.playAudio("/public/audio/client-request.mp3", 0);
-utils.playAudio("/public/audio/bee-show.wav", 0);
-utils.playAudio("/public/audio/type.wav", 0);
-
 let enterRoom = false;
 let auth;
 
