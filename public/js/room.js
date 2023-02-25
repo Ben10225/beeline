@@ -1799,9 +1799,9 @@ let gameStartAni = () => {
     setTimeout(()=>{
         let timer = setInterval(()=>{
             extension.reciprocalAnimation(content);
-            // let audio = new Audio("/public/audio/count-down.wav");
-            // audio.volume = 0.2;
-            // audio.play();
+            let audio = new Audio("/public/audio/count-down.wav");
+            audio.volume = 0.2;
+            audio.play();
             // utils.playAudio("/public/audio/count-down.wav", 0.2);
 
             content --;
