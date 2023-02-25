@@ -336,10 +336,10 @@ let socketConn = async (sk, stream) => {
             console.log("conn establish");
             document.querySelector("#waiting-block").remove();
             if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                utils.playAudio("/public/audio/enter-room.mp3", 0.2);
-                // let audio = new Audio("/public/audio/enter-room.mp3");
-                // audio.volume = 0.2;
-                // audio.play();
+                // utils.playAudio("/public/audio/enter-room.mp3", 0.2);
+                let audio = new Audio("/public/audio/enter-room.mp3");
+                audio.volume = 0.2;
+                audio.play();
             }
         }
     })
@@ -380,10 +380,10 @@ let s2InRoomAuthInit = async () => {
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-            utils.playAudio("/public/audio/client-request.mp3", 0.3);
-            // let audio = new Audio("/public/audio/client-request.mp3");
-            // audio.volume = 0.3;
-            // audio.play();
+            // utils.playAudio("/public/audio/client-request.mp3", 0.3);
+            let audio = new Audio("/public/audio/client-request.mp3");
+            audio.volume = 0.3;
+            audio.play();
 
             let alert = document.querySelector(`#alert-user-${clientUuid}`);
             let clientAllow = document.querySelector(`#alert-user-${clientUuid} .allow`);
@@ -660,10 +660,10 @@ let inRoomSocketInit = async () => {
 
             setTimeout(()=>{
                 setTimeout(()=>{
-                    utils.playAudio("/public/audio/bee-show.wav", 0.3);
-                    // let audio = new Audio("/public/audio/bee-show.wav");
-                    // audio.volume = 0.4;
-                    // audio.play();
+                    // utils.playAudio("/public/audio/bee-show.wav", 0.3);
+                    let audio = new Audio("/public/audio/bee-show.wav");
+                    audio.volume = 0.4;
+                    audio.play();
                     gameBlock.insertAdjacentHTML("beforeend", `<div class="bee-game-gif"></div>`);
                     let dom = document.querySelector(".bee-game-gif");
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
@@ -1279,10 +1279,10 @@ let tryEnterRoom = (uuid) => {
                     document.querySelector("#waiting-block").remove();
                     clearInterval(timer);
                     if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                        utils.playAudio("/public/audio/enter-room.mp3", 0.2)
-                        // let audio = new Audio("/public/audio/enter-room.mp3");
-                        // audio.volume = 0.2;
-                        // audio.play();
+                        // utils.playAudio("/public/audio/enter-room.mp3", 0.2);
+                        let audio = new Audio("/public/audio/enter-room.mp3");
+                        audio.volume = 0.2;
+                        audio.play();
                     }
                 }
             }, 1000);
@@ -1670,10 +1670,10 @@ let alertNewAuth = (uuid) => {
     </div>
     `;
     document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-    utils.playAudio("/public/audio/client-request.mp3", 0.3)
-    // let audio = new Audio("/public/audio/client-request.mp3");
-    // audio.volume = 0.3;
-    // audio.play();
+    // utils.playAudio("/public/audio/client-request.mp3", 0.3);
+    let audio = new Audio("/public/audio/client-request.mp3");
+    audio.volume = 0.3;
+    audio.play();
 
     let alert = document.querySelector(`#auth-alert-${uuid}`);
     setTimeout(() => {
@@ -1802,7 +1802,7 @@ let gameStartAni = () => {
             // let audio = new Audio("/public/audio/count-down.wav");
             // audio.volume = 0.2;
             // audio.play();
-            utils.playAudio("/public/audio/count-down.wav", 0.2);
+            // utils.playAudio("/public/audio/count-down.wav", 0.2);
 
             content --;
             if(content === 0){
