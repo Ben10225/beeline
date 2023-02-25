@@ -1120,7 +1120,8 @@ let toggleCamera = async (stream, dom, inRoom) => {
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
         document.querySelector(".user-block.local").classList.add("show");
-        stream.getTracks()[1].enabled = false;
+        stream.getVideoTracks()[0].enabled = false;
+        // stream.getTracks()[1].enabled = false;
         // stream.getTracks()[1].stop();
         // stream.getVideoTracks()[0].stop();
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
@@ -1136,7 +1137,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
             document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
         }
         dom.classList.remove("disable");
-        stream.getTracks()[1].enabled = true;
+        stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
@@ -1238,7 +1239,8 @@ let toggleAudio = async (stream, dom, inRoom) => {
     let isVolumn = stream.getTracks()[0].enabled;
     if(isVolumn){
         dom.classList.add("disable");
-        stream.getTracks()[0].enabled = false;
+        // stream.getTracks()[0].enabled = false;
+        stream.getAudioTracks()[0].enabled = false;
         document.querySelector(".micro-status-icon.local").classList.add("show");
         if(auth || CLIENT){
             document.querySelector(`#group-${USER_ID} .user-micro`).classList.add("micro-off");
@@ -1251,7 +1253,8 @@ let toggleAudio = async (stream, dom, inRoom) => {
 
     }else{
         dom.classList.remove("disable");
-        stream.getTracks()[0].enabled = true;
+        // stream.getTracks()[0].enabled = true;
+        stream.getAudioTracks()[0].enabled = true;
         document.querySelector(".micro-status-icon.local").classList.remove("show");
         if(auth || CLIENT){
             document.querySelector(`#group-${USER_ID} .user-micro`).classList.remove("micro-off");
@@ -1822,7 +1825,6 @@ let audioSetInit = async (stream) => {
     let volumeInterval = null;
     let isVolumn = false;
     let stopT = true;
-
 
     // Initialize
     try {
