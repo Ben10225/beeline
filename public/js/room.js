@@ -55,7 +55,8 @@ let userInRoomObj = {};
 let videoCt = 0;
 let tmpNewStreamCt = null;
 let needLoadAgain = false;
-let currentPeer;
+// let currentPeer;
+let currentPeer = {};
 
 
 let gameLeft = 0;
@@ -156,7 +157,8 @@ navigator.mediaDevices.getUserMedia({
             const video = document.createElement("video");
             let remoteUuid = call.peer;
             call.on("stream", userVideoStream => {
-                currentPeer = call.peerConnection;
+                // currentPeer = call.peerConnection;
+                currentPeer[remoteUuid] = call.peerConnection;
 
                 if (USER_ID === userVideoStream.id) return;
                 // console.log("stream", userVideoStream)
@@ -432,12 +434,12 @@ let inRoomSocketInit = async () => {
             let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
             let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
             if(remoteDiv && b){
-                remoteDiv.classList.remove("show");
-                remoteNameBg.classList.remove("bg-none");
-                // setTimeout(()=>{
-                //     remoteDiv.classList.remove("show");
-                //     remoteNameBg.classList.remove("bg-none");
-                // }, 2000)
+                // remoteDiv.classList.remove("show");
+                // remoteNameBg.classList.remove("bg-none");
+                setTimeout(()=>{
+                    remoteDiv.classList.remove("show");
+                    remoteNameBg.classList.remove("bg-none");
+                }, 1000)
             }else if(remoteDiv && !b){
                 remoteDiv.classList.add("show");
                 remoteNameBg.classList.add("bg-none");
@@ -1081,6 +1083,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
+        
+        socket.emit("remote-track-reload", ROOM_ID, USER_ID);
 
         // if(needLoadAgain){
         //     addVideoStream(video, stream, islocal, remoteUuid);
@@ -1120,10 +1124,14 @@ let toggleCamera = async (stream, dom, inRoom) => {
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
         document.querySelector(".user-block.local").classList.add("show");
-        stream.getVideoTracks()[0].enabled = false;
+        // stream.getVideoTracks()[0].enabled = false;
         // stream.getTracks()[1].enabled = false;
         // stream.getTracks()[1].stop();
-        // stream.getVideoTracks()[0].stop();
+        if(inRoom){
+            stream.getVideoTracks()[0].stop();
+        }else{
+            stream.getVideoTracks()[0].enabled = false;
+        }
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
 
@@ -1137,36 +1145,48 @@ let toggleCamera = async (stream, dom, inRoom) => {
             document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
         }
         dom.classList.remove("disable");
-        stream.getVideoTracks()[0].enabled = true;
+        // stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
-        /*
+        if(!inRoom){
+            stream.getVideoTracks()[0].enabled = true;
+            return;
+        }
+
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false,
         }).then( newStream => {
 
-            // const pc = new RTCPeerConnection();
-
-            // let camVideoTrack = newStream.getVideoTracks()[0];
-            // let videoSender = pc.addTrack(camVideoTrack, newStream);
-
-            // videoSender.replaceTrack(newStream.getVideoTracks()[0]);
             myVideo.srcObject = newStream;
 
             let videoTrack = newStream.getVideoTracks()[0];
             // let videoTrack = newStream.getTracks()[1];
-            // console.log(currentPeer)
-            if(currentPeer){
-                let sender = currentPeer.getSenders().find(function(s){
-                    return s.track.kind == videoTrack.kind;
-                });
-                sender.replaceTrack(videoTrack);
-            }
+            socket.on('need-reload', async (roomId, uuid) => {
+                if(ROOM_ID === roomId && uuid !== USER_ID){
+                    let timer = setInterval(() => {
+                        if(currentPeer[uuid]){
+                            let sender = currentPeer[uuid].getSenders().find(function(s){
+                                return s.track.kind == videoTrack.kind;
+                            });
+                            sender.replaceTrack(videoTrack);
+                            clearInterval(timer);
+                        }
+                    }, 100)   
+                }
+            })
+            try{
+                Object.values(currentPeer).forEach(item => {
+                    let sender = item.getSenders().find(function(s){
+                        return s.track.kind == videoTrack.kind;
+                    });
+                    sender.replaceTrack(videoTrack);
+                })
+            }catch{}
 
             cameraBtn.onclick = () => {
-                toggleCamera(newStream, cameraBtn);
+                toggleCamera(newStream, cameraBtn, true);
             }
 
 
@@ -1180,57 +1200,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
             //         newStream.getTracks()[0].enabled = false;
             //     }
             // }
-        })
-        */
-        
-
-        /*
-        stream.getTracks().forEach(function(track) {
-            track.stop();
-        });
-
-        setTimeout(()=>{
-            document.querySelector(".user-block.local").classList.remove("show");
-            if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
-            }
-        }, 2000)
-
-        videoCt ++;
-        navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        }).then( newStream => {
-
-            // document.querySelector(".video-container").style.opacity = "0";
-            // document.querySelector(".user-block").style.opacity = "1";
-
-            myPeer = new Peer(`${USER_ID}-${videoCt}`)
-
-            myPeer.on('call', function(call){
-                call.answer(newStream);
-                addVideoStream(myVideo, newStream, true, `${USER_ID}-${videoCt}`)
-            })
-
-            myPeer.on('open', async id => {
-                socket.emit('join-room', ROOM_ID, id);
-            })
-
-            cameraBtn.onclick = () => {
-                toggleCamera(newStream, cameraBtn);
-            }
-
-            audioBtn.onclick = () => {
-                toggleAudio(newStream, audioBtn);
-            }
-            if(auth || CLIENT){
-                if(document.querySelector("#audio-btn").classList.contains("disable")){
-                    newStream.getTracks()[0].enabled = false;
-
-                }
-            }
-        })
-        */
+        })        
     }
 }
 
@@ -1311,7 +1281,8 @@ let connectToNewUser = (userId, stream) => {
     let video = document.createElement("video")
     let remoteUuid = call.peer
     call.on("stream", userVideoStream => {
-        currentPeer = call.peerConnection;
+        // currentPeer = call.peerConnection;
+        currentPeer[remoteUuid] = call.peerConnection;
         addVideoStream(video, userVideoStream, false, remoteUuid);
     })
     call.on("close", () => {

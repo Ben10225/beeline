@@ -146,6 +146,11 @@ func main() {
 		})
 	*/
 
+	// track reload
+	server.OnEvent("/", "remote-track-reload", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/", roomId, "need-reload", roomId, uuid)
+	})
+
 	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
 		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)
 	})
