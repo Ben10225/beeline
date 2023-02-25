@@ -1,3 +1,5 @@
+import utils from "./utils.js";
+
 const userContainer = document.querySelector(".user-container");
 
 const infoIcon =  document.querySelector(".fa-link");
@@ -198,9 +200,10 @@ let gameStartTextSetting = () => {
                 gameStartTxt.textContent = t;
             }, index * 160)
         })
-        let audio = new Audio("/public/audio/type.wav");
-        audio.volume = 0.7;
-        audio.play();
+        utils.playAudio("/public/audio/type.wav", 0.6);
+        // let audio = new Audio("/public/audio/type.wav");
+        // audio.volume = 0.7;
+        // audio.play();
     },500)
 }
 

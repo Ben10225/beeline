@@ -670,9 +670,10 @@ let inRoomSocketInit = async () => {
 
             setTimeout(()=>{
                 setTimeout(()=>{
-                    let audio = new Audio("/public/audio/bee-show.wav");
-                    audio.volume = 0.4;
-                    audio.play();
+                    utils.playAudio("/public/audio/bee-show.wav", 0.3);
+                    // let audio = new Audio("/public/audio/bee-show.wav");
+                    // audio.volume = 0.4;
+                    // audio.play();
                     gameBlock.insertAdjacentHTML("beforeend", `<div class="bee-game-gif"></div>`);
                     let dom = document.querySelector(".bee-game-gif");
                     dom.style = `left: ${gameLeft}%; top: ${gameTop}%;`;
@@ -1317,10 +1318,10 @@ let connectToNewUser = (userId, stream) => {
     let remoteUuid = call.peer
     call.on("stream", userVideoStream => {
         currentPeer = call.peerConnection;
-        addVideoStream(video, userVideoStream, false, remoteUuid)
+        addVideoStream(video, userVideoStream, false, remoteUuid);
     })
     call.on("close", () => {
-        video.remove()
+        video.remove();
     })
     peers[userId] = call;
 }
@@ -1353,7 +1354,7 @@ let getRemoteUser = async (roomId, remoteUuid) => {
     });
     let data = await response.json();
     if(data.data){
-        return data.data
+        return data.data;
     }
 }
 
@@ -1419,7 +1420,7 @@ let checkNeedReconnect = async (roomId, uuid) => {
     });
     let data = await response.json();
     if(data.message == "needReconnect"){
-        console.log(`user ${uuid} connection break, try reconnect.`)
+        console.log(`user ${uuid} connection break, try reconnect.`);
         tryEnterRoom(uuid);
     }
 }
@@ -1647,7 +1648,7 @@ let NameBtnInit = (uuid) => {
 
     userOne.addEventListener("click",() => {
         block.classList.add("show");
-        let ct = 0
+        let ct = 0;
         extensionBox.addEventListener("click", function blockShow(e){
             ct ++;
             if (!block.contains(e.target) 
@@ -1783,77 +1784,6 @@ screenShareBtn.addEventListener("click", function addScreen(){
 })
 
 
-
-let audioSetInit = async (stream) => {
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const microphone = audioContext.createMediaStreamSource(stream);
-    const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
-
-    analyser.smoothingTimeConstant = 0.8;
-    analyser.fftSize = 1024;
-
-    microphone.connect(analyser);
-    analyser.connect(scriptProcessor);
-    scriptProcessor.connect(audioContext.destination);
-    scriptProcessor.onaudioprocess = function() {        
-        if(!audioBtn.classList.contains("disable")){
-            const array = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(array);
-            const arraySum = array.reduce((a, value) => a + value, 0);
-            const average = arraySum / array.length;
-            let number = Math.round(average);
-
-            if(number < 10){
-                socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-            }else{
-                socket.emit("audio-ani", ROOM_ID, USER_ID, true);
-            }
-            
-            // if(!wait){
-            //     vThird = vSecond;
-            //     vSecond = vFirst;
-            //     vFirst = number;
-            // }
-
-            // if((vThird-vFirst > 3 && voiceNow)){
-            //     stopToken ++;
-            //     if(stopToken > 3){
-            //         socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-            //         voiceNow = false;
-            //         wait = true;
-
-            //         setTimeout(()=>{
-            //             wait = false;
-            //         }, 700)
-            //     }
-            // }else{
-            //     stopToken = 0;
-            // }
-
-            // if(number < 7 && voiceNow){
-            // if(number < 10){
-            //     socket.emit("audio-ani", ROOM_ID, USER_ID, false);
-            //     // voiceNow = false;
-            // }else{
-            //     socket.emit("audio-ani", ROOM_ID, USER_ID, true);
-            // }
-
-            // if(!voiceNow && !wait){
-            //     if(number >= 9 && vFirst - vThird > 2){
-            //         aniToken ++ ;
-            //         if(aniToken > 0){
-            //             voiceNow = true;
-            //             socket.emit("audio-ani", ROOM_ID, USER_ID, true);
-            //         }
-            //     }else{
-            //         aniToken = 0;
-            //     }
-            // }
-        }
-    };
-}
-
 let gameStartAni = () => {
     let html = `
     <div class="game-bg"></div>
@@ -1867,7 +1797,7 @@ let gameStartAni = () => {
     extension.gameStartTextSetting();
 
     setTimeout(()=>{
-        gameStartTxt.style.opacity = "0" ;
+        gameStartTxt.style.opacity = "0";
         setTimeout(()=>{
             gameStartTxt.remove();
         }, 500)
@@ -1877,9 +1807,10 @@ let gameStartAni = () => {
     setTimeout(()=>{
         let timer = setInterval(()=>{
             extension.reciprocalAnimation(content);
-            let audio = new Audio("/public/audio/count-down.wav");
-            audio.volume = 0.2;
-            audio.play();
+            // let audio = new Audio("/public/audio/count-down.wav");
+            // audio.volume = 0.2;
+            // audio.play();
+            utils.playAudio("/public/audio/count-down.wav", 0.2);
 
             content --;
             if(content === 0){
@@ -1892,4 +1823,51 @@ let gameStartAni = () => {
 
 let roundTo = ( num, decimal ) => {
     return Math.round( ( num + Number.EPSILON ) * Math.pow( 10, decimal ) ) / Math.pow( 10, decimal ); 
+}
+
+let audioSetInit = async (stream) => {
+    let volumeCallback = null;
+    let volumeInterval = null;
+    let isVolumn = false;
+    let stopT = true;
+
+
+    // Initialize
+    try {
+        const audioContext = new AudioContext();
+        const audioSource = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.minDecibels = -127;
+        analyser.maxDecibels = 0;
+        analyser.smoothingTimeConstant = 0.4;
+        audioSource.connect(analyser);
+        const volumes = new Uint8Array(analyser.frequencyBinCount);
+        volumeCallback = () => {
+            analyser.getByteFrequencyData(volumes);
+            let volumeSum = 0;
+            for(const volume of volumes)
+            volumeSum += volume;
+            const averageVolume = volumeSum / volumes.length;
+            // console.log(averageVolume)
+
+            if(averageVolume < 40 && !isVolumn){
+                socket.emit("audio-ani", ROOM_ID, USER_ID, false);
+            }else{
+                isVolumn = true;
+                if(isVolumn && stopT){
+                    socket.emit("audio-ani", ROOM_ID, USER_ID, true);
+                    setTimeout(() => {
+                        isVolumn = false;
+                        stopT = true;
+                    }, 500)
+                }
+                stopT = false;
+            }
+        };
+    } catch(e) {
+        console.error('Failed to initialize volume visualizer, simulating instead...', e);
+    }
+
+    volumeInterval = setInterval(volumeCallback, 100);
 }

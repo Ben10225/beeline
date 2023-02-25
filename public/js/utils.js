@@ -265,6 +265,40 @@ let getGameResult = async (roomId) => {
 }
 
 
+let playAudio = (url, volume) => {
+    const URL = url;
+      
+    const context = new AudioContext();
+    // const playButton = document.querySelector('#play');
+  
+    window.fetch(URL)
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+
+            play(context, audioBuffer, volume);
+        });
+      
+}
+
+let play = (context, audioBuffer, volume) => {
+    const source = context.createBufferSource();
+    source.buffer = audioBuffer;
+
+    const gainNode = context.createGain()
+    gainNode.gain.value = volume
+    gainNode.connect(context.destination)
+
+    source.connect(gainNode);
+    source.start();
+}
+
+  
+    
+  
+
+    
+
 
 export default {
     auth,
@@ -275,6 +309,7 @@ export default {
     sendUserSecToDB,
     getGameResult,
     checkUserLeaveFalse,
+    playAudio,
 }
 
 
