@@ -350,11 +350,11 @@ body{
                 border: none;
                 background-color: #df9c4a;
                 color: #fff;
-                opacity: 0.4;
-                transition: 0.4s;
+                opacity: 1;
+                transition: 0.3s;
                 display: inline-block;
                 &:hover{
-                    opacity: 0.9;
+                    opacity: 0.8;
                 }
             }
             .request-gif{

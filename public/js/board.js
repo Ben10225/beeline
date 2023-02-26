@@ -204,8 +204,8 @@ let boardInit = async (socketDraw) => {
     
     const exit = document.querySelector(".white-board-exit");
     exit.onclick = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.beginPath();
         document.querySelector("#white-board-block").classList.remove("show");
     }
 }

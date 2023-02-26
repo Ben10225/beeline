@@ -136,6 +136,9 @@ func main() {
 		server.BroadcastToRoom("/draw", roomId, "onup", roomId, uuid, lst, color, lineWidth)
 	})
 
+	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)
+	})
 	/*
 		server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
 			server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
@@ -151,8 +154,8 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "need-reload", roomId, uuid)
 	})
 
-	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
-		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)
+	server.OnEvent("/", "remote-audio-track-reload", func(s socketio.Conn, roomId, uuid string) {
+		server.BroadcastToRoom("/", roomId, "need-audio-reload", roomId, uuid)
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {

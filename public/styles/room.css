@@ -346,12 +346,12 @@ body .bg {
   border: none;
   background-color: #df9c4a;
   color: #fff;
-  opacity: 0.4;
-  transition: 0.4s;
+  opacity: 1;
+  transition: 0.3s;
   display: inline-block;
 }
 #user-setup .setting-options .button-block #enter-request:hover {
-  opacity: 0.9;
+  opacity: 0.8;
 }
 #user-setup .setting-options .button-block .request-gif {
   width: 40px;

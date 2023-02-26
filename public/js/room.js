@@ -166,13 +166,6 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
-        // nPeer.on('call', function(call){
-        //     call.answer(stream);
-        //     console.log(stream)
-        //     // const video = document.createElement("video")
-        //     // addVideoStream(video, userVideoStream, false, remoteUuid, "screen")
-        // })
-
         socketConn(socket, stream)
 
         socket.emit('join-room', ROOM_ID, USER_ID);
@@ -182,6 +175,26 @@ navigator.mediaDevices.getUserMedia({
             s2.emit('join-room', ROOM_ID, USER_ID);
         }
 
+        /*
+        let audioTrack = stream.getAudioTracks()[0];
+        socket.on('need-audio-reload', async (roomId, uuid) => {
+            if(ROOM_ID === roomId && uuid !== USER_ID){
+                // let timer = setInterval(() => {
+
+                if(currentPeer[uuid]){
+                    console.log(currentPeer[uuid]);
+                    let sender = currentPeer[uuid].getSenders().find(function(s){
+                        return s.track.kind == audioTrack.kind;
+                    });
+                    currentPeer[uuid].removeTrack(sender);
+                    currentPeer[uuid].addTrack(audioTrack);
+                    // sender.replaceTrack(audioTrack)
+                    // clearInterval(timer);
+                }
+                // }, 100)   
+            }
+        })
+        */
 
     }else{
         waitingSocketInit();
@@ -434,12 +447,12 @@ let inRoomSocketInit = async () => {
             let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
             let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
             if(remoteDiv && b){
-                // remoteDiv.classList.remove("show");
-                // remoteNameBg.classList.remove("bg-none");
-                setTimeout(()=>{
-                    remoteDiv.classList.remove("show");
-                    remoteNameBg.classList.remove("bg-none");
-                }, 1000)
+                remoteDiv.classList.remove("show");
+                remoteNameBg.classList.remove("bg-none");
+                // setTimeout(()=>{
+                //     remoteDiv.classList.remove("show");
+                //     remoteNameBg.classList.remove("bg-none");
+                // }, 1000)
             }else if(remoteDiv && !b){
                 remoteDiv.classList.add("show");
                 remoteNameBg.classList.add("bg-none");
@@ -804,30 +817,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
     }
 
     if(islocal){
-        /*
-        if(remoteUuid.split("-")[1]){
-            if (tmpNewStreamCt === remoteUuid.split("-")[1]) return;
 
-            // let videoBlock = document.createElement("div");
-            // videoBlock.className = "video-block";
-            // document.querySelector(`#user-${existUuid}`).append(videoBlock);
-
-            tmpNewStreamCt = remoteUuid.split("-")[1];
-            let existUuid = remoteUuid.split("-")[0];
-
-            // let videoDom = document.querySelector(`#user-${existUuid} video`);
-            // videoDom.remove()
-            // videoDom.style = `background-color: #fff`;
-
-            video.addEventListener("loadedmetadata", () => {
-                video.play()
-            })
-            setTimeout(()=>{
-                document.querySelector(`#user-${existUuid}`).append(video);
-            }, 1000)
-            return
-        }
-        */
         userInRoomObj[remoteUuid] = [USER_NAME, USER_IMG];
 
         tempMediaStreamId = stream.id;
@@ -917,17 +907,36 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             let localAudioStatus = data.audioStatus;
             let localVideoStatus = data.videoStatus;
             if(!localAudioStatus){
-                stream.getTracks()[0].enabled = false;
+                // stream.getTracks()[0].enabled = false;
+                stream.getAudioTracks()[0].enabled = false;
                 document.querySelector(`#user-${USER_ID} .micro-status-icon`).classList.add("show");
                 document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.add("hide");
                 audioBtn.classList.add("disable");
             }
             if(!localVideoStatus){
-                stream.getTracks()[1].enabled = false;
-                // stream.getTracks()[1].stop();
+                // stream.getTracks()[1].enabled = false;
+                stream.getVideoTracks()[0].stop();
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
+
+                navigator.mediaDevices.getUserMedia({
+                    video: false,
+                    audio: true,
+                }).then( newStream => {
+                    myVideo.srcObject = newStream;
+
+                    let audioTrack = newStream.getAudioTracks()[0];
+
+                    try{
+                        Object.values(currentPeer).forEach(item => {
+                            let sender = item.getSenders().find(function(s){
+                                return s.track.kind == audioTrack.kind;
+                            });
+                            sender.replaceTrack(audioTrack);
+                        })
+                    }catch{}
+                })
             }
             
             let roomStatus = await getRoomChatAndShare(ROOM_ID);
@@ -976,29 +985,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             utils.settingVideoSize();
             return
         }
-        /*
-        let oriDom;
-        if(remoteUuid.split("-")[1] !== undefined){
-            oriDom = document.querySelector(`wrapper-${remoteUuid.split("-")[0]}`);
-        }
-        if(remoteUuid.split("-")[1] && oriDom){
-            if (tmpNewStreamCt === remoteUuid.split("-")[1]) return;
-            tmpNewStreamCt = remoteUuid.split("-")[1];
-            let existUuid = remoteUuid.split("-")[0];
-            // console.log(existUuid)
-            let videoDom = document.querySelector(`#user-${existUuid} video`);
-            videoDom.remove();
-
-            // video.addEventListener("loadedmetadata", () => {
-            //     video.play()
-            // })
-            document.querySelector(`#user-${existUuid}`).append(video);
-            return
-        }else if(remoteUuid.split("-")[1] && !oriDom){
-            remoteUuid = remoteUuid.split("-")[0];
-            needLoadAgain = true;
-        }
-        */
     
         // create remote container
         if(document.querySelector(`#wrapper-${remoteUuid}`)){
@@ -1084,35 +1070,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
         
-        socket.emit("remote-track-reload", ROOM_ID, USER_ID);
-
-        // if(needLoadAgain){
-        //     addVideoStream(video, stream, islocal, remoteUuid);
-        // }
-        // needLoadAgain = false;
-
-        // if(clientFirstLoad && !auth){
-        //     if (Object.keys(userInRoomObj).length >= groupLst.length){
-        //         // console.log("cc")
-        //         createGroupDom(groupLst, host, USER_ID);
-        //     }
-        // }else{
-        //     let needAdd = true;
-        //     groupLst.forEach(data => {
-        //         if(data.uuid === remoteUuid){
-        //             needAdd = false
-        //         }
-        //     })
-        //     if(needAdd){
-        //         groupLst.push({"uuid": remoteUuid, "audioStatus": remoteAudioStatus});
-        //     }
-        //     if (Object.keys(userInRoomObj).length >= groupLst.length){
-        //         // console.log("dd")
-        //         createGroupDom(groupLst, host, USER_ID);
-        //     }
-        // }
-
-        // clientFirstLoad = false;
+        // socket.emit("remote-track-reload", ROOM_ID, USER_ID);
+        // socket.emit("remote-audio-track-reload", ROOM_ID, USER_ID);
     }
     
     utils.settingVideoSize();
@@ -1124,14 +1083,16 @@ let toggleCamera = async (stream, dom, inRoom) => {
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
         document.querySelector(".user-block.local").classList.add("show");
-        // stream.getVideoTracks()[0].enabled = false;
+        stream.getVideoTracks()[0].enabled = false;
         // stream.getTracks()[1].enabled = false;
         // stream.getTracks()[1].stop();
-        if(inRoom){
-            stream.getVideoTracks()[0].stop();
-        }else{
-            stream.getVideoTracks()[0].enabled = false;
-        }
+        // stream.getVideoTracks()[0].stop();
+
+        // if(inRoom){
+        //     stream.getVideoTracks()[0].stop();
+        // }else{
+        //     stream.getVideoTracks()[0].enabled = false;
+        // }
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
 
@@ -1139,25 +1100,73 @@ let toggleCamera = async (stream, dom, inRoom) => {
             document.querySelector(".username-wrapper-room.local").classList.add("bg-none");
         }
 
+        /*
+        if(inRoom){
+            navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: true,
+            }).then( newStream => {
+                let audioTrack = newStream.getAudioTracks()[0];
+                socket.on('need-audio-reload', async (roomId, uuid) => {
+                    if(ROOM_ID === roomId && uuid !== USER_ID){
+                        let timer = setInterval(() => {
+                            if(currentPeer[uuid]){
+                                console.log(currentPeer[uuid]);
+                                currentPeer[uuid].addTrack(audioTrack);
+                                clearInterval(timer);
+                            }
+                        }, 100)   
+                    }
+                })
+            })
+        }
+        */
+        
+        /*
+        if(inRoom){
+            navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: true,
+            }).then( newStream => {
+                myVideo.srcObject = newStream;
+                let audioTrack = newStream.getAudioTracks()[0];
+
+                try{
+                    Object.values(currentPeer).forEach(item => {
+                        let sender = item.getSenders().find(function(s){
+                            return s.track.kind == audioTrack.kind;
+                        });
+                        sender.replaceTrack(audioTrack);
+                    })
+                }catch{}
+            })
+        }
+        */
+
     }else{
         document.querySelector(".user-block.local").classList.remove("show");
         if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
             document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
         }
         dom.classList.remove("disable");
-        // stream.getVideoTracks()[0].enabled = true;
+        stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
-        if(!inRoom){
-            stream.getVideoTracks()[0].enabled = true;
-            return;
-        }
-
+        /*
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false,
         }).then( newStream => {
+
+            if(!inRoom){
+                let waitingCameraBtn = document.querySelector("#setting-camera-btn");
+                document.querySelector(".setup-player video").srcObject = newStream;
+                waitingCameraBtn.onclick = () => {
+                    toggleCamera(newStream, waitingCameraBtn, false);
+                }
+                return;
+            }
 
             myVideo.srcObject = newStream;
 
@@ -1189,18 +1198,8 @@ let toggleCamera = async (stream, dom, inRoom) => {
                 toggleCamera(newStream, cameraBtn, true);
             }
 
-
-
-            // audioBtn.onclick = () => {
-            //     toggleAudio(newStream, audioBtn);
-            // }
-
-            // if(auth || CLIENT){
-            //     if(document.querySelector("#audio-btn").classList.contains("disable")){
-            //         newStream.getTracks()[0].enabled = false;
-            //     }
-            // }
-        })        
+        }) 
+        */       
     }
 }
 
