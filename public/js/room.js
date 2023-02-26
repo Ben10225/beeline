@@ -915,11 +915,13 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             }
             if(!localVideoStatus){
                 // stream.getTracks()[1].enabled = false;
-                stream.getVideoTracks()[0].stop();
+                // stream.getVideoTracks()[0].stop();
+                stream.getVideoTracks()[0].enabled = false;
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
 
+                /*
                 navigator.mediaDevices.getUserMedia({
                     video: false,
                     audio: true,
@@ -937,6 +939,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                         })
                     }catch{}
                 })
+                */
             }
             
             let roomStatus = await getRoomChatAndShare(ROOM_ID);
