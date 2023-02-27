@@ -224,18 +224,20 @@ body{
                 transform: scaleX(-1);
             }
             .micro-status-icon{
-                width: 50px;
-                height: 50px;
+                width: 35px;
+                height: 35px;
                 background-image: url('/public/images/micro_disable_transparent.svg');
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
                 position: absolute;
-                right: 5px;
-                top: 0;
+                right: 8px;
+                top: 8px;
                 z-index: 10;
                 z-index: 160;
                 display: none;
+                background-color: rgba(#222, 0.6);
+                border-radius: 50%;
                 &.show{
                     display: block;
                 }
@@ -267,7 +269,7 @@ body{
                         width: 180px;
                         height: 180px;
                         border-radius: 50%;
-                        border: 2px solid #fff;
+                        // border: 2px solid #fff;
                         h3{
                             position: absolute;
                             left: 50%;
@@ -562,17 +564,19 @@ body{
                     
                 }
                 .micro-status-icon{
-                    width: 50px;
-                    height: 50px;
+                    width: 35px;
+                    height: 35px;
                     background-image: url('/public/images/micro_disable_transparent.svg');
                     background-position: center;
                     background-repeat: no-repeat;
                     background-size: cover;
                     position: absolute;
-                    right: 8px;
-                    top: 8px;
+                    right: 15px;
+                    top: 15px;
                     display: none;
                     z-index: 160;
+                    background-color: rgba(#222, 0.6);
+                    border-radius: 50%;
                     &.show{
                         display: block;
                     }
@@ -603,7 +607,7 @@ body{
                             width: 150px;
                             height: 150px;
                             border-radius: 50%;
-                            border: 2px solid #fff;
+                            // border: 2px solid #fff;
                             &.smaller{
                                 transform: scale(0.75);
                             }
