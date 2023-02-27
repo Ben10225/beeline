@@ -731,7 +731,7 @@ let inRoomSocketInit = async () => {
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
                         }
-                        if(auth && !showRecord){
+                        if(auth && !document.querySelector(".record-exit")){
                            socket.emit("five-sec-end-game", ROOM_ID);
                         }
                     }, 5000)
@@ -752,8 +752,9 @@ let inRoomSocketInit = async () => {
                 extension.createRecordBoard(data, userSec);
             }, 500)
             setTimeout(() => {
-                let previous = document.querySelector(".record-wrapper");
-                if(previous){
+                // let previous = document.querySelector(".record-wrapper");
+                let exit = document.querySelector(".record-exit");
+                if(exit){
                     gameBlock.classList.remove("show");
                     setTimeout(() => {
                         gameBlock.replaceChildren();
