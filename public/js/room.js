@@ -110,8 +110,9 @@ const peers = {};
 let nPeer = new Peer();
 // const nPeer = new Peer(`${USER_ID}-screen`)
 
-let eyeGameInit = async () => {
-    document.querySelector("#eye-game").onclick = () => {
+let eyeGameInit = () => {
+    document.querySelector("#eye-game").onclick = async () => {
+        await modal.resetAllUserGameClickFalse(ROOM_ID);
         socket.emit("start-game", ROOM_ID);
     }
 }
@@ -674,6 +675,7 @@ let inRoomSocketInit = async () => {
             gameTop = gameValue[1];
             gameDelay = parseFloat(gameValue[2]);
             let clicked = false;
+            let showRecord = false;
 
             let gameBg = document.querySelector(".game-bg");
             if(gameBg){
@@ -694,12 +696,12 @@ let inRoomSocketInit = async () => {
                     userSec = 5;
                     setTimeout(() => {
                         let start = window.performance.now();
-                        dom.addEventListener("click", function sendReactionSecond(){
+                        dom.addEventListener("click", async function sendReactionSecond(){
                             clicked = true;
                             let end = window.performance.now();
                             let sec = roundTo(((end - start) / 1000), 6);
                             userSec = sec;
-                            utils.sendUserSecToDB(ROOM_ID, USER_ID, sec);
+                            let quitGame = await utils.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
                             this.removeEventListener("click", sendReactionSecond);
                             this.remove();
         
@@ -710,14 +712,16 @@ let inRoomSocketInit = async () => {
                             </div>
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
+
+                            if(quitGame){
+                                socket.emit("five-sec-end-game", ROOM_ID);
+                                showRecord = true;
+                            }
                         })
                     }, 1)
                     setTimeout(() => {
-                        if(auth){
-                           socket.emit("five-sec-end-game", ROOM_ID);
-                        }
                         if(!clicked){
-                            utils.sendUserSecToDB(ROOM_ID, USER_ID, 5);
+                            utils.sendUserSecToDB(ROOM_ID, USER_ID, 5, false);
                             dom.remove();
                             let waitHtml = `
                             <div class="game-wait">
@@ -726,6 +730,9 @@ let inRoomSocketInit = async () => {
                             </div>
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
+                        }
+                        if(auth && !showRecord){
+                           socket.emit("five-sec-end-game", ROOM_ID);
                         }
                     }, 5000)
                 }, gameDelay * 1000)
@@ -744,6 +751,12 @@ let inRoomSocketInit = async () => {
                 }
                 extension.createRecordBoard(data, userSec);
             }, 500)
+            setTimeout(() => {
+                gameBlock.classList.remove("show");
+                setTimeout(() => {
+                    gameBlock.replaceChildren();
+                }, 500)
+            }, 10000)
         }
     })
 

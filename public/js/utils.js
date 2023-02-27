@@ -220,7 +220,7 @@ let setScreenShareBool = async (roomId, bool) => {
     let data = await response.json();
 }
 
-let sendUserSecToDB = async (roomId, uuid, sec) => {
+let sendUserSecToDB = async (roomId, uuid, sec, click) => {
     let response = await fetch(`/room/sendUserSecToDB`, {
         method: "POST",
         headers: {
@@ -230,9 +230,11 @@ let sendUserSecToDB = async (roomId, uuid, sec) => {
             "roomId": roomId,
             "uuid": uuid,
             "sec": sec,
+            "gameClick": click,
         })
     });
     let data = await response.json();
+    return data.data;
 }
 
 let checkUserLeaveFalse = async (roomId, uuid) => {

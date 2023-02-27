@@ -79,6 +79,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid, name, imgUrl string, audio, 
 				{"auth", auth},
 				{"leave", leaveStatus},
 				{"sec", 5},
+				{"gameClick", false},
 			},
 		},
 	}
@@ -387,16 +388,33 @@ func SetScreenShare(c *gin.Context, roomId string, b bool) {
 	}
 }
 
-func SendSec(c *gin.Context, roomId, uuid string, sec float64) {
+func SendSec(c *gin.Context, roomId, uuid string, sec float64, click bool) bool {
 	filter := bson.D{{"roomId", roomId}}
 	coll.FindOneAndUpdate(
 		context.Background(),
 		filter,
-		bson.M{"$set": bson.M{"user.$[elem].sec": sec}},
+		bson.M{"$set": bson.M{
+			"user.$[elem].sec":       sec,
+			"user.$[elem].gameClick": click,
+		}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
 			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
 		}),
 	)
+	var room structs.RoomInfo
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	user := room.User
+
+	for _, v := range user {
+		if !v.Leave && !v.GameClick {
+			return false
+		}
+	}
+	return true
 }
 
 func GetGameSlice(c *gin.Context, roomId string) ([]structs.Game, []structs.GameInfoArray) {
@@ -493,6 +511,30 @@ func SetWaitingStatusData(c *gin.Context, roomId, uuid string, audioStatus, vide
 			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
 		}),
 	)
+}
+
+func ResetAllUserGameClickFalseData(c *gin.Context, roomId string) {
+	var room structs.RoomInfo
+	filter := bson.D{{"roomId", roomId}}
+	err := coll.FindOne(context.TODO(), filter).Decode(&room)
+	if err != nil {
+		fmt.Println(err)
+	}
+	user := room.User
+	for _, v := range user {
+		if !v.Leave {
+			coll.FindOneAndUpdate(
+				context.Background(),
+				filter,
+				bson.M{"$set": bson.M{
+					"user.$[elem].gameClick": false,
+				}},
+				options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+					Filters: []interface{}{bson.M{"elem.uuid": v.Uuid}},
+				}),
+			)
+		}
+	}
 }
 
 /*

@@ -284,10 +284,11 @@ func SendUserSec(c *gin.Context) {
 	roomId := req.RoomId
 	uuid := req.Uuid
 	sec := req.Sec
-	models.SendSec(c, roomId, uuid, sec)
+	gameClick := req.GameClick
+	canQuitGame := models.SendSec(c, roomId, uuid, sec, gameClick)
 
 	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
+		"data": canQuitGame,
 	})
 }
 
@@ -330,6 +331,18 @@ func SetWaitingStatus(c *gin.Context) {
 	videoStatus := req.VideoStatus
 
 	models.SetWaitingStatusData(c, roomId, uuid, audioStatus, videoStatus)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func ResetAllUserGameClickFalse(c *gin.Context) {
+	var req structs.RoomUserData
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	models.ResetAllUserGameClickFalseData(c, roomId)
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,

@@ -46,5 +46,6 @@ func Routers(router *gin.Engine) {
 		room.POST("/sendUserSecToDB", api.SendUserSec)
 		room.POST("/getGameResult", api.GetGameResult)
 		room.POST("/checkUserLeaveFalse", api.CheckUserLeaveFalse)
+		room.POST("/resetAllUserGameClickFalse", api.ResetAllUserGameClickFalse)
 	}
 }

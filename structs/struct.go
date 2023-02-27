@@ -50,6 +50,7 @@ type RoomUserData struct {
 	Sec         float64
 	Name        string
 	ImgUrl      string
+	GameClick   bool
 }
 
 type RoomInfo struct {
