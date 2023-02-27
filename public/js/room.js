@@ -701,7 +701,6 @@ let inRoomSocketInit = async () => {
                             let end = window.performance.now();
                             let sec = roundTo(((end - start) / 1000), 6);
                             userSec = sec;
-                            let quitGame = await utils.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
                             this.removeEventListener("click", sendReactionSecond);
                             this.remove();
         
@@ -713,6 +712,7 @@ let inRoomSocketInit = async () => {
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
 
+                            let quitGame = await utils.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
                             if(quitGame){
                                 socket.emit("five-sec-end-game", ROOM_ID);
                                 showRecord = true;
@@ -752,10 +752,13 @@ let inRoomSocketInit = async () => {
                 extension.createRecordBoard(data, userSec);
             }, 500)
             setTimeout(() => {
-                gameBlock.classList.remove("show");
-                setTimeout(() => {
-                    gameBlock.replaceChildren();
-                }, 500)
+                let previous = document.querySelector(".record-wrapper");
+                if(previous){
+                    gameBlock.classList.remove("show");
+                    setTimeout(() => {
+                        gameBlock.replaceChildren();
+                    }, 500)
+                }
             }, 10000)
         }
     })
