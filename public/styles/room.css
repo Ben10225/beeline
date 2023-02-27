@@ -310,6 +310,10 @@ body .bg {
 #user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-audio-btn.disable {
   background-image: url("/public/images/micro_disable_icon.svg");
 }
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-audio-btn.stop-click {
+  opacity: 0.5;
+  pointer-events: none;
+}
 #user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-camera-btn {
   position: relative;
   left: 7px;
@@ -317,6 +321,10 @@ body .bg {
 }
 #user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-camera-btn.disable {
   background-image: url("/public/images/camera_disable_icon.svg");
+}
+#user-setup .setup-container .setup-player .icon-wrapper .setup-control-icon#setting-camera-btn.stop-click {
+  opacity: 0.5;
+  pointer-events: none;
 }
 #user-setup .setting-options {
   position: relative;

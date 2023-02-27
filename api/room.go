@@ -319,3 +319,19 @@ func CheckUserLeaveFalse(c *gin.Context) {
 		"data": leave,
 	})
 }
+
+func SetWaitingStatus(c *gin.Context) {
+	var req structs.RoomUserData
+	c.BindJSON(&req)
+
+	roomId := req.RoomId
+	uuid := req.Uuid
+	audioStatus := req.AudioStatus
+	videoStatus := req.VideoStatus
+
+	models.SetWaitingStatusData(c, roomId, uuid, audioStatus, videoStatus)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}

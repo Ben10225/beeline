@@ -311,6 +311,10 @@ body{
                         &.disable{
                             background-image: url('/public/images/micro_disable_icon.svg');
                         }
+                        &.stop-click{
+                            opacity: 0.5;
+                            pointer-events: none;
+                        }
                     }
                     &#setting-camera-btn{
                         position: relative;
@@ -318,6 +322,10 @@ body{
                         background-image: url('/public/images/setting_camera_icon.svg');
                         &.disable{
                             background-image: url('/public/images/camera_disable_icon.svg');
+                        }
+                        &.stop-click{
+                            opacity: 0.5;
+                            pointer-events: none;
                         }
                     }
                 }

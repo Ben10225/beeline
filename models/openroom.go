@@ -479,6 +479,22 @@ func CheckUserLeave(c *gin.Context, roomId, uuid string) bool {
 	return b
 }
 
+func SetWaitingStatusData(c *gin.Context, roomId, uuid string, audioStatus, videoStatus bool) {
+	filter := bson.D{{"roomId", roomId}}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{
+			"user.$[elem].audioStatus": audioStatus,
+			"user.$[elem].videoStatus": videoStatus,
+		}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
 /*
 func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
 

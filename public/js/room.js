@@ -1,6 +1,7 @@
 import utils from "./utils.js";
 import extension from "./extension.js";
 import board from "./board.js"
+import modal from "./modal.js"
 
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
@@ -256,8 +257,13 @@ navigator.mediaDevices.getUserMedia({
 
 
         const btn = document.querySelector("#enter-request");
-        btn.onclick = () => {
-            // socket.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
+        btn.onclick = async () => {
+            let audioStatus = !settingAudioBtn.classList.contains("disable");
+            let videoStatus = !settingCameraBtn.classList.contains("disable");
+            settingAudioBtn.classList.add("stop-click");
+            settingCameraBtn.classList.add("stop-click");
+            await modal.setWaitingStatus(ROOM_ID, USER_ID, audioStatus, videoStatus);
+
             s2.emit('send-enter-request', ROOM_ID, USER_ID, USER_NAME, USER_IMG);
             btn.style = `pointer-events: none; opacity: 0.3;`;
             let imgTag = `<div class="request-gif"></div>`;
@@ -1088,8 +1094,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
         
-        // socket.emit("remote-track-reload", ROOM_ID, USER_ID);
-        // socket.emit("remote-audio-track-reload", ROOM_ID, USER_ID);
     }
     
     utils.settingVideoSize();
@@ -1112,7 +1116,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
         //     stream.getVideoTracks()[0].enabled = false;
         // }
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
-        setUserStreamStatus(ROOM_ID, USER_ID, "video", false);
+        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "video", false); 
 
         if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
             document.querySelector(".username-wrapper-room.local").classList.add("bg-none");
@@ -1169,7 +1173,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
         dom.classList.remove("disable");
         // stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
-        setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
+        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
         navigator.mediaDevices.getUserMedia({
             video: true,
@@ -1235,7 +1239,7 @@ let toggleAudio = async (stream, dom, inRoom) => {
         }
         
         inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
-        setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
+        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
     }else{
         dom.classList.remove("disable");
@@ -1248,7 +1252,7 @@ let toggleAudio = async (stream, dom, inRoom) => {
             document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.remove("hide");
         }
         inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
-        setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
+        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
 }
 

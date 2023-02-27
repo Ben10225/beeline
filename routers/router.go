@@ -39,6 +39,7 @@ func Routers(router *gin.Engine) {
 		room.POST("/roomChatStatus", api.RoomChatStatus)
 		room.POST("/getRoomChatAndShare", api.GetRoomChatAndShare)
 		room.POST("/getGroupInfo", api.GetGroupInfo)
+		room.POST("/setWaitingStatus", api.SetWaitingStatus)
 
 		room.POST("/assignNewAuth", api.AssignNewAuth)
 		room.POST("/setScreenShareBool", api.SetScreenShareBool)
