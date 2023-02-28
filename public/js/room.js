@@ -40,7 +40,6 @@ const groupNumber = document.querySelector(".group-number");
 const searchBar = document.querySelector("#search");
 
 const gameBlock = document.querySelector("#game-block");
-// const eyeGame = document.querySelector("#eye-game");
 
 
 let disconnect = true;
@@ -48,11 +47,11 @@ let disconnect = true;
 let tmpMessageClock = null;
 let tmpMessageTime = null;
 let tmpMessageName = null;
-// let clientFirstLoad = true;
 let clickLeaveBtnToLeave = false;
 let host = "";
 let groupLst = [];
 let userInRoomObj = {};
+
 let videoCt = 0;
 let tmpNewStreamCt = null;
 let needLoadAgain = false;
@@ -112,8 +111,8 @@ let nPeer = new Peer();
 
 let eyeGameInit = () => {
     document.querySelector("#eye-game").onclick = async () => {
-        await modal.resetAllUserGameClickFalse(ROOM_ID);
         socket.emit("start-game", ROOM_ID);
+        modal.resetAllUserGameClickFalse(ROOM_ID);
     }
 }
 
@@ -509,7 +508,7 @@ let inRoomSocketInit = async () => {
     })
 
     // chat room
-    socket.on('chat-room', async (roomId, clientName, timeSlice, message) => {
+    socket.on('chat-room', async (roomId, clientName, message) => {
         if(ROOM_ID === roomId){
 
             let currentdate = new Date().toLocaleTimeString();
@@ -554,6 +553,8 @@ let inRoomSocketInit = async () => {
             tmpMessageTime = time;
 
             messageWrapper.scrollTo(0, messageWrapper.scrollHeight);
+
+            extension.insertMessageAlert(clientName, message);
         }
     })
 
@@ -626,7 +627,9 @@ let inRoomSocketInit = async () => {
                 let data = await resetAuthData(ROOM_ID, USER_ID);
                 let chatOpen = data[1];
 
-                addAllowClick();
+                let chatAllowBlock = document.querySelector(".allow-click");
+                chatAllowBlock || (addAllowClick());
+
                 document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
 
                 if(!chatOpen){
@@ -781,7 +784,10 @@ let inRoomSocketInit = async () => {
                 let chatOpen = data[1];
                 if(USER_ID === newHostUuid){
                     auth = true;
-                    addAllowClick();
+                    
+                    let chatAllowBlock = document.querySelector(".allow-click");
+                    chatAllowBlock || (addAllowClick());
+
                     document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
                     if(!chatOpen){
                         // messageWrapper.classList.add("add-disabled");
@@ -1873,3 +1879,4 @@ let audioSetInit = async (stream) => {
 
     volumeInterval = setInterval(volumeCallback, 100);
 }
+

@@ -91,8 +91,8 @@ func main() {
 
 	// chat
 	server.OnEvent("/", "chat", func(s socketio.Conn, roomId, clientName, message string) {
-		current := utils.GetCurrentTime()
-		server.BroadcastToRoom("/", roomId, "chat-room", roomId, clientName, current, message)
+		// current := utils.GetCurrentTime()
+		server.BroadcastToRoom("/", roomId, "chat-room", roomId, clientName, message)
 	})
 
 	// close chat

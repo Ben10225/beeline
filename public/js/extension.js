@@ -34,11 +34,16 @@ const emojiBee = document.querySelector(".emoji-bee");
 const emojiLst = [emojiGood, emojiHeart, emojLaugh, emojiShock, emojiBee];
 
 const emojiAniWrapper = document.querySelector(".emoji-ani-wrapper");
+const messageShowWrapper = document.querySelector(".message-show-wrapper");
+const iconMessageBg = document.querySelector(".icon-message-i-bg");
+const alertMsgCircle = document.querySelector(".ic-message .alert-circle");
+
+let extensionBlockOpen = false;
 
 
 let rightIconsInit = () => {
     infoIconBlock.onclick = () => {
-        iconBlockClick(infoIcon, info);
+        iconBlockClick(infoIcon, info, extensionBlockOpen);
     }
 
     groupIconBlock.onclick = () => {
@@ -58,19 +63,28 @@ let rightIconsInit = () => {
             dom.classList.remove("clicked");
         })
         extensionBox.classList.remove("show");
+        messageShowWrapper.classList.add("show");
+        extensionBlockOpen = false;
         setTimeout(() => {
             userContainer.classList.remove("go-left");
             alertWrapper.classList.remove("go-left");
         }, 100);
-
     }
 }
 
 let iconBlockClick = (iconDom, extensionBlock) => {
     if(!iconDom.classList.contains("clicked")){
+        messageShowWrapper.classList.remove("show");
+        extensionBlockOpen = true;
+        messageAlertClear();
         iconLst.forEach(icon => {
             if(icon === iconDom){
                 icon.classList.add("clicked");
+                if(iconDom === chatIcon){
+                    iconMessageBg.classList.add("show");
+                    alertMsgCircle.classList.remove("show");
+                }
+                iconDom === chatIcon || (iconMessageBg.classList.remove("show"));
             }else{
                 icon.classList.remove("clicked");
             }
@@ -91,6 +105,9 @@ let iconBlockClick = (iconDom, extensionBlock) => {
         }
     }else{
         iconDom.classList.remove("clicked");
+        messageShowWrapper.classList.add("show");
+        extensionBlockOpen = false;
+        iconMessageBg.classList.remove("show");
         setTimeout(() => {
             extensionBlock.classList.remove("show");
         }, 300)
@@ -103,6 +120,40 @@ let iconBlockClick = (iconDom, extensionBlock) => {
         }
     }
 }
+
+let insertMessageAlert = async (name, content) => {
+    if(!chat.classList.contains("show")){
+        alertMsgCircle.classList.add("show");
+    }
+    if (extensionBlockOpen) return;
+    let uuidToken = uuid();
+    let html = `
+        <div class="one-message-block" id="message-alert-${uuidToken}">
+            <div class="one-message-title">
+                <i class="fa-solid fa-message">
+                    <div class="one-message-i-bg">
+                        <div class="one-message-i-line"></div>
+                    </div>
+                </i>
+                <div class="one-message-name">${name}</div>
+            </div>
+            <div class="one-message-content">${content}</div>
+        </div>
+    `;
+    messageShowWrapper.insertAdjacentHTML("afterbegin", html);
+    let audio = new Audio("/public/audio/message-alert.mp3");
+    audio.volume = 0.3;
+    audio.play();
+
+    let dom = document.querySelector(`#message-alert-${uuidToken}`);
+    setTimeout(() => {
+        dom.remove();
+    }, 3000)
+}
+
+let messageAlertClear = () => {
+    messageShowWrapper.replaceChildren();
+} 
 
 let getGroupInfo = async (roomId) => {
     let response = await fetch(`/room/getGroupInfo`, {
@@ -440,6 +491,7 @@ export default {
     gameStartTextSetting,
     createRecordBoard,
     emojiBtnInit,
+    insertMessageAlert,
 }
 
 
