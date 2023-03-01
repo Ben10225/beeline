@@ -38,8 +38,8 @@ const messageShowWrapper = document.querySelector(".message-show-wrapper");
 const iconMessageBg = document.querySelector(".icon-message-i-bg");
 const alertMsgCircle = document.querySelector(".ic-message .alert-circle");
 
-let extensionBlockOpen = false;
 
+let extensionBlockOpen = false;
 
 let rightIconsInit = () => {
     infoIconBlock.onclick = () => {

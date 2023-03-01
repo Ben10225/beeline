@@ -143,7 +143,8 @@ navigator.mediaDevices.getUserMedia({
         wrapper.style.justifyContent = "flex-start";
         document.querySelector("#user-setup").remove();
 
-        utils.generateShortLink();   
+        utils.generateShortLink();
+        utils.createCopyBlock();
 
         board.boardInit(socketDraw);   
         whiteBoardInit();

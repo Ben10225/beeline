@@ -2197,6 +2197,87 @@ body .bg {
   border-radius: 3px;
 }
 
+.meeting-url-wrapper {
+  position: absolute;
+  left: 20px;
+  top: -165px;
+  background-color: #e8e8e8;
+  width: 290px;
+  border-radius: 10px;
+  padding: 17px 15px;
+  z-index: 700;
+  transition: 0.4s;
+}
+.meeting-url-wrapper.fadeout {
+  opacity: 0;
+  visibility: hidden;
+}
+.meeting-url-wrapper .fa-xmark {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 20px;
+  color: #333;
+  opacity: 0.9;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.meeting-url-wrapper .fa-xmark:hover {
+  opacity: 0.6;
+}
+.meeting-url-wrapper .meeting-url-title {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+.meeting-url-wrapper .meeting-url-content {
+  font-size: 12px;
+  font-weight: 300;
+  margin-bottom: 12px;
+}
+.meeting-url-wrapper .meeting-url-copy-block {
+  background-color: rgba(153, 153, 153, 0.2);
+  padding: 7px 10px;
+  position: relative;
+  border-radius: 4px;
+}
+.meeting-url-wrapper .meeting-url-copy-block p {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 300;
+}
+.meeting-url-wrapper .meeting-url-copy-block i {
+  position: absolute;
+  right: 9px;
+  top: 8px;
+  color: rgba(17, 17, 17, 0.7);
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.meeting-url-wrapper .meeting-url-copy-block i:hover {
+  color: rgba(17, 17, 17, 0.5);
+}
+.meeting-url-wrapper .meeting-url-copy-block i.disappear {
+  opacity: 0;
+  visibility: hidden;
+}
+.meeting-url-wrapper .meeting-url-copy-block i.fa-check {
+  color: green;
+  font-size: 18px;
+}
+
+.room-id {
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: #222;
+}
+
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
