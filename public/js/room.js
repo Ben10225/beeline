@@ -1117,9 +1117,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
-        
-    }
-    
+        socket.emit("remote-track-reload", ROOM_ID, remoteUuid);
+    }    
     utils.settingVideoSize();
 }
 
