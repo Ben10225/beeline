@@ -24,6 +24,7 @@ if(auth){
     }
 }
 
+const userContainer = document.querySelector(".user-container");
 const cameraBtn = document.querySelector("#camera-btn");
 const audioBtn = document.querySelector("#audio-btn");
 const leaveBtn = document.querySelector("#leave-btn");
@@ -86,7 +87,6 @@ if(auth){
 // const socket = io({upgrade: true});
 // const socket = io({transports: ['websocket']});
 
-const userContainer = document.querySelector(".user-container");
 
 // const myPeer = new Peer()
 const myPeer = new Peer(USER_ID);
@@ -165,6 +165,8 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
+
+
         socketConn(socket, stream)
         socket.emit('join-room', ROOM_ID, USER_ID);
 
@@ -192,6 +194,12 @@ navigator.mediaDevices.getUserMedia({
                 // }, 100)   
             }
         })
+        */
+
+        /*
+        document.querySelector(".test-btn").onclick = () => {
+            utils.testResize();
+        }
         */
 
     }else{
@@ -816,27 +824,10 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
 
-    if(screen === "screen"){
-        // document.querySelector(".user-container").style.width = "20%";
-
-        // let html = `<div id="screen-warpper"></div>`;
-        // document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html)
-        // video.addEventListener("loadedmetadata", () => {
-        //     video.play();
-        // })
-        // document.querySelector(`#screen-warpper`).append(video);
-
-        // utils.settingVideoSize();
-        // console.log("dd")
-        // document.querySelector(".video-container").style.width = "20%";
-        // document.querySelector(".video-container").style.height = "20%";
-        return
-    }
-
+    if (screen === "screen") return
+    
     if(islocal){
-
         userInRoomObj[remoteUuid] = [USER_NAME, USER_IMG];
-
         tempMediaStreamId = stream.id;
 
         audioBtn.onclick = () => {
@@ -937,26 +928,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
-
-                /*
-                navigator.mediaDevices.getUserMedia({
-                    video: false,
-                    audio: true,
-                }).then( newStream => {
-                    myVideo.srcObject = newStream;
-
-                    let audioTrack = newStream.getAudioTracks()[0];
-
-                    try{
-                        Object.values(currentPeer).forEach(item => {
-                            let sender = item.getSenders().find(function(s){
-                                return s.track.kind == audioTrack.kind;
-                            });
-                            sender.replaceTrack(audioTrack);
-                        })
-                    }catch{}
-                })
-                */
             }else{
 
             }
@@ -987,19 +958,18 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
     }else{
         if(remoteUuid.split("-")[1] === "screen"){
-            let shareName = userInRoomObj[remoteUuid.split("-")[0]][0]
-            // oriDom = document.querySelector(`wrapper-${remoteUuid.split("-")[0]}`);
+            let shareName = userInRoomObj[remoteUuid.split("-")[0]][0];
             let html = `
             <div id="screen-wrapper">
                 <h4>${shareName} 正在分享螢幕</h4>
             </div>
             `;
-            document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html)
+            // document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html);
+            document.querySelector("#video-streams").insertAdjacentHTML("afterbegin", html);
             video.addEventListener("loadedmetadata", () => {
                 video.play();
             })
             document.querySelector(`#screen-wrapper`).append(video);
-            // console.log(remoteUuid.split("-")[0])
             if(remoteUuid.split("-")[0] !== USER_ID){
                 screenShareBtn.classList.add("stopShareClick");
             }

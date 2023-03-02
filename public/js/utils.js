@@ -1,4 +1,3 @@
-
 let auth = async (page) => {
     let response = await fetch(`/api/auth`);
     let data = await response.json();
@@ -117,9 +116,42 @@ let copyContent = async (url) => {
     }
 }
 
+let resizeClassListModify = (lst, status) => {
+    if(status === "normal"){
+        lst.forEach(item => {
+            item.classList.remove("smaller");
+            item.classList.remove("smallest");
+        })
+    }
+    else if(status === "smaller"){
+        lst.forEach(item => {
+            item.classList.add("smaller");
+            item.classList.remove("smallest");
+        })
+    }
+    else if(status === "smallest"){
+        lst.forEach(item => {
+            item.classList.remove("smaller");
+            item.classList.add("smallest");
+        })
+    }
+}
+
 let settingVideoSize = () => {
+    const videoStream = document.querySelector("#video-streams");
     const containerWrapper = document.querySelector(".user-container");
     let videoContainerS = document.querySelectorAll(".video-container");
+    let imgBgS = document.querySelectorAll(".img-bg");
+    let microAniBlockS = document.querySelectorAll(".micro-ani-block");
+    let userNameBlockS = document.querySelectorAll(".username-wrapper-room");
+    let microStopIconS = document.querySelectorAll(".micro-status-icon");
+    let screenShareNow = document.querySelector("#screen-wrapper");
+
+    if(screenShareNow){
+        videoStream.style.gridTemplateColumns =  "80% 20%";
+    }else{
+        videoStream.style.gridTemplateColumns =  "1fr";
+    }
 
     if(videoContainerS.length == 1){
         containerWrapper.style.gridTemplateColumns = "1fr";
@@ -131,8 +163,21 @@ let settingVideoSize = () => {
                 max-height: 80vh;
             `;
         })
-    }else if(videoContainerS.length == 2){
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "normal");
+            resizeClassListModify(microAniBlockS, "normal");
+            resizeClassListModify(userNameBlockS, "normal");
+            resizeClassListModify(microStopIconS, "normal");
+        }
+    }
+    else if(videoContainerS.length == 2){
         containerWrapper.style.gridTemplateColumns = "1fr 1fr";
+        if (screenShareNow) containerWrapper.style.gridTemplateColumns = "1fr";
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
@@ -141,9 +186,21 @@ let settingVideoSize = () => {
                 max-height: 85vh;
             `;
         })
-
-    }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "normal");
+            resizeClassListModify(microAniBlockS, "normal");
+            resizeClassListModify(userNameBlockS, "normal");
+            resizeClassListModify(microStopIconS, "normal");
+        }
+    }
+    else if(videoContainerS.length == 3 || videoContainerS.length == 4){
         containerWrapper.style.gridTemplateColumns = "1fr 1fr";
+        if (screenShareNow) containerWrapper.style.gridTemplateColumns = "1fr";
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
@@ -152,9 +209,24 @@ let settingVideoSize = () => {
                 max-height: 40vh;
             `;
         })
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "normal");
+            resizeClassListModify(microAniBlockS, "normal");
+            resizeClassListModify(userNameBlockS, "normal");
+            resizeClassListModify(microStopIconS, "normal");
+        }
     }
-    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
+    else if(videoContainerS.length == 5 || videoContainerS.length == 6){
         containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+        if(screenShareNow){
+            containerWrapper.style.gridTemplateColumns = "1fr 1fr";
+            videoStream.style.gridTemplateColumns =  "80% 40%";
+        }
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
@@ -163,33 +235,77 @@ let settingVideoSize = () => {
                 max-height: 40vh;
             `;
         })
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "normal");
+            resizeClassListModify(microAniBlockS, "normal");
+            resizeClassListModify(userNameBlockS, "normal");
+            resizeClassListModify(microStopIconS, "normal");
+        }
     }
-    else if(videoContainerS.length >= 7 || videoContainerS.length <= 9){
+    else if(videoContainerS.length >= 7 && videoContainerS.length <= 9){
         containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+        if(screenShareNow){
+            containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+            videoStream.style.gridTemplateColumns =  "80% 40%";
+        }
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 27vh;
+                max-height: 25vh;
             `;
         })
-        // let imgBgS = document.querySelectorAll(".img-bg");
-        // imgBgS.forEach(img => {
-        //     img.classList.add("smaller");
-        // })
-    }else if(videoContainerS.length <= 16){
+
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "normal");
+            resizeClassListModify(microAniBlockS, "normal");
+            resizeClassListModify(userNameBlockS, "normal");
+            resizeClassListModify(microStopIconS, "normal");
+        }
+    }
+    else if(videoContainerS.length >= 10 && videoContainerS.length <= 16){
         containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
+        if(screenShareNow){
+            containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+            videoStream.style.gridTemplateColumns =  "80% 40%";
+        }
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 23vh;
+                max-height: 19vh;
             `;
         })
-    }else{
-        containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr 1fr 1fr 1r";
+        if(screenShareNow !== null){
+            resizeClassListModify(imgBgS, "smallest");
+            resizeClassListModify(microAniBlockS, "smallest");
+            resizeClassListModify(userNameBlockS, "smallest");
+            resizeClassListModify(microStopIconS, "smallest");
+        }else{
+            resizeClassListModify(imgBgS, "smaller");
+            resizeClassListModify(microAniBlockS, "smaller");
+            resizeClassListModify(userNameBlockS, "smaller");
+            resizeClassListModify(microStopIconS, "smaller");
+        }
+    }
+    else{
+        containerWrapper.style.gridTemplateColumns = "16% 16% 16% 16% 16% 16%";
+        if(screenShareNow){
+            containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+            videoStream.style.gridTemplateColumns =  "80% 40%";
+        }
 
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
@@ -198,7 +314,40 @@ let settingVideoSize = () => {
                 max-height: 15vh;
             `;
         })
+        resizeClassListModify(imgBgS, "smallest")
+        resizeClassListModify(microAniBlockS, "smallest")
+        resizeClassListModify(userNameBlockS, "smallest")
+        resizeClassListModify(microStopIconS, "smallest")
     }
+}
+
+let testResize = () => {
+    let player = 
+    `
+        <div class="video-container">
+        <div class="username-wrapper-room local">
+            <span class="user-name">你</span>
+        </div>
+        <div class="video-player" id="user-">
+            <div class="micro-ani-block">
+                <div class="dot d-left"></div>
+                <div class="dot d-middle"></div>
+                <div class="dot d-right"></div>
+            </div>
+            <div class="micro-status-icon local"></div>
+            <div class="user-block local show">
+                <div class="auto-img">
+                    <div class="img-bg" style="background-color: #FE981C">
+                        <h3>p</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+
+    document.querySelector(".user-container").insertAdjacentHTML("beforeend", player);
+    settingVideoSize();
 }
 
 let setScreenShareBool = async (roomId, bool) => {
@@ -347,6 +496,7 @@ export default {
     playAudio,
     createCopyBlock,
     setRoomId,
+    testResize,
 }
 
 

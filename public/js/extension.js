@@ -68,6 +68,8 @@ let rightIconsInit = () => {
         setTimeout(() => {
             userContainer.classList.remove("go-left");
             alertWrapper.classList.remove("go-left");
+            let screenShare = document.querySelector("#screen-wrapper");
+            screenShare !== null && screenShare.classList.remove("go-left");
         }, 100);
     }
 }
@@ -101,6 +103,8 @@ let iconBlockClick = (iconDom, extensionBlock) => {
             setTimeout(() => {
                 userContainer.classList.add("go-left");
                 alertWrapper.classList.add("go-left");
+                let screenShare = document.querySelector("#screen-wrapper");
+                screenShare !== null && screenShare.classList.add("go-left");
             }, 100);
         }
     }else{
@@ -116,6 +120,8 @@ let iconBlockClick = (iconDom, extensionBlock) => {
             setTimeout(() => {
                 userContainer.classList.remove("go-left");
                 alertWrapper.classList.remove("go-left");
+                let screenShare = document.querySelector("#screen-wrapper");
+                screenShare !== null && screenShare.classList.remove("go-left");
             }, 100);
         }
     }
@@ -464,7 +470,7 @@ let createEmojiTag = async (userName, gifIndex) => {
     }, 5500)
 } 
 
-let uuid =() => {
+let uuid = () => {
     let d = Date.now();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
         d += performance.now(); //use high-precision timer if available
@@ -492,6 +498,7 @@ export default {
     createRecordBoard,
     emojiBtnInit,
     insertMessageAlert,
+    uuid,
 }
 
 

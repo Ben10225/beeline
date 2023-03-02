@@ -495,9 +495,30 @@ body .bg {
   position: relative;
   height: calc(100vh - 90px);
 }
+#video-streams #screen-wrapper {
+  position: relative;
+  width: 100%;
+  margin-right: 40px;
+  margin-left: -70px;
+  display: inline-block;
+  transition: 0.6s;
+}
+#video-streams #screen-wrapper h4 {
+  position: absolute;
+  font-size: 20px;
+  color: #fff;
+  top: -45px;
+  font-weight: 400;
+}
+#video-streams #screen-wrapper video {
+  width: 100%;
+  height: 100%;
+}
+#video-streams #screen-wrapper.go-left {
+  transform: translateX(-158px);
+}
 #video-streams .user-container {
   display: grid;
-  grid-template-columns: 1fr;
   justify-content: center;
   align-items: center;
   gap: 20px;
@@ -507,21 +528,6 @@ body .bg {
 }
 #video-streams .user-container.go-left {
   transform: translateX(-158px);
-}
-#video-streams .user-container #screen-wrapper {
-  position: relative;
-  width: 100%;
-}
-#video-streams .user-container #screen-wrapper h4 {
-  position: absolute;
-  font-size: 20px;
-  color: #fff;
-  top: -45px;
-  font-weight: 400;
-}
-#video-streams .user-container #screen-wrapper video {
-  width: 100%;
-  height: 100%;
 }
 #video-streams .user-container .video-container {
   border-radius: 8px;
@@ -543,6 +549,12 @@ body .bg {
 #video-streams .user-container .video-container .username-wrapper-room.bg-none {
   background-color: rgba(0, 0, 0, 0);
 }
+#video-streams .user-container .video-container .username-wrapper-room.smaller {
+  transform: scale(0.8) translate(-15px, 15px);
+}
+#video-streams .user-container .video-container .username-wrapper-room.smallest {
+  transform: scale(0.6) translate(-35px, 35px);
+}
 #video-streams .user-container .video-container .video-player {
   height: 100%;
   position: relative;
@@ -561,6 +573,12 @@ body .bg {
   border-radius: 50%;
   opacity: 1;
   visibility: visible;
+}
+#video-streams .user-container .video-container .video-player .micro-ani-block.smaller {
+  transform: scale(0.8) translate(15px, -15px);
+}
+#video-streams .user-container .video-container .video-player .micro-ani-block.smallest {
+  transform: scale(0.6) translate(25px, -25px);
 }
 #video-streams .user-container .video-container .video-player .micro-ani-block.hide {
   opacity: 0;
@@ -706,6 +724,12 @@ body .bg {
 #video-streams .user-container .video-container .video-player .micro-status-icon.show {
   display: block;
 }
+#video-streams .user-container .video-container .video-player .micro-status-icon.smaller {
+  transform: scale(0.8) translate(15px, -15px);
+}
+#video-streams .user-container .video-container .video-player .micro-status-icon.smallest {
+  transform: scale(0.6) translate(25px, -25px);
+}
 #video-streams .user-container .video-container .video-player .user-block {
   background: #444;
   width: 100%;
@@ -737,6 +761,9 @@ body .bg {
 }
 #video-streams .user-container .video-container .video-player .user-block .auto-img .img-bg.smaller {
   transform: scale(0.75);
+}
+#video-streams .user-container .video-container .video-player .user-block .auto-img .img-bg.smallest {
+  transform: scale(0.5);
 }
 #video-streams .user-container .video-container .video-player .user-block .auto-img .img-bg h3 {
   position: absolute;

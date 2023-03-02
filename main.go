@@ -154,9 +154,9 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "need-reload", roomId, uuid)
 	})
 
-	server.OnEvent("/", "remote-audio-track-reload", func(s socketio.Conn, roomId, uuid string) {
-		server.BroadcastToRoom("/", roomId, "need-audio-reload", roomId, uuid)
-	})
+	// server.OnEvent("/", "remote-audio-track-reload", func(s socketio.Conn, roomId, uuid string) {
+	// 	server.BroadcastToRoom("/", roomId, "need-audio-reload", roomId, uuid)
+	// })
 
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)
