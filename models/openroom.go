@@ -521,142 +521,17 @@ func ResetAllUserGameClickFalseData(c *gin.Context, roomId string) {
 		fmt.Println(err)
 	}
 	user := room.User
+
 	for _, v := range user {
 		if !v.Leave {
-			coll.FindOneAndUpdate(
-				context.Background(),
-				filter,
-				bson.M{"$set": bson.M{
-					"user.$[elem].gameClick": false,
-				}},
-				options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
-					Filters: []interface{}{bson.M{"elem.uuid": v.Uuid}},
-				}),
-			)
+			update := bson.D{{"$set", bson.D{{"user.$[elem].gameClick", false}}}}
+			arrayFiltersOpt := options.ArrayFilters{Filters: []interface{}{bson.D{{"elem.uuid", v.Uuid}}}}
+			opts := options.Update().SetArrayFilters(arrayFiltersOpt)
+
+			_, err := coll.UpdateOne(context.TODO(), filter, update, opts)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }
-
-/*
-func InsertUserToRoom(c *gin.Context, roomId, uuid string, audio, video bool) bool {
-
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
-
-	var user []*structs.RoomData
-	filter := bson.D{{"uuid", uuid}}
-	cursor, err := roomCollection.Find(context.TODO(), filter)
-
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
-	cursor.All(context.TODO(), &user)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-	if len(user) > 0 {
-		return false
-	}
-
-	newData := gin.H{
-		"uuid":        uuid,
-		"audioStatus": audio,
-		"videoStatus": video,
-	}
-
-	roomCollection.InsertOne(c, newData)
-	return true
-
-}
-
-func DeleteUserToRoom(c *gin.Context, roomId, uuid string) bool {
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
-	_, err := roomCollection.DeleteOne(c, bson.M{"uuid": uuid})
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
-	var roomDatas []structs.RoomData
-	filter := bson.D{{}}
-	cursor, err := roomCollection.Find(context.TODO(), filter)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	cursor.All(context.TODO(), &roomDatas)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// for _, result := range roomDatas {
-	// 	fmt.Printf("%+v\n", result)
-	// }
-
-	if len(roomDatas) == 0 {
-		roomCollection.Drop(c)
-		var collection *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
-		_, err := collection.DeleteOne(c, bson.M{"roomId": roomId})
-		if err != nil {
-			log.Println(err)
-		}
-	}
-	return true
-}
-
-func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
-	var userInRoom structs.RoomData
-	cur := roomCollection.FindOne(c, bson.M{
-		"uuid": uuid,
-	})
-	err := cur.Decode(&userInRoom)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-	return true
-}
-
-func CheckOrInsertRoom(c *gin.Context, roomId string) bool {
-	var coll *mongo.Collection = configs.GetCollection(configs.DB, "rooms")
-
-	var result structs.DataInfo
-	filter := bson.D{{"roomid", roomId}}
-	err := coll.FindOne(context.TODO(), filter).Decode(&result)
-	if err == nil {
-		return true
-	}
-	return false
-}
-
-func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
-	// if both {
-	// 	filter := bson.D{{"uuid", uuid}}
-	// 	update := bson.D{{"$set", bson.D{{"videostatus", false}, {"audiostatus", false}}}}
-	// 	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	return
-	// }
-
-	var roomCollection *mongo.Collection = configs.GetCollection(configs.DB, roomId)
-	var s string
-	if status == "video" {
-		s = "videoStatus"
-	} else {
-		s = "audioStatus"
-	}
-
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{s, b}}}}
-	_, err := roomCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-*/
