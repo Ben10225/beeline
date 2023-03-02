@@ -959,8 +959,12 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
     }else{
         if(remoteUuid.split("-")[1] === "screen"){
             let shareName = userInRoomObj[remoteUuid.split("-")[0]][0];
+            let tag = "";
+            if(document.querySelector(".extension-box").classList.contains("show")){
+                tag = `class="go-left"`;
+            }
             let html = `
-            <div id="screen-wrapper">
+            <div id="screen-wrapper" ${tag}>
                 <h4>${shareName} 正在分享螢幕</h4>
             </div>
             `;
