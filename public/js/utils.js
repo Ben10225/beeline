@@ -334,7 +334,9 @@ let createCopyBlock = () => {
     }
 }  
   
-
+let setRoomId = () => {
+    document.querySelector(".room-id").textContent = ROOM_ID;
+}
     
 
 
@@ -349,6 +351,7 @@ export default {
     checkUserLeaveFalse,
     playAudio,
     createCopyBlock,
+    setRoomId,
 }
 
 
