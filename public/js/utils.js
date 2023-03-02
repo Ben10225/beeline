@@ -118,90 +118,85 @@ let copyContent = async (url) => {
 }
 
 let settingVideoSize = () => {
-    const videoStreams = document.querySelector("#video-streams");
     const containerWrapper = document.querySelector(".user-container");
     let videoContainerS = document.querySelectorAll(".video-container");
 
     if(videoContainerS.length == 1){
-        // containerWrapper.style.gridTemplateColumns = "1fr";
-        containerWrapper.style.flexWrap = "nowrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 80%;
-            `;
-        })
+        containerWrapper.style.gridTemplateColumns = "1fr";
+
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
-                height: calc(${containerWidth}px * 3 / 4);
+                height: calc(${containerWidth}px * 2 / 3);
+                max-height: 80vh;
             `;
         })
     }else if(videoContainerS.length == 2){
-        containerWrapper.style.flexWrap = "nowrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 50%;
-            `;
-        })
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr";
+
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
+                max-height: 85vh;
             `;
         })
+
     }else if(videoContainerS.length == 3 || videoContainerS.length == 4){
-        containerWrapper.style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-                width: 35%;
-            `;
-        })
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr";
+
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
-                max-height: 100%;
+                max-height: 40vh;
             `;
-        })
-        let imgBgS = document.querySelectorAll(".img-bg");
-        imgBgS.forEach(img => {
-            img.classList.remove("smaller");
         })
     }
-    else if(videoContainerS.length >= 5 || videoContainerS.length <= 9){
-        containerWrapper.style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-            width: 25%;
-            `;
-        })
+    else if(videoContainerS.length >= 5 || videoContainerS.length <= 6){
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
+                max-height: 40vh;
             `;
-        })
-        let imgBgS = document.querySelectorAll(".img-bg");
-        imgBgS.forEach(img => {
-            img.classList.add("smaller");
         })
     }
-    else if(videoContainerS.length >= 10){
-        containerWrapper.style.flexWrap = "wrap";
-        videoContainerS.forEach(container => {
-            container.style = `
-            width: 20%;
-            `;
-        })
+    else if(videoContainerS.length >= 7 || videoContainerS.length <= 9){
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr";
+
         let containerWidth = document.querySelector(".video-container").offsetWidth;
         videoContainerS.forEach(container => {
             container.style = `
                 height: calc(${containerWidth}px * 3 / 4);
+                max-height: 27vh;
             `;
         })
-        let imgBgS = document.querySelectorAll(".img-bg");
-        imgBgS.forEach(img => {
-            img.classList.add("smaller");
+        // let imgBgS = document.querySelectorAll(".img-bg");
+        // imgBgS.forEach(img => {
+        //     img.classList.add("smaller");
+        // })
+    }else if(videoContainerS.length <= 16){
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
+
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 23vh;
+            `;
+        })
+    }else{
+        containerWrapper.style.gridTemplateColumns = "1fr 1fr 1fr 1fr 1fr 1r";
+
+        let containerWidth = document.querySelector(".video-container").offsetWidth;
+        videoContainerS.forEach(container => {
+            container.style = `
+                height: calc(${containerWidth}px * 3 / 4);
+                max-height: 15vh;
+            `;
         })
     }
 }

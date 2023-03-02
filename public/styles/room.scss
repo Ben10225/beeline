@@ -500,9 +500,10 @@ body{
 }
 
 #video-streams{
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: 1fr;
     // background-color: red;
     max-width: 1200px;
     width: 100vw;
@@ -522,12 +523,12 @@ body{
 
     .user-container{
         
-        // display: grid;
-        // grid-template-columns: 1fr;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr;
+        // display: flex;
         justify-content: center;
         align-items: center;
-        flex-wrap: nowrap;
+        // flex-wrap: nowrap;
         gap: 20px;
         // flex-shrink: 1;
         // flex-direction: row;

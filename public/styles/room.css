@@ -484,6 +484,10 @@ body .bg {
 }
 
 #video-streams {
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  grid-template-columns: 1fr;
   max-width: 1200px;
   width: 100vw;
   padding: 40px;
@@ -492,10 +496,10 @@ body .bg {
   height: calc(100vh - 90px);
 }
 #video-streams .user-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   justify-content: center;
   align-items: center;
-  flex-wrap: nowrap;
   gap: 20px;
   width: 100%;
   height: 100%;
