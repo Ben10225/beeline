@@ -11,13 +11,14 @@ import (
 )
 
 func SetUserRoomData(c *gin.Context) {
+	roomId := c.Param("roomId")
+	uuid := c.Param("id")
+
 	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	roomId := req.RoomId
-	uuid := req.Uuid
 	audioStatus := req.AudioStatus
 	videoStatus := req.VideoStatus
 	auth := req.Auth
@@ -32,13 +33,16 @@ func SetUserRoomData(c *gin.Context) {
 }
 
 func SetUserLeaveTrue(c *gin.Context) {
+	roomId := c.Param("roomId")
+	uuid := c.Param("id")
+
 	var req structs.RoomUserData
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	roomId := req.RoomId
-	uuid := req.Uuid
+	// roomId := req.RoomId
+	// uuid := req.Uuid
 	auth := req.Auth
 
 	models.UserLeaveTrue(c, roomId, uuid, auth)
@@ -49,10 +53,12 @@ func SetUserLeaveTrue(c *gin.Context) {
 }
 
 func RefuseUserInRoom(c *gin.Context) {
-	var req structs.RoomUserData
-	c.BindJSON(&req)
-	roomId := req.RoomId
-	uuid := req.Uuid
+	// var req structs.RoomUserData
+	// c.BindJSON(&req)
+	// roomId := req.RoomId
+	// uuid := req.Uuid
+	roomId := c.Param("roomId")
+	uuid := c.Param("id")
 
 	models.PullUserData(c, roomId, uuid)
 	c.JSON(http.StatusOK, gin.H{

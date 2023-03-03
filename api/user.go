@@ -131,22 +131,24 @@ func Signout(c *gin.Context) {
 }
 
 func GetRemoteUser(c *gin.Context) {
-	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	roomId := req.RoomId
-	uuid := req.Uuid
+	// var req structs.RoomUserData
+	// err := c.BindJSON(&req)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// roomId := req.RoomId
+	// uuid := req.Uuid
+	roomId := c.Param("roomId")
+	uuid := c.Param("id")
 
-	userData := models.GetUserByUuid(c, uuid)
+	// userData := models.GetUserByUuid(c, uuid)
 
 	userStreamStatus := models.GetStatusByUuid(c, roomId, uuid)
 	if userStreamStatus == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"data": gin.H{
-				"name":        userData.Name,
-				"imgurl":      userData.ImgUrl,
+				"name":        userStreamStatus.Name,
+				"imgurl":      userStreamStatus.ImgUrl,
 				"audioStatus": true,
 				"videoStatus": true,
 			},
@@ -156,8 +158,8 @@ func GetRemoteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"name":        userData.Name,
-			"imgurl":      userData.ImgUrl,
+			"name":        userStreamStatus.Name,
+			"imgurl":      userStreamStatus.ImgUrl,
 			"audioStatus": userStreamStatus.AudioStatus,
 			"videoStatus": userStreamStatus.VideoStatus,
 		},

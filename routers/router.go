@@ -20,15 +20,23 @@ func Routers(router *gin.Engine) {
 		user.POST("/signup", api.Signup)
 		user.POST("/signin", api.Signin)
 		user.GET("/signout", api.Signout)
-		user.POST("/getremoteuser", api.GetRemoteUser)
+		// user.POST("/getremoteuser", api.GetRemoteUser)
+		// /room/:roomid/user/:id
+
+		// /room/:roomid?uuid
+		// /room/:roomid/user
+
 		user.POST("/uploadimg", api.UploadImg)
 	}
 
 	room := router.Group("/room")
 	{
-		room.POST("/setusertoroom", api.SetUserRoomData)
-		room.POST("/setLeaveTrueOrDeleteRoom", api.SetUserLeaveTrue)
-		room.POST("/deleteUserArray", api.RefuseUserInRoom)
+		room.GET("/:roomId/user/:id", api.GetRemoteUser)
+		room.POST("/:roomId/user/:id", api.SetUserRoomData)
+
+		// room.POST("/setusertoroom", api.SetUserRoomData)
+		// room.POST("/setLeaveTrueOrDeleteRoom", api.SetUserLeaveTrue)
+		// room.POST("/deleteUserArray", api.RefuseUserInRoom)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		room.POST("/streamstatus", api.SetUserStreamStatus)
@@ -47,5 +55,11 @@ func Routers(router *gin.Engine) {
 		room.POST("/getGameResult", api.GetGameResult)
 		room.POST("/checkUserLeaveFalse", api.CheckUserLeaveFalse)
 		room.POST("/resetAllUserGameClickFalse", api.ResetAllUserGameClickFalse)
+	}
+
+	leave := router.Group("/leave")
+	{
+		leave.PATCH("/:roomId/user/:id", api.SetUserLeaveTrue)
+		leave.DELETE("/:roomId/user/:id", api.RefuseUserInRoom)
 	}
 }

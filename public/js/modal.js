@@ -118,16 +118,18 @@ let getRoomChatAndShare = async (roomId) => {
 }
 
 let getRemoteUser = async (roomId, remoteUuid) => {
-    let response = await fetch(`/api/getremoteuser`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": remoteUuid
-        })
-    });
+    // let response = await fetch(`/api/getremoteuser`, {
+    console.log(roomId, remoteUuid);
+    let response = await fetch(`/room/${roomId}/user/${remoteUuid}`);
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type":"application/json"
+    //     },
+    //     body: JSON.stringify({
+    //         "roomId": roomId,
+    //         "uuid": remoteUuid
+    //     })
+    // });
     let data = await response.json();
     if(data.data){
         return data.data;
@@ -135,14 +137,15 @@ let getRemoteUser = async (roomId, remoteUuid) => {
 }
 
 let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, userName, userImg) => {
-    let response = await fetch(`/room/setusertoroom`, {
+    // let response = await fetch(`/room/setusertoroom`, {
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
+            // "roomId": roomId,
+            // "uuid": uuid,
             "audioStatus": audioStatus,
             "videoStatus": videoStatus,
             "auth": auth,
@@ -154,14 +157,14 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, u
 }
 
 let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
-    let response = await fetch(`/room/setLeaveTrueOrDeleteRoom`, {
-        method: "POST",
+    // let response = await fetch(`/room/setLeaveTrueOrDeleteRoom`, {
+    let response = await fetch(`/leave/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        // method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
             "auth": auth,
         })
     });
@@ -170,15 +173,12 @@ let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
 }
 
 let refuseUserInRoom = async (roomId, uuid) => {
-    let response = await fetch(`/room/deleteUserArray`, {
-        method: "POST",
+    // let response = await fetch(`/room/deleteUserArray`, {
+    let response = await fetch(`/leave/${roomId}/user/${uuid}`, {
+        method: "DELETE",
         headers: {
             "Content-Type":"application/json"
         },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
     });
     let data = await response.json();
 }

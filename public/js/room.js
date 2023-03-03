@@ -212,6 +212,7 @@ navigator.mediaDevices.getUserMedia({
         document.querySelector("#video-streams").remove();
         document.querySelector("#controls-wrapper").remove();
         document.querySelector(".extension-wrapper").remove();
+        document.querySelector(".message-show-wrapper").remove();
 
         const video = document.createElement("video");
         video.muted = true;
