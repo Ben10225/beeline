@@ -33,13 +33,16 @@ func Routers(router *gin.Engine) {
 	{
 		room.GET("/:roomId/user/:id", api.GetRemoteUser)
 		room.POST("/:roomId/user/:id", api.SetUserRoomData)
+		room.PATCH("/:roomId/user/:id", api.ChangeRoomUserData)
+
+		// room.PATCH("/:roomId/user/:id", api.SetUserStreamStatus)
 
 		// room.POST("/setusertoroom", api.SetUserRoomData)
 		// room.POST("/setLeaveTrueOrDeleteRoom", api.SetUserLeaveTrue)
 		// room.POST("/deleteUserArray", api.RefuseUserInRoom)
 		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
 		room.POST("/checkroomexist", api.CheckRoomExist)
-		room.POST("/streamstatus", api.SetUserStreamStatus)
+		// room.POST("/streamstatus", api.SetUserStreamStatus)
 		room.POST("/entertoken", api.SetEnterToken)
 		room.POST("/checkAuth", api.CheckAuth)
 		room.POST("/setLeaveFalse", api.SetUserLeaveFalse)

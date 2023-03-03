@@ -535,3 +535,23 @@ func ResetAllUserGameClickFalseData(c *gin.Context, roomId string) {
 		}
 	}
 }
+
+func ChangeRoomUserDataAudioOrVideo(c *gin.Context, roomId, uuid, status string, b bool) {
+	filter := bson.D{{"roomId", roomId}}
+
+	var s string
+	if status == "video" {
+		s = "videoStatus"
+	} else {
+		s = "audioStatus"
+	}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{fmt.Sprintf("user.$[elem].%s", s): b}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}

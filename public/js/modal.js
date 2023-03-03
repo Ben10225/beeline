@@ -28,17 +28,33 @@ let resetAllUserGameClickFalse = async (roomId) => {
 }
 
 let setUserStreamStatus = async (roomId, uuid, status, bool) => {
-    let response = await fetch(`/room/streamstatus`, {
-        method: "POST",
+    // let response = await fetch(`/room/streamstatus`, {
+    let body;
+    if(status === "audio"){
+        body = JSON.stringify({
+            "option": "audioStatus",
+            "videoOrAudio": bool,
+        })
+    }else if(status === "video"){
+        body = JSON.stringify({
+            "option": "videoStatus",
+            "videoOrAudio": bool,
+        })
+    }
+    console.log(body)
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        // method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-            "status": status,
-            "b": bool,
-        })
+        body: body,
+        // body: JSON.stringify({
+            // "roomId": roomId,
+            // "uuid": uuid,
+            // "status": status,
+            // "b": bool,
+        // })
     });
     let data = await response.json();
 }

@@ -4,6 +4,7 @@ import (
 	"beeline/models"
 	"beeline/structs"
 	"beeline/utils"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -349,6 +350,42 @@ func ResetAllUserGameClickFalse(c *gin.Context) {
 
 	roomId := req.RoomId
 	models.ResetAllUserGameClickFalseData(c, roomId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok": true,
+	})
+}
+
+func ChangeRoomUserData(c *gin.Context) {
+	roomId := c.Param("roomId")
+	uuid := c.Param("id")
+
+	req := struct {
+		Option       string
+		VideoOrAudio bool
+	}{}
+	c.BindJSON(&req)
+
+	option := req.Option
+	videoOrAudio := req.VideoOrAudio
+	fmt.Println(option, videoOrAudio)
+	// auth := req.Auth
+	// audioStatus := req.AudioStatus
+	// videoStatus := req.VideoStatus
+	// sec := req.Sec
+	// fmt.Println(auth, audioStatus, videoStatus, sec)
+
+	if option == "auth" {
+
+	} else if option == "audioStatus" {
+		models.ChangeRoomUserDataAudioOrVideo(c, roomId, uuid, "audio", videoOrAudio)
+
+	} else if option == "videoStatus" {
+		models.ChangeRoomUserDataAudioOrVideo(c, roomId, uuid, "video", videoOrAudio)
+
+	} else if option == "sec" {
+
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"ok": true,
