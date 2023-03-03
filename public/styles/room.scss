@@ -1470,7 +1470,7 @@ body{
 
 #game-block{
     position: fixed;
-    z-index: 500;
+    z-index: 1000;
     width: 100%;
     // height: 100%;
     height: 90%;
@@ -1866,7 +1866,7 @@ body{
     background-color: #DBA39A;
     // background-color: #474747;
     height: 8%;
-    z-index: 500;
+    z-index: 1150;
     #room-url-wrapper{
         position: absolute;
         left: 50px;
@@ -2195,7 +2195,7 @@ body{
     position: absolute;
     left: 10px;
     top: -40px;
-    z-index: 600;
+    z-index: 1200;
     width: auto;
     .solo-emoji{
         display: flex;

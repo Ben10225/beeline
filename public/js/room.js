@@ -12,7 +12,7 @@ let auth;
 
 auth = (parseInt(params.auth) === 0);
 if(auth){
-    let authData = await utils.checkIfAuthAlready(ROOM_ID);
+    let authData = await modal.checkIfAuthAlready(ROOM_ID);
     let authExist = authData[0];
     let authUuid = authData[1];
 
@@ -146,6 +146,10 @@ navigator.mediaDevices.getUserMedia({
         board.boardInit(socketDraw);   
         whiteBoardInit();
         extension.emojiBtnInit(socket);
+
+        extension.rightIconsInit();
+        msgSubmit.addEventListener("submit", messageSubmit);
+        searchBar.addEventListener("input", extension.searchUser); 
         // socketDraw.emit('join-room', ROOM_ID, USER_ID);
 
 
@@ -258,7 +262,7 @@ navigator.mediaDevices.getUserMedia({
             video.play();
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
-        insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth, USER_NAME, USER_IMG);
+        modal.insertMongoRoomData(ROOM_ID, USER_ID, true, true, auth, USER_NAME, USER_IMG);
 
 
         const btn = document.querySelector("#enter-request");
@@ -287,7 +291,7 @@ navigator.mediaDevices.getUserMedia({
 
 
         document.querySelector(".waiting-exit").onclick = () => {
-            refuseUserInRoom(ROOM_ID, USER_ID);
+            modal.refuseUserInRoom(ROOM_ID, USER_ID);
             window.location = "/";
         }
 
@@ -309,7 +313,7 @@ let waitingSocketInit = async () => {
     socketWait.on('client-action', async (roomId, clientName, b) => {
     // socket.on('client-action', async (roomId, clientName, b) => {
         if(clientName === USER_NAME && b){
-            await setRoomEnterToken(roomId);
+            await modal.setRoomEnterToken(roomId);
             window.location.reload();
             // history.go(0);
         }else if(clientName === USER_NAME && !b){
@@ -326,9 +330,9 @@ let socketConn = async (sk, stream) => {
         if(USER_ID === uuid){
             // tryEnterRoom(USER_ID);        
             if(auth){
-                await insertMongoRoomData(ROOM_ID, uuid, true, true, auth, USER_NAME, USER_IMG);
+                await modal.insertMongoRoomData(ROOM_ID, uuid, true, true, auth, USER_NAME, USER_IMG);
             }else if(CLIENT){
-                await setBackRoomLeaveStatus(ROOM_ID, uuid);
+                await modal.setBackRoomLeaveStatus(ROOM_ID, uuid);
             }
             if(auth || CLIENT){
                 let audioStatus;
@@ -418,7 +422,7 @@ let s2InRoomAuthInit = async () => {
                 socketWait.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
                 // 需要改成 delete 不只設 leave
-                refuseUserInRoom(ROOM_ID, clientUuid);
+                modal.refuseUserInRoom(ROOM_ID, clientUuid);
                 // removeMongoRoomData(ROOM_ID, clientUuid, false);
             }
 
@@ -485,7 +489,7 @@ let inRoomSocketInit = async () => {
     // leave room
     socket.on('leave-video-remove', async (uuid) => {
         // if(authParam){
-        //     let newAuth = await resetAuthData(ROOM_ID, USER_ID);
+        //     let newAuth = await modal.resetAuthData(ROOM_ID, USER_ID);
         //     console.log(newAuth);
         // }
 
@@ -619,7 +623,7 @@ let inRoomSocketInit = async () => {
                 newAuthGroupSetting();
 
                 // chat room
-                let data = await resetAuthData(ROOM_ID, USER_ID);
+                let data = await modal.resetAuthData(ROOM_ID, USER_ID);
                 let chatOpen = data[1];
 
                 let chatAllowBlock = document.querySelector(".allow-click");
@@ -710,7 +714,7 @@ let inRoomSocketInit = async () => {
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
 
-                            let quitGame = await utils.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
+                            let quitGame = await modal.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
                             if(quitGame){
                                 socket.emit("five-sec-end-game", ROOM_ID);
                                 showRecord = true;
@@ -719,7 +723,7 @@ let inRoomSocketInit = async () => {
                     }, 1)
                     setTimeout(() => {
                         if(!clicked){
-                            utils.sendUserSecToDB(ROOM_ID, USER_ID, 5, false);
+                            modal.sendUserSecToDB(ROOM_ID, USER_ID, 5, false);
                             dom.remove();
                             let waitHtml = `
                             <div class="game-wait">
@@ -742,7 +746,7 @@ let inRoomSocketInit = async () => {
     socket.on('five-end', async (roomId) => {
         if(ROOM_ID === roomId){
             setTimeout(async () => {
-                let data = await utils.getGameResult(ROOM_ID);
+                let data = await modal.getGameResult(ROOM_ID);
                 let wait =  document.querySelector(".game-wait");
                 if(wait){
                     wait.remove();
@@ -774,7 +778,7 @@ let inRoomSocketInit = async () => {
         if(userInRoomObj[USER_ID] && uuid !== USER_ID){
             if (document.querySelector(".allow-click")) return
             setTimeout(async()=>{
-                let data = await resetAuthData(ROOM_ID, USER_ID);
+                let data = await modal.resetAuthData(ROOM_ID, USER_ID);
                 let newHostUuid = data[0];
                 let chatOpen = data[1];
                 if(USER_ID === newHostUuid){
@@ -815,7 +819,11 @@ let inRoomSocketInit = async () => {
 
         if(uuid === USER_ID){
             disconnect = true;
-            checkNeedReconnect(ROOM_ID, USER_ID);
+            let data = await modal.checkNeedReconnect(ROOM_ID, USER_ID);
+            if(data.message == "needReconnect"){
+                console.log(`user ${uuid} connection break, try reconnect.`);
+                tryEnterRoom(uuid);
+            }
         }
     })
 }
@@ -844,8 +852,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         leaveBtn.onclick = async () => {
             // socket.disconnect();
             clickLeaveBtnToLeave = true;
-            await setLeaveTrueOrDeleteRoom(ROOM_ID, USER_ID, auth);
-            await setRoomEnterToken(ROOM_ID);
+            await modal.setLeaveTrueOrDeleteRoom(ROOM_ID, USER_ID, auth);
+            await modal.setRoomEnterToken(ROOM_ID);
             socket.emit("leave-room", ROOM_ID, USER_ID);
             window.location = "/";
         }
@@ -855,8 +863,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             if(!clickLeaveBtnToLeave){
                 // broswer 關閉不要 await 不然會壞掉
                 // 需要一個 clickLeave 變數，不然案離開畫面轉跳會再執行一次
-                setLeaveTrueOrDeleteRoom(ROOM_ID, USER_ID, auth);
-                setRoomEnterToken(ROOM_ID);
+                modal.setLeaveTrueOrDeleteRoom(ROOM_ID, USER_ID, auth);
+                modal.setRoomEnterToken(ROOM_ID);
                 socket.emit("leave-room", ROOM_ID, USER_ID);
             }
         }
@@ -912,7 +920,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
         
         if(!auth){
-            let data = await getRemoteUser(ROOM_ID, USER_ID);
+            let data = await modal.getRemoteUser(ROOM_ID, USER_ID);
 
             let localAudioStatus = data.audioStatus;
             let localVideoStatus = data.videoStatus;
@@ -934,7 +942,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
             }
             
-            let roomStatus = await getRoomChatAndShare(ROOM_ID);
+            let roomStatus = await modal.getRoomChatAndShare(ROOM_ID);
             let chatOpen = roomStatus[0];
             let screenShare = roomStatus[1];
             if(!chatOpen){
@@ -1039,7 +1047,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         })
         document.querySelector(`#user-${remoteUuid}`).append(audio);
 
-        let data = await getRemoteUser(ROOM_ID, remoteUuid);
+        let data = await modal.getRemoteUser(ROOM_ID, remoteUuid);
         let remoteName = data.name;
         let remoteImgUrl = data.imgurl;
         let remoteAudioStatus = data.audioStatus;
@@ -1099,7 +1107,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
         //     stream.getVideoTracks()[0].enabled = false;
         // }
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
-        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "video", false); 
+        inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "video", false); 
 
         if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
             document.querySelector(".username-wrapper-room.local").classList.add("bg-none");
@@ -1113,7 +1121,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
         dom.classList.remove("disable");
         // stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
-        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
+        inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
         navigator.mediaDevices.getUserMedia({
             video: true,
@@ -1179,7 +1187,7 @@ let toggleAudio = async (stream, dom, inRoom) => {
         }
         
         inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, false);
-        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
+        inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "audio", false);
 
     }else{
         dom.classList.remove("disable");
@@ -1192,7 +1200,7 @@ let toggleAudio = async (stream, dom, inRoom) => {
             document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.remove("hide");
         }
         inRoom && socket.emit("set-option", ROOM_ID, "audio", USER_ID, true);
-        inRoom && setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
+        inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
 }
 
@@ -1251,165 +1259,6 @@ let connectToNewUser = (userId, stream) => {
     peers[userId] = call;
 }
 
-// let connectToNewUserScreen = (userId, stream) => {
-//     const call = nPeer.call(userId, stream)
-//     let video = document.createElement("video")
-//     let remoteUuid = call.peer
-//     call.on("stream", userVideoStream => {
-//         currentPeer = call.peerConnection;
-//         addVideoStream(video, userVideoStream, false, remoteUuid)
-//     })
-//     call.on("close", () => {
-//         video.remove()
-//     })
-//     peers[userId] = call;
-// }
-
-
-let getRemoteUser = async (roomId, remoteUuid) => {
-    let response = await fetch(`/api/getremoteuser`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": remoteUuid
-        })
-    });
-    let data = await response.json();
-    if(data.data){
-        return data.data;
-    }
-}
-
-let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, userName, userImg) => {
-    let response = await fetch(`/room/setusertoroom`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-            "audioStatus": audioStatus,
-            "videoStatus": videoStatus,
-            "auth": auth,
-            "name": userName,
-            "imgUrl": userImg,
-        })
-    });
-    let data = await response.json();
-}
-
-let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
-    let response = await fetch(`/room/setLeaveTrueOrDeleteRoom`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-            "auth": auth,
-        })
-    });
-    let data = await response.json();
-    return data.ok;
-}
-
-let refuseUserInRoom = async (roomId, uuid) => {
-    let response = await fetch(`/room/deleteUserArray`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-}
-
-let checkNeedReconnect = async (roomId, uuid) => {
-    let response = await fetch(`/room/checkneedreconnect`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-    if(data.message == "needReconnect"){
-        console.log(`user ${uuid} connection break, try reconnect.`);
-        tryEnterRoom(uuid);
-    }
-}
-
-let setUserStreamStatus = async (roomId, uuid, status, bool) => {
-    let response = await fetch(`/room/streamstatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-            "status": status,
-            "b": bool,
-        })
-    });
-    let data = await response.json();
-}
-
-let setRoomEnterToken = async (roomId) => {
-    let response = await fetch(`/room/entertoken`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-}
-
-let setBackRoomLeaveStatus = async (roomId, uuid) => {
-    let response = await fetch(`/room/setLeaveFalse`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-}
-
-let resetAuthData = async (roomId, uuid) => {
-    let response = await fetch(`/room/checkAuthChange`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-    if(data){
-        return [data.newHost, data.chatOpen];
-    }
-}
-
 let messageSubmit = async (e) => {
     e.preventDefault();
     let message = sendMessageInput.value;
@@ -1419,10 +1268,6 @@ let messageSubmit = async (e) => {
     sendImg.classList.remove("entering");
 }
 
-extension.rightIconsInit();
-
-msgSubmit.addEventListener("submit", messageSubmit);
-
 sendMessageInput.addEventListener("input", ()=>{
     sendImg.classList.add("entering");
     if(!sendMessageInput.value){
@@ -1430,48 +1275,16 @@ sendMessageInput.addEventListener("input", ()=>{
     }
 })
 
-searchBar.addEventListener("input", extension.searchUser);  
-
 let switchInputInit = () => {
     const switchInput = document.querySelector("#switch");
     switchInput.onclick = async () => {
         if(!switchInput.checked){
             socket.emit('close-chat', ROOM_ID, true);
-            await setRoomChatStatus(ROOM_ID, false);
+            await modal.setRoomChatStatus(ROOM_ID, false);
         }else{
             socket.emit('close-chat', ROOM_ID, false);
-            await setRoomChatStatus(ROOM_ID, true);
+            await modal.setRoomChatStatus(ROOM_ID, true);
         }
-    }
-}
-
-let setRoomChatStatus = async (roomId, b) => {
-    let response = await fetch(`/room/roomChatStatus`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "chatOpen": b,
-        })
-    });
-    let data = await response.json();
-}
-
-let getRoomChatAndShare = async (roomId) => {
-    let response = await fetch(`/room/getRoomChatAndShare`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-    if(data){
-        return [data.chatOpen, data.screenShare];
     }
 }
 
@@ -1587,7 +1400,6 @@ let NameBtnInit = (uuid) => {
         })
     })
     yesBtn.onclick = async () => {
-        // console.log(ROOM_ID, USER_ID, uuid);
         await extension.assignNewAuth(ROOM_ID, USER_ID, uuid);
         socket.emit("auth-change", ROOM_ID, USER_ID, uuid);
         auth = false;
@@ -1671,14 +1483,14 @@ screenShareBtn.addEventListener("click", function addScreen(){
             socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
         })
 
-        await utils.setScreenShareBool(ROOM_ID, true);
+        await modal.setScreenShareBool(ROOM_ID, true);
 
         this.removeEventListener("click", addScreen);
         this.classList.add("userShare");
 
         this.addEventListener("click", async function stopShare(){
             stream.getTracks().forEach(track => track.stop());
-            await utils.setScreenShareBool(ROOM_ID, false);
+            await modal.setScreenShareBool(ROOM_ID, false);
             screenShareBtn.classList.remove("userShare");
             socket.emit('close-screen', ROOM_ID, USER_ID);
 
@@ -1688,7 +1500,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
 
         let videoTrack = stream.getVideoTracks()[0];
         videoTrack.onended = async () => {
-            await utils.setScreenShareBool(ROOM_ID, false);
+            await modal.setScreenShareBool(ROOM_ID, false);
             screenShareBtn.classList.remove("userShare");
             socket.emit('close-screen', ROOM_ID, USER_ID);
             screenShareBtn.addEventListener("click", addScreen);
@@ -1698,15 +1510,6 @@ screenShareBtn.addEventListener("click", function addScreen(){
     }).catch(err => {
         console.log("unable to get display media" + err);
     })
-
-    // socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
-
-    // 更換 videoTrack
-    // let videoTrack = stream.getVideoTracks()[0];
-    // let sender = currentPeer.getSenders().find(function(s){
-    //     return s.track.kind == videoTrack.kind
-    // });
-    // sender.replaceTrack(videoTrack);
 })
 
 

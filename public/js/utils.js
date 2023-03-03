@@ -78,22 +78,6 @@ let checkRoomExist = async (roomId) => {
     return data.exist;
 }
 
-let checkIfAuthAlready = async (roomId) => {
-    let response = await fetch(`/room/checkAuth`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-    if(data){
-        return [data.message, data.authUuid]
-    }
-}
-
 let generateShortLink = async () => {
     let currentUrl = window.location.href.split("?")[0];
     document.querySelector(".copy-link-txt").textContent = currentUrl;
@@ -350,67 +334,6 @@ let testResize = () => {
     settingVideoSize();
 }
 
-let setScreenShareBool = async (roomId, bool) => {
-    let response = await fetch(`/room/setScreenShareBool`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "screenShare": bool,
-        })
-    });
-    let data = await response.json();
-}
-
-let sendUserSecToDB = async (roomId, uuid, sec, click) => {
-    let response = await fetch(`/room/sendUserSecToDB`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-            "sec": sec,
-            "gameClick": click,
-        })
-    });
-    let data = await response.json();
-    return data.data;
-}
-
-let checkUserLeaveFalse = async (roomId, uuid) => {
-    let response = await fetch(`/room/checkUserLeaveFalse`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-    return data.data;
-}
-
-let getGameResult = async (roomId) => {
-    let response = await fetch(`/room/getGameResult`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-    return data.data;
-}
-
-
 let playAudio = (url, volume) => {
     const URL = url;
       
@@ -481,18 +404,11 @@ let createCopyBlock = () => {
 let setRoomId = () => {
     document.querySelector(".room-id").textContent = ROOM_ID;
 }
-    
-
 
 export default {
     auth,
-    checkIfAuthAlready,
     generateShortLink,
     settingVideoSize,
-    setScreenShareBool,
-    sendUserSecToDB,
-    getGameResult,
-    checkUserLeaveFalse,
     playAudio,
     createCopyBlock,
     setRoomId,

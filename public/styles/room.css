@@ -1486,7 +1486,7 @@ body .bg {
 
 #game-block {
   position: fixed;
-  z-index: 500;
+  z-index: 1000;
   width: 100%;
   height: 90%;
   opacity: 0;
@@ -1874,7 +1874,7 @@ body .bg {
   bottom: 0;
   background-color: #DBA39A;
   height: 8%;
-  z-index: 500;
+  z-index: 1150;
 }
 #controls-wrapper #room-url-wrapper {
   position: absolute;
@@ -2201,7 +2201,7 @@ body .bg {
   position: absolute;
   left: 10px;
   top: -40px;
-  z-index: 600;
+  z-index: 1200;
   width: auto;
 }
 .emoji-ani-wrapper .solo-emoji {
