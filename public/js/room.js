@@ -508,6 +508,7 @@ let inRoomSocketInit = async () => {
             let time = currentdate.slice(0,2);
             let clock = currentdate.slice(2,-3);
             let hour = clock.split(":")[0];
+            let txtUuid = extension.uuid();
 
             if(time === "上午" && hour <= 6){
                 time = "凌晨";
@@ -521,7 +522,7 @@ let inRoomSocketInit = async () => {
             if(tmpMessageName === clientName 
             && tmpMessageClock === clock
             && tmpMessageTime === time){
-                let tag = `<div class="message-content">${message}</div>`
+                let tag = `<div class="message-content msg-${txtUuid}"></div>`
                 let messageBlockS = document.querySelectorAll(".message-block");
                 messageBlockS.forEach((block, i) => {
                     if(i === messageBlockS.length-1){
@@ -536,11 +537,12 @@ let inRoomSocketInit = async () => {
                         <span class="message-time">${time}</span>
                         <span class="message-clock">${clock}</span>
                     </div>
-                    <div class="message-content">${message}</div>
+                    <div class="message-content msg-${txtUuid}"></div>
                 </div> 
                 `;
                 messageWrapper.insertAdjacentHTML("beforeend", html);
             }
+            document.querySelector(`.msg-${txtUuid}`).textContent = message;
             tmpMessageName = clientName;
             tmpMessageClock = clock;
             tmpMessageTime = time;
@@ -1659,7 +1661,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
         //     port: 9000,
         //     path: "/myapp",
         // })
-        nPeer = new Peer(`${USER_ID}-screen-${sct}`);
+        // nPeer = new Peer(`${USER_ID}-screen-${sct}`);
 
         nPeer.on('call', function(call){
             call.answer(stream);
