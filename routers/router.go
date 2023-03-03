@@ -21,19 +21,26 @@ func Routers(router *gin.Engine) {
 		user.POST("/signin", api.Signin)
 		user.GET("/signout", api.Signout)
 		// user.POST("/getremoteuser", api.GetRemoteUser)
+		user.PATCH("/photo", api.UploadImg)
+
 		// /room/:roomid/user/:id
 
 		// /room/:roomid?uuid
 		// /room/:roomid/user
-
-		user.POST("/uploadimg", api.UploadImg)
 	}
 
 	room := router.Group("/room")
 	{
 		room.GET("/:roomId/user/:id", api.GetRemoteUser)
-		room.POST("/:roomId/user/:id", api.SetUserRoomData)
-		room.PATCH("/:roomId/user/:id", api.ChangeRoomUserData)
+		room.POST("/:roomId/user/:id", api.InsertUserRoomData)
+		room.PATCH("/:roomId/user/:id", api.UpdateRoomUserData)
+
+		room.GET("/:roomId/users", api.GetRoomUsers)
+		room.GET("/:roomId/auth", api.GetAuth)
+		room.GET("/:roomId/chatAndShare", api.GetRoomChatAndShare)
+		room.PATCH("/:roomId/screen", api.UpdateScreenShareBool)
+		room.PATCH("/:roomId/auth", api.UpdateNewAuthAndOldAuth)
+		room.PATCH("/:roomId/chat", api.UpdateRoomChatStatus)
 
 		// room.PATCH("/:roomId/user/:id", api.SetUserStreamStatus)
 
@@ -44,25 +51,36 @@ func Routers(router *gin.Engine) {
 		room.POST("/checkroomexist", api.CheckRoomExist)
 		// room.POST("/streamstatus", api.SetUserStreamStatus)
 		room.POST("/entertoken", api.SetEnterToken)
-		room.POST("/checkAuth", api.CheckAuth)
-		room.POST("/setLeaveFalse", api.SetUserLeaveFalse)
-		room.POST("/checkAuthChange", api.GetUserAuth)
-		room.POST("/roomChatStatus", api.RoomChatStatus)
-		room.POST("/getRoomChatAndShare", api.GetRoomChatAndShare)
-		room.POST("/getGroupInfo", api.GetGroupInfo)
-		room.POST("/setWaitingStatus", api.SetWaitingStatus)
+		// room.POST("/checkAuth", api.CheckAuth)
+		// room.POST("/setLeaveFalse", api.SetUserLeaveFalse)
+		// room.POST("/checkAuthChange", api.GetUserAuth)
+		// room.POST("/roomChatStatus", api.RoomChatStatus)
+		// room.POST("/getRoomChatAndShare", api.GetRoomChatAndShare)
+		// room.POST("/getGroupInfo", api.GetGroupInfo)
+		// room.POST("/setWaitingStatus", api.SetWaitingStatus)
 
-		room.POST("/assignNewAuth", api.AssignNewAuth)
-		room.POST("/setScreenShareBool", api.SetScreenShareBool)
-		room.POST("/sendUserSecToDB", api.SendUserSec)
-		room.POST("/getGameResult", api.GetGameResult)
-		room.POST("/checkUserLeaveFalse", api.CheckUserLeaveFalse)
-		room.POST("/resetAllUserGameClickFalse", api.ResetAllUserGameClickFalse)
+		// room.POST("/assignNewAuth", api.AssignNewAuth)
+		// room.POST("/setScreenShareBool", api.SetScreenShareBool)
+		// room.POST("/sendUserSecToDB", api.SendUserSec)
+		// room.POST("/getGameResult", api.GetGameResult)
+		// room.POST("/checkUserLeaveFalse", api.CheckUserLeaveFalse)
+		// room.POST("/resetAllUserGameClickFalse", api.ResetAllUserGameClickFalse)
 	}
 
 	leave := router.Group("/leave")
 	{
 		leave.PATCH("/:roomId/user/:id", api.SetUserLeaveTrue)
 		leave.DELETE("/:roomId/user/:id", api.RefuseUserInRoom)
+	}
+
+	chat := router.Group("/chat")
+	{
+		chat.GET("/:roomId/user/:id", api.GetNewAuthAndChatStatus)
+	}
+
+	game := router.Group("/game")
+	{
+		game.GET("/:roomId", api.GetGameResult)
+		game.PATCH("/:roomId", api.ResetAllUserGameClickFalse)
 	}
 }

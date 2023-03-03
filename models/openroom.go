@@ -347,7 +347,7 @@ func GetGroupInfoData(c *gin.Context, roomId string) ([]gin.H, string) {
 	return result, host
 }
 
-func AssignNewAuthFunc(c *gin.Context, roomId, oldUuid, newUuid string) string {
+func AssignNewAuth(c *gin.Context, roomId, oldUuid, newUuid string) string {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
 	err := coll.FindOne(context.TODO(), filter).Decode(&room)
@@ -388,7 +388,7 @@ func SetScreenShare(c *gin.Context, roomId string, b bool) {
 	}
 }
 
-func SendSec(c *gin.Context, roomId, uuid string, sec float64, click bool) bool {
+func ChangeRoomUserDataGameSetting(c *gin.Context, roomId, uuid string, sec float64, click bool) bool {
 	filter := bson.D{{"roomId", roomId}}
 	coll.FindOneAndUpdate(
 		context.Background(),
@@ -497,22 +497,6 @@ func CheckUserLeave(c *gin.Context, roomId, uuid string) bool {
 	return b
 }
 
-func SetWaitingStatusData(c *gin.Context, roomId, uuid string, audioStatus, videoStatus bool) {
-	filter := bson.D{{"roomId", roomId}}
-
-	coll.FindOneAndUpdate(
-		context.Background(),
-		filter,
-		bson.M{"$set": bson.M{
-			"user.$[elem].audioStatus": audioStatus,
-			"user.$[elem].videoStatus": videoStatus,
-		}},
-		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
-			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
-		}),
-	)
-}
-
 func ResetAllUserGameClickFalseData(c *gin.Context, roomId string) {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
@@ -550,6 +534,35 @@ func ChangeRoomUserDataAudioOrVideo(c *gin.Context, roomId, uuid, status string,
 		context.Background(),
 		filter,
 		bson.M{"$set": bson.M{fmt.Sprintf("user.$[elem].%s", s): b}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
+func ChangeRoomUserDataWaitingStatus(c *gin.Context, roomId, uuid string, audioStatus, videoStatus bool) {
+	filter := bson.D{{"roomId", roomId}}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{
+			"user.$[elem].audioStatus": audioStatus,
+			"user.$[elem].videoStatus": videoStatus,
+		}},
+		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
+		}),
+	)
+}
+
+func ChangeRoomUserDataLeave(c *gin.Context, roomId, uuid string, leave bool) {
+	filter := bson.D{{"roomId", roomId}}
+
+	coll.FindOneAndUpdate(
+		context.Background(),
+		filter,
+		bson.M{"$set": bson.M{"user.$[elem].leave": leave}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
 			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
 		}),

@@ -1522,6 +1522,7 @@ body{
         top: 40%;
         transform: translateX(-50%);
         transition: 0.4s;
+        user-select: none;
         &.game-start-txt{
             font-size: 70px;
             letter-spacing: 0.1em;

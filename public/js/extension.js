@@ -159,36 +159,6 @@ let insertMessageAlert = async (name, content) => {
 
 let messageAlertClear = () => {
     messageShowWrapper.replaceChildren();
-} 
-
-let getGroupInfo = async (roomId) => {
-    let response = await fetch(`/room/getGroupInfo`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-    return [data.data, data.host];
-}
-
-let assignNewAuth = async (roomId, oldUuid, newUuid) => {
-    let response = await fetch(`/room/assignNewAuth`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "oldUuid": oldUuid,
-            "newUuid": newUuid,
-        })
-    });
-    let data = await response.json();
-    // return [data.data, data.host];
 }
 
 let searchUser = async () => {
@@ -489,8 +459,6 @@ let randomInt = (min, max) => {
 
 export default {
     rightIconsInit,
-    getGroupInfo,
-    assignNewAuth,
     searchUser,
     audioAni,
     reciprocalAnimation,

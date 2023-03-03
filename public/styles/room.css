@@ -1538,6 +1538,9 @@ body .bg {
   top: 40%;
   transform: translateX(-50%);
   transition: 0.4s;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 #game-block h3.game-start-txt {
   font-size: 70px;

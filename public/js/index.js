@@ -350,8 +350,8 @@ let uploadImg = async () => {
     waitingImgBlock.classList.add("show");
   
     toDataURL(window.URL.createObjectURL(uploadImg[0]), async function (dataUrl) {
-        let response = await fetch(`/api/uploadimg`, {
-            method: "POST",
+        let response = await fetch(`/api/photo`, {
+            method: "PATCH",
             headers: {
                 "Content-Type":"application/json"
             },

@@ -337,7 +337,7 @@ let socketConn = async (sk, stream) => {
             }
             if(auth || CLIENT){
                 let audioStatus;
-                let groupData = await extension.getGroupInfo(ROOM_ID);
+                let groupData = await modal.getGroupInfo(ROOM_ID);
                 groupLst = groupData[0];
                 host = groupData[1];
                 groupLst.forEach(user => {
@@ -1079,7 +1079,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         }
 
         if(!userInRoomObj[remoteUuid]){
-            let groupData = await extension.getGroupInfo(ROOM_ID);
+            let groupData = await modal.getGroupInfo(ROOM_ID);
             groupLst = groupData[0];
             host = groupData[1];
     
@@ -1401,7 +1401,7 @@ let NameBtnInit = (uuid) => {
         })
     })
     yesBtn.onclick = async () => {
-        await extension.assignNewAuth(ROOM_ID, USER_ID, uuid);
+        await modal.assignNewAuth(ROOM_ID, USER_ID, uuid);
         socket.emit("auth-change", ROOM_ID, USER_ID, uuid);
         auth = false;
         block.classList.remove("show");
@@ -1457,8 +1457,6 @@ let newAuthGroupSetting = () => {
     })
 }
 
-// console.log(nPeer)
-
 let sct = 0;
 screenShareBtn.addEventListener("click", function addScreen(){
     sct ++;
@@ -1469,12 +1467,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
         },
         audio: false
     }).then(async stream => {
-        // nPeer = new Peer(`${USER_ID}-screen-${sct}`, {
-        //     host: "beelinetw.com",
-        //     port: 9000,
-        //     path: "/myapp",
-        // })
-        // nPeer = new Peer(`${USER_ID}-screen-${sct}`);
+        nPeer = new Peer(`${USER_ID}-screen-${sct}`);
 
         nPeer.on('call', function(call){
             call.answer(stream);
@@ -1506,7 +1499,6 @@ screenShareBtn.addEventListener("click", function addScreen(){
             socket.emit('close-screen', ROOM_ID, USER_ID);
             screenShareBtn.addEventListener("click", addScreen);
         }
-
 
     }).catch(err => {
         console.log("unable to get display media" + err);
