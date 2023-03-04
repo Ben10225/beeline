@@ -153,9 +153,10 @@ func main() {
 		server.BroadcastToRoom("/", roomId, "need-reload", roomId, uuid)
 	})
 
-	// server.OnEvent("/", "remote-audio-track-reload", func(s socketio.Conn, roomId, uuid string) {
-	// 	server.BroadcastToRoom("/", roomId, "need-audio-reload", roomId, uuid)
-	// })
+	// screen share
+	server.OnEvent("/", "get-already-screen-share", func(s socketio.Conn, roomId string) {
+		server.BroadcastToRoom("/", roomId, "screen-share-emit-for-late-users", roomId)
+	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {
 		fmt.Println("meet error:", e)

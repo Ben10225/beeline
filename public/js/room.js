@@ -56,9 +56,9 @@ let userInRoomObj = {};
 let videoCt = 0;
 let tmpNewStreamCt = null;
 let needLoadAgain = false;
+let tmpScreenShareStreamId = null;
 // let currentPeer;
 let currentPeer = {};
-
 
 let gameLeft = 0;
 let gameTop = 0;
@@ -970,8 +970,9 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         }
 
     }else{
-        console.log(remoteUuid);
+        if (tmpScreenShareStreamId === remoteUuid) return;
         if(remoteUuid.split("-")[1] === "screen"){
+            tmpScreenShareStreamId = remoteUuid;
             let shareName = userInRoomObj[remoteUuid.split("-")[0]][0];
             let tag = "";
             if(document.querySelector(".extension-box").classList.contains("show")){
@@ -1080,7 +1081,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
-        socket.emit("remote-track-reload", ROOM_ID, remoteUuid);
+        socket.emit('remote-track-reload', ROOM_ID, remoteUuid);
+        socket.emit('get-already-screen-share', ROOM_ID);
     }    
     utils.settingVideoSize();
 }
@@ -1452,6 +1454,7 @@ let newAuthGroupSetting = () => {
     })
 }
 
+
 let sct = 0;
 screenShareBtn.addEventListener("click", function addScreen(){
     sct ++;
@@ -1468,8 +1471,12 @@ screenShareBtn.addEventListener("click", function addScreen(){
             call.answer(stream);
         })
     
-        nPeer.on('open', async id => {
-            socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+        socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+
+        socket.on('screen-share-emit-for-late-users', async (roomId) => {
+            if(ROOM_ID === roomId){
+                socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+            }
         })
 
         await modal.setScreenShareBool(ROOM_ID, true);
@@ -1478,6 +1485,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
         this.classList.add("userShare");
 
         this.addEventListener("click", async function stopShare(){
+            tmpScreenShareStreamId = null;
             stream.getTracks().forEach(track => track.stop());
             await modal.setScreenShareBool(ROOM_ID, false);
             screenShareBtn.classList.remove("userShare");
@@ -1489,6 +1497,7 @@ screenShareBtn.addEventListener("click", function addScreen(){
 
         let videoTrack = stream.getVideoTracks()[0];
         videoTrack.onended = async () => {
+            tmpScreenShareStreamId = null;
             await modal.setScreenShareBool(ROOM_ID, false);
             screenShareBtn.classList.remove("userShare");
             socket.emit('close-screen', ROOM_ID, USER_ID);
