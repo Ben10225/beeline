@@ -1082,7 +1082,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
         socket.emit('remote-track-reload', ROOM_ID, remoteUuid);
-        socket.emit('get-already-screen-share', ROOM_ID);
+        socket.emit('get-already-screen-share', ROOM_ID, `${USER_ID}-screen-${sct}`);
     }    
     utils.settingVideoSize();
 }
