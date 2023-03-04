@@ -921,11 +921,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             video.play()
         })
         document.querySelector(`#user-${USER_ID}`).append(video);
-
-        // let videoBlock = document.createElement("div");
-        // videoBlock.className = "video-block";
-        // document.querySelector(`#user-${USER_ID}`).append(videoBlock);
-
         
         if(!auth){
             let data = await modal.getRemoteUser(ROOM_ID, USER_ID);
@@ -975,6 +970,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         }
 
     }else{
+        console.log(remoteUuid);
         if(remoteUuid.split("-")[1] === "screen"){
             let shareName = userInRoomObj[remoteUuid.split("-")[0]][0];
             let tag = "";
@@ -1005,10 +1001,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             document.querySelector(`#wrapper-${remoteUuid}`).remove();
         }
 
-        tempRemoteMediaStreamId = stream.id
-
-        // let remoteVideoStatus = stream.getTracks()[1].enabled;
-        // let remoteAudioStatus = stream.getTracks()[0].enabled;
+        tempRemoteMediaStreamId = stream.id;
 
         let player = `
         <div class="video-container" id="wrapper-${remoteUuid}">
@@ -1032,13 +1025,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             </div>
         </div>
         `
-
-        let screenDom = document.querySelector("#screen-wrapper");
-        if(screenDom){
-            screenDom.insertAdjacentHTML("afterend", player);
-        }else{
-            userContainer.insertAdjacentHTML("afterbegin", player);
-        }
+        userContainer.insertAdjacentHTML("afterbegin", player);
 
         video.addEventListener("loadedmetadata", () => {
             video.play();
