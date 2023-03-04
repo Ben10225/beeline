@@ -32,7 +32,6 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid, name, imgUrl string, audio, 
 				"screenShare": false,
 				"roomCreated": time.Now().In(tpZone).Format("2006-01-02 15:04:05"),
 				"user":        []structs.RoomUserData{},
-				// User:   []interface{}{uuid, audio, video, true},
 			},
 		}
 		_, err := coll.InsertMany(context.TODO(), docs)
@@ -50,17 +49,7 @@ func InsertUserToRoom(c *gin.Context, roomId, uuid, name, imgUrl string, audio, 
 	}
 
 	filter := bson.D{{"roomId", roomId}}
-	// userInfo := bson.D{{
-	// 	"$push", bson.D{{
-	// 		"user", bson.D{
-	// 			{"uuid", uuid},
-	// 			{"audioStatus", audio},
-	// 			{"videoStatus", video},
-	// 			{"auth", auth},
-	// 			{"leave", false},
-	// 		},
-	// 	}},
-	// }}
+
 	var leaveStatus bool
 	if auth {
 		leaveStatus = false
@@ -191,26 +180,6 @@ func PullUserData(c *gin.Context, roomId, uuid string) {
 		fmt.Println(err)
 	}
 }
-
-/*
-func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
-	var room structs.RoomInfo
-	filter := bson.D{{"roomId", roomId}}
-	err := coll.FindOne(context.TODO(), filter).Decode(&room)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	user := room.User
-	for _, v := range user {
-		if v.Uuid == uuid {
-			return true
-		}
-	}
-	return false
-}
-*/
 
 func FindRoom(c *gin.Context, roomId string) bool {
 	var room structs.RoomInfo
@@ -428,17 +397,11 @@ func GetGameSlice(c *gin.Context, roomId string) ([]structs.Game, []structs.Game
 	}
 	user := room.User
 	userSec := map[string]float64{}
-	// userSec := map[string][]structs.RoomUserData{}
 	userInfo := []structs.GameInfoArray{}
 
 	for _, v := range user {
 		if !v.Leave {
 			userSec[v.Uuid] = v.Sec
-			// userSec[v.Uuid] = []structs.RoomUserData{
-			// 	{Sec: v.Sec},
-			// 	{Name: v.Name},
-			// 	{ImgUrl: v.ImgUrl},
-			// }
 		}
 	}
 
@@ -471,7 +434,6 @@ func GetGameSlice(c *gin.Context, roomId string) ([]structs.Game, []structs.Game
 	for _, v := range lst {
 		for _, userV := range user {
 			if v.Uuid == userV.Uuid {
-				// item := []string{userV.Name, userV.ImgUrl}
 				item := []structs.GameInfoArray{
 					{Arr: []string{userV.Name, userV.ImgUrl}},
 				}

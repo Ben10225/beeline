@@ -11,36 +11,12 @@ let setWaitingStatus = async (roomId, uuid, audioStatus, videoStatus) => {
         })
     });
     let data = await response.json();
-    // let response = await fetch(`/room/setWaitingStatus`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "uuid": uuid,
-    //         "audioStatus": audioStatus,
-    //         "videoStatus": videoStatus,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let getGameResult = async (roomId) => {
     let response = await fetch(`/game/${roomId}`);
     let data = await response.json();
     return data.data;
-    // let response = await fetch(`/room/getGameResult`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
-    // return data.data;
 }
 
 let resetAllUserGameClickFalse = async (roomId) => {
@@ -48,20 +24,9 @@ let resetAllUserGameClickFalse = async (roomId) => {
         method: "PATCH",
     });
     let data = await response.json();
-    // let response = await fetch(`/room/resetAllUserGameClickFalse`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let setUserStreamStatus = async (roomId, uuid, status, bool) => {
-    // let response = await fetch(`/room/streamstatus`, {
     let body;
     if(status === "audio"){
         body = JSON.stringify({
@@ -76,17 +41,10 @@ let setUserStreamStatus = async (roomId, uuid, status, bool) => {
     }
     let response = await fetch(`/room/${roomId}/user/${uuid}`, {
         method: "PATCH",
-        // method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: body,
-        // body: JSON.stringify({
-            // "roomId": roomId,
-            // "uuid": uuid,
-            // "status": status,
-            // "b": bool,
-        // })
     });
     let data = await response.json();
 }
@@ -94,16 +52,6 @@ let setUserStreamStatus = async (roomId, uuid, status, bool) => {
 let setRoomEnterToken = async (roomId) => {
     let response = await fetch(`/room/${roomId}/token`);
     let data = await response.json();
-    // let response = await fetch(`/room/entertoken`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let setBackRoomLeaveStatus = async (roomId, uuid) => {
@@ -118,17 +66,6 @@ let setBackRoomLeaveStatus = async (roomId, uuid) => {
         })
     });
     let data = await response.json();
-    // let response = await fetch(`/room/setLeaveFalse`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "uuid": uuid,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let resetAuthData = async (roomId, uuid) => {
@@ -137,20 +74,6 @@ let resetAuthData = async (roomId, uuid) => {
     if(data){
         return [data.newHost, data.chatOpen];
     }
-    // let response = await fetch(`/room/checkAuthChange`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "uuid": uuid,
-    //     })
-    // });
-    // let data = await response.json();
-    // if(data){
-    //     return [data.newHost, data.chatOpen];
-    // }
 }
 
 let setRoomChatStatus = async (roomId, b) => {
@@ -164,17 +87,6 @@ let setRoomChatStatus = async (roomId, b) => {
         })
     });
     let data = await response.json();
-    // let response = await fetch(`/room/roomChatStatus`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "chatOpen": b,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let getRoomChatAndShare = async (roomId) => {
@@ -183,33 +95,10 @@ let getRoomChatAndShare = async (roomId) => {
     if(data){
         return [data.chatOpen, data.screenShare];
     }
-    // let response = await fetch(`/room/getRoomChatAndShare`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
-    // if(data){
-    //     return [data.chatOpen, data.screenShare];
-    // }
 }
 
 let getRemoteUser = async (roomId, remoteUuid) => {
-    // let response = await fetch(`/api/getremoteuser`, {
     let response = await fetch(`/room/${roomId}/user/${remoteUuid}`);
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "uuid": remoteUuid
-    //     })
-    // });
     let data = await response.json();
     if(data.data){
         return data.data;
@@ -217,15 +106,12 @@ let getRemoteUser = async (roomId, remoteUuid) => {
 }
 
 let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, userName, userImg) => {
-    // let response = await fetch(`/room/setusertoroom`, {
     let response = await fetch(`/room/${roomId}/user/${uuid}`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
         body: JSON.stringify({
-            // "roomId": roomId,
-            // "uuid": uuid,
             "audioStatus": audioStatus,
             "videoStatus": videoStatus,
             "auth": auth,
@@ -237,10 +123,8 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, u
 }
 
 let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
-    // let response = await fetch(`/room/setLeaveTrueOrDeleteRoom`, {
     let response = await fetch(`/leave/${roomId}/user/${uuid}`, {
         method: "PATCH",
-        // method: "POST",
         headers: {
             "Content-Type":"application/json"
         },
@@ -253,7 +137,6 @@ let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
 }
 
 let refuseUserInRoom = async (roomId, uuid) => {
-    // let response = await fetch(`/room/deleteUserArray`, {
     let response = await fetch(`/leave/${roomId}/user/${uuid}`, {
         method: "DELETE",
         headers: {
@@ -289,17 +172,6 @@ let setScreenShareBool = async (roomId, bool) => {
         })
     });
     let data = await response.json();
-    // let response = await fetch(`/room/setScreenShareBool`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "screenShare": bool,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let sendUserSecToDB = async (roomId, uuid, sec, click) => {
@@ -316,20 +188,6 @@ let sendUserSecToDB = async (roomId, uuid, sec, click) => {
     });
     let data = await response.json();
     return data.data;
-    // let response = await fetch(`/room/sendUserSecToDB`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "uuid": uuid,
-    //         "sec": sec,
-    //         "gameClick": click,
-    //     })
-    // });
-    // let data = await response.json();
-    // return data.data;
 }
 
 let checkIfAuthAlready = async (roomId) => {
@@ -338,19 +196,6 @@ let checkIfAuthAlready = async (roomId) => {
     if(data){
         return [data.message, data.authUuid]
     }
-    // let response = await fetch(`/room/checkAuth`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
-    // if(data){
-    //     return [data.message, data.authUuid]
-    // }
 }
 
 let assignNewAuth = async (roomId, oldUuid, newUuid) => {
@@ -365,52 +210,18 @@ let assignNewAuth = async (roomId, oldUuid, newUuid) => {
         })
     });
     let data = await response.json();
-    // let response = await fetch(`/room/assignNewAuth`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //         "oldUuid": oldUuid,
-    //         "newUuid": newUuid,
-    //     })
-    // });
-    // let data = await response.json();
 }
 
 let getGroupInfo = async (roomId) => {
     let response = await fetch(`/room/${roomId}/users`);
     let data = await response.json();
     return [data.data, data.host];
-    // let response = await fetch(`/room/${roomId}/users`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
-    // return [data.data, data.host];
 }
 
 let checkRoomExist = async (roomId) => {
     let response = await fetch(`/room/${roomId}`);
     let data = await response.json();
     return data.exist;
-    // let response = await fetch(`/room/checkroomexist`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type":"application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         "roomId": roomId,
-    //     })
-    // });
-    // let data = await response.json();
-    // return data.exist;
 }
 
 export default {
@@ -435,20 +246,3 @@ export default {
     getGroupInfo,
     checkRoomExist,
 }
-
-/*
-let checkUserLeaveFalse = async (roomId, uuid) => {
-    let response = await fetch(`/room/checkUserLeaveFalse`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
-    let data = await response.json();
-    return data.data;
-}
-*/

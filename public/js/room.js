@@ -7,7 +7,6 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
 
-let enterRoom = false;
 let auth;
 
 auth = (parseInt(params.auth) === 0);
@@ -53,11 +52,7 @@ let host = "";
 let groupLst = [];
 let userInRoomObj = {};
 
-let videoCt = 0;
-let tmpNewStreamCt = null;
-let needLoadAgain = false;
 let tmpScreenShareStreamId = null;
-// let currentPeer;
 let currentPeer = {};
 
 let gameLeft = 0;
@@ -85,29 +80,17 @@ if(auth){
     socketWait = io("/enter", {transports: ['websocket']});
     firstSocketWait = false;
 }
-// const socket = io({transports: ['websocket'], upgrade: false});
-// const socket = io({upgrade: true});
-// const socket = io({transports: ['websocket']});
 
-
-// const myPeer = new Peer()
 const myPeer = new Peer(USER_ID);
-// const myPeer = new Peer(USER_ID, {
-//     host: "beelinetw.com",
-//     port: 9000,
-//     path: "/myapp",
-// })
+let nPeer = new Peer();
 
-const myVideo = document.createElement("video")
+const myVideo = document.createElement("video");
 myVideo.muted = true;
 
 let tempMediaStreamId = null;
 let tempRemoteMediaStreamId = null;
 
 const peers = {};
-
-let nPeer = new Peer();
-// const nPeer = new Peer(`${USER_ID}-screen`)
 
 let eyeGameInit = () => {
     document.querySelector("#eye-game").onclick = async () => {
@@ -152,8 +135,6 @@ navigator.mediaDevices.getUserMedia({
         extension.rightIconsInit();
         msgSubmit.addEventListener("submit", messageSubmit);
         searchBar.addEventListener("input", extension.searchUser); 
-        // socketDraw.emit('join-room', ROOM_ID, USER_ID);
-
 
         // 進房時監聽
         addVideoStream(myVideo, stream, true, USER_ID);
@@ -162,11 +143,9 @@ navigator.mediaDevices.getUserMedia({
             const video = document.createElement("video");
             let remoteUuid = call.peer;
             call.on("stream", userVideoStream => {
-                // currentPeer = call.peerConnection;
                 currentPeer[remoteUuid] = call.peerConnection;
 
                 if (USER_ID === userVideoStream.id) return;
-                // console.log("stream", userVideoStream)
                 addVideoStream(video, userVideoStream, false, remoteUuid);
             })
         })
@@ -180,33 +159,6 @@ navigator.mediaDevices.getUserMedia({
             socketWaitInRoomAuthInit();
             socketWait.emit('join-room', ROOM_ID, USER_ID);
         }
-
-        /*
-        let audioTrack = stream.getAudioTracks()[0];
-        socket.on('need-audio-reload', async (roomId, uuid) => {
-            if(ROOM_ID === roomId && uuid !== USER_ID){
-                // let timer = setInterval(() => {
-
-                if(currentPeer[uuid]){
-                    console.log(currentPeer[uuid]);
-                    let sender = currentPeer[uuid].getSenders().find(function(s){
-                        return s.track.kind == audioTrack.kind;
-                    });
-                    currentPeer[uuid].removeTrack(sender);
-                    currentPeer[uuid].addTrack(audioTrack);
-                    // sender.replaceTrack(audioTrack)
-                    // clearInterval(timer);
-                }
-                // }, 100)   
-            }
-        })
-        */
-
-        /*
-        document.querySelector(".test-btn").onclick = () => {
-            utils.testResize();
-        }
-        */
 
     }else{
         waitingSocketInit();
@@ -307,18 +259,11 @@ navigator.mediaDevices.getUserMedia({
 })
 
 
-// myPeer.on('open', async id => {
-//     socket.emit('join-room', ROOM_ID, USER_ID);
-// })
-
-
 let waitingSocketInit = async () => {
     socketWait.on('client-action', async (roomId, clientName, b) => {
-    // socket.on('client-action', async (roomId, clientName, b) => {
         if(clientName === USER_NAME && b){
             await modal.setRoomEnterToken(roomId);
             window.location.reload();
-            // history.go(0);
         }else if(clientName === USER_NAME && !b){
             window.location = "/";
         }
@@ -330,8 +275,7 @@ let socketConn = async (sk, stream) => {
         console.log(`socket user ${uuid} enter room ${ROOM_ID}`);
         connectToNewUser(uuid, stream);
         
-        if(USER_ID === uuid){
-            // tryEnterRoom(USER_ID);        
+        if(USER_ID === uuid){     
             if(auth){
                 await modal.insertMongoRoomData(ROOM_ID, uuid, true, true, auth, USER_NAME, USER_IMG);
             }else if(CLIENT){
@@ -351,13 +295,9 @@ let socketConn = async (sk, stream) => {
                 audioSetInit(stream);
             }
 
-            // enterRoom = true;
-            // disconnect = false;
-
             console.log("conn establish");
             document.querySelector("#waiting-block").remove();
             if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                // utils.playAudio("/public/audio/enter-room.mp3", 0.2);
                 let audio = new Audio("/public/audio/enter-room.mp3");
                 audio.volume = 0.2;
                 audio.play();
@@ -367,7 +307,7 @@ let socketConn = async (sk, stream) => {
 }
 
 let socketWaitInRoomAuthInit = async () => {
-    // s2 connect
+    // socketWait connect
     socketWait.on('user-connected', async uuid => {
         console.log(`waiter user ${uuid} enter room ${ROOM_ID}`);
     })
@@ -401,7 +341,6 @@ let socketWaitInRoomAuthInit = async () => {
             </div>
             `;
             document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-            // utils.playAudio("/public/audio/client-request.mp3", 0.3);
             let audio = new Audio("/public/audio/client-request.mp3");
             audio.volume = 0.3;
             audio.play();
@@ -424,9 +363,7 @@ let socketWaitInRoomAuthInit = async () => {
                 } ,500)
                 socketWait.emit("allow-refuse-room", ROOM_ID, clientName, false);
 
-                // 需要改成 delete 不只設 leave
                 modal.refuseUserInRoom(ROOM_ID, clientUuid);
-                // removeMongoRoomData(ROOM_ID, clientUuid, false);
             }
 
             clientAllow.onmouseover = () => {
@@ -453,8 +390,6 @@ let inRoomSocketInit = async () => {
             let remoteDiv = document.querySelector(`#user-${uuid} .user-block`);
             let remoteNameBg = document.querySelector(`#wrapper-${uuid} .username-wrapper-room`);
             if(remoteDiv && b){
-                // remoteDiv.classList.remove("show");
-                // remoteNameBg.classList.remove("bg-none");
                 setTimeout(()=>{
                     remoteDiv.classList.remove("show");
                     remoteNameBg.classList.remove("bg-none");
@@ -491,11 +426,6 @@ let inRoomSocketInit = async () => {
 
     // leave room
     socket.on('leave-video-remove', async (uuid) => {
-        // if(authParam){
-        //     let newAuth = await modal.resetAuthData(ROOM_ID, USER_ID);
-        //     console.log(newAuth);
-        // }
-
         let remoteUserWrapper =  document.querySelector(`#wrapper-${uuid}`);
         if(remoteUserWrapper){
             remoteUserWrapper.remove();
@@ -616,7 +546,6 @@ let inRoomSocketInit = async () => {
                 </div>
                 `;
                 document.querySelector(".service-wrapper").insertAdjacentHTML("afterbegin", gameTag);
-                // socketWait.disconnect();
             }
             if(USER_ID === newUuid){
                 if(firstSocketWait){
@@ -694,7 +623,6 @@ let inRoomSocketInit = async () => {
 
             setTimeout(()=>{
                 setTimeout(()=>{
-                    // utils.playAudio("/public/audio/bee-show.wav", 0.3);
                     let audio = new Audio("/public/audio/bee-show.wav");
                     audio.volume = 0.4;
                     audio.play();
@@ -760,7 +688,6 @@ let inRoomSocketInit = async () => {
                 extension.createRecordBoard(data, userSec);
             }, 500)
             setTimeout(() => {
-                // let previous = document.querySelector(".record-wrapper");
                 let exit = document.querySelector(".record-exit");
                 if(exit){
                     gameBlock.classList.remove("show");
@@ -795,10 +722,6 @@ let inRoomSocketInit = async () => {
 
                     document.querySelector(".message-wrapper").style.height = "calc(100vh - 343px)";
                     if(!chatOpen){
-                        // messageWrapper.classList.add("add-disabled");
-                        // sendWrapper.classList.add("add-disabled");
-                        // sendMessageInput.disabled = true;
-    
                         let switchInput = document.querySelector("#switch");
                         switchInput.checked = false;
                     }
@@ -823,17 +746,6 @@ let inRoomSocketInit = async () => {
                 }
             }, 1000)
         }
-
-        /*
-        if(uuid === USER_ID){
-            disconnect = true;
-            let data = await modal.checkNeedReconnect(ROOM_ID, USER_ID);
-            if(data.message == "needReconnect"){
-                console.log(`user ${uuid} connection break, try reconnect.`);
-                tryEnterRoom(uuid);
-            }
-        }
-        */
     })
 }
 
@@ -859,7 +771,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
         // leave room
         leaveBtn.onclick = async () => {
-            // socket.disconnect();
             clickLeaveBtnToLeave = true;
             await modal.setLeaveTrueOrDeleteRoom(ROOM_ID, USER_ID, auth);
             await modal.setRoomEnterToken(ROOM_ID);
@@ -929,16 +840,13 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             let localAudioStatus = data.audioStatus;
             let localVideoStatus = data.videoStatus;
             if(!localAudioStatus){
-                // stream.getTracks()[0].enabled = false;
                 stream.getAudioTracks()[0].enabled = false;
                 document.querySelector(`#user-${USER_ID} .micro-status-icon`).classList.add("show");
                 document.querySelector(`#user-${USER_ID} .micro-ani-block`).classList.add("hide");
                 audioBtn.classList.add("disable");
             }
             if(!localVideoStatus){
-                // stream.getTracks()[1].enabled = false;
                 stream.getVideoTracks()[0].stop();
-                // stream.getVideoTracks()[0].enabled = false;
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
@@ -982,7 +890,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 <h4>${shareName} 正在分享螢幕</h4>
             </div>
             `;
-            // document.querySelector(".user-container").insertAdjacentHTML("afterbegin", html);
             document.querySelector("#video-streams").insertAdjacentHTML("afterbegin", html);
             video.addEventListener("loadedmetadata", () => {
                 video.play();
@@ -1034,7 +941,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
         document.querySelector(`#user-${remoteUuid}`).append(video);
 
         let audio = document.createElement("audio");
-        // audio.src = URL.createObjectURL(stream.getAudioTracks()[0]);
         audio.srcObject=stream;
 
         audio.addEventListener("loadedmetadata", () => {
@@ -1091,20 +997,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
 // camera button
 let toggleCamera = async (stream, dom, inRoom) => {
-    // let isOpen = stream.getTracks()[1].enabled;
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
         document.querySelector(".user-block.local").classList.add("show");
-        // stream.getVideoTracks()[0].enabled = false;
-        // stream.getTracks()[1].enabled = false;
-        // stream.getTracks()[1].stop();
         stream.getVideoTracks()[0].stop();
 
-        // if(inRoom){
-        //     stream.getVideoTracks()[0].stop();
-        // }else{
-        //     stream.getVideoTracks()[0].enabled = false;
-        // }
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
         inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "video", false); 
 
@@ -1118,7 +1015,6 @@ let toggleCamera = async (stream, dom, inRoom) => {
             document.querySelector(".username-wrapper-room.local").classList.remove("bg-none");            
         }
         dom.classList.remove("disable");
-        // stream.getVideoTracks()[0].enabled = true;
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, true);
         inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "video", true);
 
@@ -1139,7 +1035,6 @@ let toggleCamera = async (stream, dom, inRoom) => {
             myVideo.srcObject = newStream;
 
             let videoTrack = newStream.getVideoTracks()[0];
-            // let videoTrack = newStream.getTracks()[1];
             socket.on('need-reload', async (roomId, uuid) => {
                 if(ROOM_ID === roomId && uuid !== USER_ID){
                     let timer = setInterval(() => {
@@ -1176,7 +1071,6 @@ let toggleAudio = async (stream, dom, inRoom) => {
     let isVolumn = stream.getTracks()[0].enabled;
     if(isVolumn){
         dom.classList.add("disable");
-        // stream.getTracks()[0].enabled = false;
         stream.getAudioTracks()[0].enabled = false;
         document.querySelector(".micro-status-icon.local").classList.add("show");
         if(auth || CLIENT){
@@ -1190,7 +1084,6 @@ let toggleAudio = async (stream, dom, inRoom) => {
 
     }else{
         dom.classList.remove("disable");
-        // stream.getTracks()[0].enabled = true;
         stream.getAudioTracks()[0].enabled = true;
         document.querySelector(".micro-status-icon.local").classList.remove("show");
         if(auth || CLIENT){
@@ -1202,54 +1095,12 @@ let toggleAudio = async (stream, dom, inRoom) => {
         inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
 }
-/*
-let tryEnterRoom = (uuid) => {
-    if(uuid){
-        if(!enterRoom){
-            // let ct = 0;
-            let timer = setInterval(() => {
-                // ct ++;
-                if(disconnect){
-                    // if(ct > 700){
-                        // window.location.reload();
-                        // history.go(0);
-                    // }
-                }else{
-                    console.log("conn establish");
-                    document.querySelector("#waiting-block").remove();
-                    clearInterval(timer);
-                    if(auth || (CLIENT && ENTER_ROOM_ID === ROOM_ID)){
-                        // utils.playAudio("/public/audio/enter-room.mp3", 0.2);
-                        let audio = new Audio("/public/audio/enter-room.mp3");
-                        audio.volume = 0.2;
-                        audio.play();
-                    }
-                }
-            }, 1000);
-        }else{
-            let timer = setInterval(() => {
-                if(disconnect){
-                    console.log("try");
-                    socket = io({transports: ['websocket']});
-                    socket.emit('join-room', ROOM_ID, USER_ID);
-                }else{
-                    console.log("conn establish");
-                    clearInterval(timer);
-                }
-            }, 10000);
-        }
-    }else{
-        console.log("loading error");
-    }
-}
-*/
 
 let connectToNewUser = (userId, stream) => {
     const call = myPeer.call(userId, stream)
     let video = document.createElement("video")
     let remoteUuid = call.peer
     call.on("stream", userVideoStream => {
-        // currentPeer = call.peerConnection;
         currentPeer[remoteUuid] = call.peerConnection;
         addVideoStream(video, userVideoStream, false, remoteUuid);
     })
@@ -1366,8 +1217,6 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
     </div>
     `;
     document.querySelector(".user-wrapper").insertAdjacentHTML(position, txt);
-
-    // groupNumber.textContent = Object.keys(userInRoomObj).length;
     groupNumber.textContent = document.querySelectorAll(".user-one").length;
 
     if(auth){
@@ -1380,7 +1229,6 @@ let createGroupDomNew = async (name, host, uuid, imgUrl, audioStatus, position) 
 let NameBtnInit = (uuid) => {
     let extensionBox = document.querySelector(".extension-box");
     let userOne = document.querySelector(`#group-${uuid}.user-one`);
-    // let nameBtn = document.querySelector(`#group-${uuid} .user-name`);
     let block = document.querySelector(`#group-${uuid} .auth-check-block`);
     let yesBtn = document.querySelector(`#group-${uuid} .auth-allow`);
 
@@ -1416,7 +1264,6 @@ let alertNewAuth = (uuid) => {
     </div>
     `;
     document.querySelector(".client-alert").insertAdjacentHTML("beforeend", html);
-    // utils.playAudio("/public/audio/client-request.mp3", 0.3);
     let audio = new Audio("/public/audio/client-request.mp3");
     audio.volume = 0.3;
     audio.play();
@@ -1538,7 +1385,6 @@ let gameStartAni = () => {
             let audio = new Audio("/public/audio/count-down.wav");
             audio.volume = 0.2;
             audio.play();
-            // utils.playAudio("/public/audio/count-down.wav", 0.2);
 
             content --;
             if(content === 0){
@@ -1576,8 +1422,7 @@ let audioSetInit = async (stream) => {
             for(const volume of volumes)
             volumeSum += volume;
             const averageVolume = volumeSum / volumes.length;
-            // console.log(averageVolume)
-
+            
             if(averageVolume < 40 && !isVolumn){
                 socket.emit("audio-ani", ROOM_ID, USER_ID, false);
             }else{

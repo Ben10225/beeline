@@ -1,4 +1,3 @@
-import utils from "./utils.js";
 
 const userContainer = document.querySelector(".user-container");
 
@@ -227,7 +226,6 @@ let gameStartTextSetting = () => {
                 gameStartTxt.textContent = t;
             }, index * 160)
         })
-        // utils.playAudio("/public/audio/type.wav", 0.6);
         let audio = new Audio("/public/audio/type.wav");
         audio.volume = 0.6;
         audio.play();

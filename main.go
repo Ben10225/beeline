@@ -34,13 +34,11 @@ func main() {
 	drawMap := map[string]string{}
 
 	server.OnEvent("/", "join-room", func(s socketio.Conn, roomId, uuid string) {
-		// s.SetContext(roomId)
 		log.Println(uuid, "join room")
 		s.Join(roomId)
 		uuidMap[s.ID()] = uuid
 		roomMap[uuid] = roomId
 		server.BroadcastToRoom("/", roomId, "user-connected", uuid)
-		// s.Emit("user-connected", uuid)
 	})
 
 	server.OnEvent("/enter", "join-room", func(s socketio.Conn, roomId, uuid string) {
@@ -85,12 +83,10 @@ func main() {
 	// allow in room
 	server.OnEvent("/enter", "allow-refuse-room", func(s socketio.Conn, roomId, clientName string, b bool) {
 		server.BroadcastToRoom("/enter", roomId, "client-action", roomId, clientName, b)
-		// server.BroadcastToNamespace("/", "client-action", roomId, clientName, b)
 	})
 
 	// chat
 	server.OnEvent("/", "chat", func(s socketio.Conn, roomId, clientName, message string) {
-		// current := utils.GetCurrentTime()
 		server.BroadcastToRoom("/", roomId, "chat-room", roomId, clientName, message)
 	})
 
@@ -138,15 +134,6 @@ func main() {
 	server.OnEvent("/draw", "reflash", func(s socketio.Conn, roomId, uuid string) {
 		server.BroadcastToRoom("/draw", roomId, "onreflash", roomId, uuid)
 	})
-	/*
-		server.OnEvent("/draw", "draw", func(s socketio.Conn, roomId, uuid string, x, y float64, color string, lineWidth int) {
-			server.BroadcastToRoom("/draw", roomId, "ondraw", roomId, uuid, x, y, color, lineWidth)
-		})
-
-		server.OnEvent("/draw", "down", func(s socketio.Conn, roomId, uuid string, x, y float64) {
-			server.BroadcastToRoom("/draw", roomId, "ondown", roomId, uuid, x, y)
-		})
-	*/
 
 	// track reload
 	server.OnEvent("/", "remote-track-reload", func(s socketio.Conn, roomId, uuid string) {
@@ -166,7 +153,6 @@ func main() {
 	defer server.Close()
 
 	r.Use(utils.GinMiddleware("http://localhost:4000"))
-	// router.Use(gin.Recovery())
 
 	r.GET("/socket.io/*any", gin.WrapH(server))
 	r.POST("/socket.io/*any", gin.WrapH(server))

@@ -392,17 +392,6 @@ function toDataURL(url, callback) {
     xhr.send();
 }
 
-// document.querySelector(".pic").style = `z-index: -2`;
-
-// navigator.mediaDevices.getUserMedia({
-//     video: true,
-//     audio: true
-// }).then( stream => {
-//     stream.getTracks()[1].stop();
-//     stream.getTracks()[0].stop();
-// })
-
-
 utils.auth("index");
 signTwoBlockButtonInit();
 inputEmailSignin.addEventListener("input", checkEmailSignin);

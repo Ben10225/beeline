@@ -15,10 +15,8 @@ func InsertUserRoomData(c *gin.Context) {
 	uuid := c.Param("id")
 
 	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c.BindJSON(&req)
+
 	audioStatus := req.AudioStatus
 	videoStatus := req.VideoStatus
 	auth := req.Auth
@@ -37,12 +35,8 @@ func SetUserLeaveTrue(c *gin.Context) {
 	uuid := c.Param("id")
 
 	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// roomId := req.RoomId
-	// uuid := req.Uuid
+	c.BindJSON(&req)
+
 	auth := req.Auth
 
 	models.UserLeaveTrue(c, roomId, uuid, auth)
@@ -53,10 +47,6 @@ func SetUserLeaveTrue(c *gin.Context) {
 }
 
 func RefuseUserInRoom(c *gin.Context) {
-	// var req structs.RoomUserData
-	// c.BindJSON(&req)
-	// roomId := req.RoomId
-	// uuid := req.Uuid
 	roomId := c.Param("roomId")
 	uuid := c.Param("id")
 
@@ -66,36 +56,7 @@ func RefuseUserInRoom(c *gin.Context) {
 	})
 }
 
-/*
-func CheckUserStillInRoom(c *gin.Context) {
-	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	roomId := req.RoomId
-	uuid := req.Uuid
-
-	needReconnect := models.GetUserInRoom(c, roomId, uuid)
-	if needReconnect {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "needReconnect",
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "userLeft",
-		})
-	}
-}
-*/
-
 func GetRoomExist(c *gin.Context) {
-	// var req structs.RoomUserData
-	// err := c.BindJSON(&req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	exist := models.FindRoom(c, roomId)
 
@@ -134,13 +95,6 @@ func SetUserStreamStatus(c *gin.Context) {
 }
 
 func GetAuth(c *gin.Context) {
-	// var req structs.RoomUserData
-	// err := c.BindJSON(&req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	result, authUuid := models.CheckAuthAlready(c, roomId)
 
@@ -175,12 +129,6 @@ func SetUserLeaveFalse(c *gin.Context) {
 }
 
 func GetNewAuthAndChatStatus(c *gin.Context) {
-	// var req structs.RoomUserData
-	// err := c.BindJSON(&req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	roomId := c.Param("roomId")
 	uuid := c.Param("id")
 
@@ -195,7 +143,6 @@ func UpdateRoomChatStatus(c *gin.Context) {
 	var req structs.RoomInfo
 	c.BindJSON(&req)
 
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	chatOpen := req.ChatOpen
 
@@ -207,10 +154,6 @@ func UpdateRoomChatStatus(c *gin.Context) {
 }
 
 func GetRoomChatAndShare(c *gin.Context) {
-	// var req structs.RoomInfo
-	// c.BindJSON(&req)
-
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	chatOpen, screenShare := models.GetRoomChatAndShareStatus(c, roomId)
 
@@ -221,13 +164,6 @@ func GetRoomChatAndShare(c *gin.Context) {
 }
 
 func GetEnterToken(c *gin.Context) {
-	// var req structs.RoomUserData
-	// err := c.BindJSON(&req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	token, _ := utils.MakeRoomToken(roomId)
 	c.SetCookie("roomT", token, 0, "/", "", false, true)
@@ -236,12 +172,7 @@ func GetEnterToken(c *gin.Context) {
 	})
 }
 
-// func GetGroupInfo(c *gin.Context) {
 func GetRoomUsers(c *gin.Context) {
-	// var req structs.RoomInfo
-	// c.BindJSON(&req)
-
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	group, host := models.GetGroupInfoData(c, roomId)
 
@@ -258,7 +189,6 @@ func UpdateNewAuthAndOldAuth(c *gin.Context) {
 	}{}
 	c.BindJSON(&req)
 
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	oldUuid := req.OldUuid
 	newUuid := req.NewUuid
@@ -280,7 +210,6 @@ func UpdateScreenShareBool(c *gin.Context) {
 	var req structs.RoomInfo
 	c.BindJSON(&req)
 
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	screenShare := req.ScreenShare
 
@@ -291,28 +220,7 @@ func UpdateScreenShareBool(c *gin.Context) {
 	})
 }
 
-/*
-func SendUserSec(c *gin.Context) {
-	var req structs.RoomUserData
-	c.BindJSON(&req)
-
-	roomId := req.RoomId
-	uuid := req.Uuid
-	sec := req.Sec
-	gameClick := req.GameClick
-	canQuitGame := models.SendSec(c, roomId, uuid, sec, gameClick)
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": canQuitGame,
-	})
-}
-*/
-
 func GetGameResult(c *gin.Context) {
-	// var req structs.RoomInfo
-	// c.BindJSON(&req)
-	// roomId := req.RoomId
-
 	roomId := c.Param("roomId")
 	result, info := models.GetGameSlice(c, roomId)
 
@@ -338,29 +246,7 @@ func CheckUserLeaveFalse(c *gin.Context) {
 	})
 }
 
-/*
-func SetWaitingStatus(c *gin.Context) {
-	var req structs.RoomUserData
-	c.BindJSON(&req)
-
-	roomId := req.RoomId
-	uuid := req.Uuid
-	audioStatus := req.AudioStatus
-	videoStatus := req.VideoStatus
-
-	models.SetWaitingStatusData(c, roomId, uuid, audioStatus, videoStatus)
-
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
-}
-*/
-
 func ResetAllUserGameClickFalse(c *gin.Context) {
-	// var req structs.RoomUserData
-	// c.BindJSON(&req)
-
-	// roomId := req.RoomId
 	roomId := c.Param("roomId")
 	models.ResetAllUserGameClickFalseData(c, roomId)
 

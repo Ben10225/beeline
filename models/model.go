@@ -27,10 +27,8 @@ func CheckEmailExist(c *gin.Context, email string) bool {
 
 func CreateUser(c *gin.Context, uuid, name, email, password, color string) bool {
 	var tpZone = time.FixedZone("GMT", 8*3600)
-	// fmt.Println(time.Now().In(tpZone).Format("01-02-2006 15:04:05"))
 
 	newUser := structs.User{
-		// Id:       primitive.NewObjectID(),
 		Uuid:        uuid,
 		Name:        name,
 		Email:       email,
@@ -75,45 +73,3 @@ func UpdateUserImg(c *gin.Context, uuid, imgUrl string) {
 		log.Fatal(err)
 	}
 }
-
-/*
-func SetPeerIdByUuid(c *gin.Context, uuid, peerId string) {
-	// update := structs.User{
-	// 	PeerId: peerId,
-	// }
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{"peerid", peerId}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	// _, err := userCollection.UpdateOne(c, bson.M{"uuid": uuid}, bson.M{"$set": update})
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-}
-
-func GetPeerIdByUuidAndRemove(c *gin.Context, uuid string) *structs.User {
-	user := structs.User{}
-	err := userCollection.FindOne(c, bson.M{"uuid": uuid}).Decode(&user)
-	if err != nil {
-		log.Fatal("find one", err)
-		return nil
-	}
-	filter := bson.D{{"uuid", uuid}}
-	update := bson.D{{"$set", bson.D{{"peerid", ""}}}}
-	_, err = userCollection.UpdateOne(c, filter, update)
-	if err != nil {
-		log.Fatal("update none", err)
-		return nil
-	}
-	return &user
-}
-
-func UpdateUserUuid(c *gin.Context, oldUuid, newUuid string) {
-	filter := bson.D{{Key: "uuid", Value: oldUuid}}
-	update := bson.D{{Key: "$set", Value: bson.D{{Key: "uuid", Value: newUuid}}}}
-	_, err := userCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-*/

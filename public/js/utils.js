@@ -326,8 +326,6 @@ let playAudio = (url, volume) => {
     const URL = url;
       
     const context = new AudioContext();
-    // const playButton = document.querySelector('#play');
-  
     window.fetch(URL)
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => context.decodeAudioData(arrayBuffer))

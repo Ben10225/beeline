@@ -16,7 +16,6 @@ let boardInit = async (socketDraw) => {
     
     canvas.onmousedown = () => {
         ctx.moveTo(x, y);
-        // socketDraw.emit("down", ROOM_ID, USER_ID, x, y);
         mouseDown = true;
     }
     
@@ -29,7 +28,6 @@ let boardInit = async (socketDraw) => {
 
     socketDraw.on("onup", (roomId, uuid, lst, c, w) => {
         if(roomId === ROOM_ID && uuid !== USER_ID){
-        // if(roomId === ROOM_ID){
             if(!mouseDown){
                 let utx = canvas.getContext("2d");
                 utx.lineCap = "round";
@@ -58,24 +56,11 @@ let boardInit = async (socketDraw) => {
                     }
                 }, 100)
             }
-
-
-            // let udx = canvas.getContext("2d");
-            // udx.lineCap = "round";
-            // udx.strokeStyle = c;
-            // udx.lineWidth = w;
-            // lst.forEach(position => {
-            //     udx.lineTo(position.x, position.y);
-            //     // udx.stroke();
-            // })
-            
         }
     })
     
     socketDraw.on("ondraw", (roomId, uuid, x, y, c, w) => {
-        // console.log(x, y)
         if(roomId === ROOM_ID && uuid !== USER_ID){
-        // if(roomId === ROOM_ID){
             ctx.strokeStyle = c;
             ctx.lineWidth = w;
             ctx.lineTo(x, y);
@@ -106,7 +91,6 @@ let boardInit = async (socketDraw) => {
         y = e.clientY - rect.top;
     
         if(mouseDown){
-            // socketDraw.emit("draw", ROOM_ID, USER_ID, x, y, color, lineWidth);
             storage.push([x, y]);
             ctx.strokeStyle = color;
             ctx.lineWidth = lineWidth;
@@ -204,8 +188,6 @@ let boardInit = async (socketDraw) => {
     
     const exit = document.querySelector(".white-board-exit");
     exit.onclick = () => {
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // ctx.beginPath();
         document.querySelector("#white-board-block").classList.remove("show");
     }
 }
