@@ -941,8 +941,6 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
                 cameraBtn.classList.add("disable");
-            }else{
-
             }
             
             let roomStatus = await modal.getRoomChatAndShare(ROOM_ID);
@@ -1081,8 +1079,11 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
+        
         socket.emit('remote-track-reload', ROOM_ID, remoteUuid);
-        socket.emit('get-already-screen-share', ROOM_ID, `${USER_ID}-screen-${sct}`);
+        if(screenShareBtn.classList.contains("stopShareClick")){
+            socket.emit('get-already-screen-share', ROOM_ID);
+        }
     }    
     utils.settingVideoSize();
 }
