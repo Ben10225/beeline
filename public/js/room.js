@@ -546,14 +546,16 @@ let inRoomSocketInit = async () => {
                 </div>
                 `;
                 document.querySelector(".service-wrapper").insertAdjacentHTML("afterbegin", gameTag);
+                socketWait.emit('auth-leave', ROOM_ID);
             }
             if(USER_ID === newUuid){
                 if(firstSocketWait){
                     socketWait = io("/enter", {transports: ['websocket']});
-                    socketWait.emit('join-room', ROOM_ID, USER_ID);
                     firstSocketWait = false;
                     socketWaitInRoomAuthInit();
                 }
+                socketWait.emit('join-room', ROOM_ID, USER_ID);
+
                 // group
                 newAuthGroupSetting();
 
@@ -734,9 +736,9 @@ let inRoomSocketInit = async () => {
                     // socketWait
                     if(firstSocketWait){
                         socketWait = io("/enter", {transports: ['websocket']});
-                        socketWait.emit('join-room', ROOM_ID, USER_ID);
                         socketWaitInRoomAuthInit();
                     }
+                    socketWait.emit('join-room', ROOM_ID, USER_ID);
                 }else{
                     auth = false;
                 }
@@ -1422,7 +1424,7 @@ let audioSetInit = async (stream) => {
             for(const volume of volumes)
             volumeSum += volume;
             const averageVolume = volumeSum / volumes.length;
-            
+
             if(averageVolume < 40 && !isVolumn){
                 socket.emit("audio-ani", ROOM_ID, USER_ID, false);
             }else{

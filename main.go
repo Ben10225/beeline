@@ -11,14 +11,10 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
-// nodemon --exec go run main.go --signal SIGTERM
-
 const portNumber = ":3000"
 
 func main() {
 	r := gin.New()
-	// r := gin.Default()
-
 	configs.ConnectDB()
 
 	server := socketio.NewServer(nil)
@@ -55,6 +51,11 @@ func main() {
 		uuidMap[s.ID()] = uuid
 		drawMap[uuid] = roomId
 		server.BroadcastToRoom("/draw", roomId, "user-connected", uuid)
+	})
+
+	// auth leave
+	server.OnEvent("/enter", "auth-leave", func(s socketio.Conn, roomId string) {
+		s.Leave(roomId)
 	})
 
 	server.OnDisconnect("", func(s socketio.Conn, msg string) {
