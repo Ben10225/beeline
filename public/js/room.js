@@ -69,19 +69,21 @@ let socket;
 let socketWait;
 let socketDraw;
 let drawOpen = false;
+let firstSocketWait = true;
 
 
 if(auth){
     socket = io({transports: ['websocket']});
     socketWait = io("/enter", {transports: ['websocket']});
     socketDraw = io("/draw", {transports: ['websocket']});
-
+    firstSocketWait = false;
 }else if(CLIENT){
     socket = io({transports: ['websocket']});
     socketDraw = io("/draw", {transports: ['websocket']});
 
 }else{
     socketWait = io("/enter", {transports: ['websocket']});
+    firstSocketWait = false;
 }
 // const socket = io({transports: ['websocket'], upgrade: false});
 // const socket = io({upgrade: true});
@@ -349,8 +351,8 @@ let socketConn = async (sk, stream) => {
                 audioSetInit(stream);
             }
 
-            enterRoom = true;
-            disconnect = false;
+            // enterRoom = true;
+            // disconnect = false;
 
             console.log("conn establish");
             document.querySelector("#waiting-block").remove();
@@ -606,7 +608,7 @@ let inRoomSocketInit = async () => {
                 document.querySelector("#eye-game").remove();
                 let gameTag = `
                 <div class="service-block" id="eye-game">
-                    <div class="service-img"></div>
+                    <div class="service-img s-game"></div>
                     <div class="service-txt">
                         <h4>眼明手快</h4>
                         <p>需由室長發起遊戲</p>
@@ -617,7 +619,10 @@ let inRoomSocketInit = async () => {
                 socketWait.disconnect();
             }
             if(USER_ID === newUuid){
-                socketWait = io("/enter", {transports: ['websocket']});
+                if(firstSocketWait){
+                    socketWait = io("/enter", {transports: ['websocket']});
+                    firstSocketWait = false;
+                }
                 socketWait.emit('join-room', ROOM_ID, USER_ID);
                 s2InRoomAuthInit();
                 // group
@@ -818,6 +823,7 @@ let inRoomSocketInit = async () => {
             }, 1000)
         }
 
+        /*
         if(uuid === USER_ID){
             disconnect = true;
             let data = await modal.checkNeedReconnect(ROOM_ID, USER_ID);
@@ -826,6 +832,7 @@ let inRoomSocketInit = async () => {
                 tryEnterRoom(uuid);
             }
         }
+        */
     })
 }
 
@@ -1204,7 +1211,7 @@ let toggleAudio = async (stream, dom, inRoom) => {
         inRoom && modal.setUserStreamStatus(ROOM_ID, USER_ID, "audio", true);
     }
 }
-
+/*
 let tryEnterRoom = (uuid) => {
     if(uuid){
         if(!enterRoom){
@@ -1244,6 +1251,7 @@ let tryEnterRoom = (uuid) => {
         console.log("loading error");
     }
 }
+*/
 
 let connectToNewUser = (userId, stream) => {
     const call = myPeer.call(userId, stream)

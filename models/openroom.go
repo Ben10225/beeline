@@ -192,6 +192,7 @@ func PullUserData(c *gin.Context, roomId, uuid string) {
 	}
 }
 
+/*
 func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
@@ -209,6 +210,7 @@ func GetUserInRoom(c *gin.Context, roomId, uuid string) bool {
 	}
 	return false
 }
+*/
 
 func FindRoom(c *gin.Context, roomId string) bool {
 	var room structs.RoomInfo

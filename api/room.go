@@ -66,6 +66,7 @@ func RefuseUserInRoom(c *gin.Context) {
 	})
 }
 
+/*
 func CheckUserStillInRoom(c *gin.Context) {
 	var req structs.RoomUserData
 	err := c.BindJSON(&req)
@@ -86,15 +87,16 @@ func CheckUserStillInRoom(c *gin.Context) {
 		})
 	}
 }
+*/
 
-func CheckRoomExist(c *gin.Context) {
-	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	roomId := req.RoomId
-
+func GetRoomExist(c *gin.Context) {
+	// var req structs.RoomUserData
+	// err := c.BindJSON(&req)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// roomId := req.RoomId
+	roomId := c.Param("roomId")
 	exist := models.FindRoom(c, roomId)
 
 	if exist {
@@ -218,15 +220,15 @@ func GetRoomChatAndShare(c *gin.Context) {
 	})
 }
 
-func SetEnterToken(c *gin.Context) {
-	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
+func GetEnterToken(c *gin.Context) {
+	// var req structs.RoomUserData
+	// err := c.BindJSON(&req)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	roomId := req.RoomId
-
+	// roomId := req.RoomId
+	roomId := c.Param("roomId")
 	token, _ := utils.MakeRoomToken(roomId)
 	c.SetCookie("roomT", token, 0, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{

@@ -92,16 +92,18 @@ let setUserStreamStatus = async (roomId, uuid, status, bool) => {
 }
 
 let setRoomEnterToken = async (roomId) => {
-    let response = await fetch(`/room/entertoken`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
+    let response = await fetch(`/room/${roomId}/token`);
     let data = await response.json();
+    // let response = await fetch(`/room/entertoken`, {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type":"application/json"
+    //     },
+    //     body: JSON.stringify({
+    //         "roomId": roomId,
+    //     })
+    // });
+    // let data = await response.json();
 }
 
 let setBackRoomLeaveStatus = async (roomId, uuid) => {
@@ -198,7 +200,6 @@ let getRoomChatAndShare = async (roomId) => {
 
 let getRemoteUser = async (roomId, remoteUuid) => {
     // let response = await fetch(`/api/getremoteuser`, {
-    console.log(roomId, remoteUuid);
     let response = await fetch(`/room/${roomId}/user/${remoteUuid}`);
     //     method: "POST",
     //     headers: {
@@ -395,6 +396,23 @@ let getGroupInfo = async (roomId) => {
     // return [data.data, data.host];
 }
 
+let checkRoomExist = async (roomId) => {
+    let response = await fetch(`/room/${roomId}`);
+    let data = await response.json();
+    return data.exist;
+    // let response = await fetch(`/room/checkroomexist`, {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type":"application/json"
+    //     },
+    //     body: JSON.stringify({
+    //         "roomId": roomId,
+    //     })
+    // });
+    // let data = await response.json();
+    // return data.exist;
+}
+
 export default {
     setWaitingStatus,
     resetAllUserGameClickFalse,
@@ -415,6 +433,7 @@ export default {
     checkIfAuthAlready,
     assignNewAuth,
     getGroupInfo,
+    checkRoomExist,
 }
 
 /*

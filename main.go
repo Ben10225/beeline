@@ -60,7 +60,6 @@ func main() {
 	})
 
 	server.OnDisconnect("", func(s socketio.Conn, msg string) {
-		// s.Emit("user-disconnected", uuid)
 		roomId := roomMap[uuidMap[s.ID()]]
 		server.BroadcastToRoom("/", roomId, "user-disconnected", uuidMap[s.ID()])
 		log.Println("disconnect", s.ID(), roomId)

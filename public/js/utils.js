@@ -1,3 +1,5 @@
+import modal from "./modal.js"
+
 let auth = async (page) => {
     let response = await fetch(`/api/auth`);
     let data = await response.json();
@@ -39,10 +41,10 @@ let auth = async (page) => {
 }
 
 let goStream = async () => {
-    let roomId
+    let roomId;
     while(true){
         roomId = makeRoomId();
-        let roomExist = await checkRoomExist(roomId);
+        let roomExist = await modal.checkRoomExist(roomId);
         if (!roomExist) break;
     }
     window.open(`/${roomId}?auth=0`, '_self');
@@ -62,20 +64,6 @@ let makeRoomId = () => {
     }
     result = result.slice(0,-1);
     return result;
-}
-
-let checkRoomExist = async (roomId) => {
-    let response = await fetch(`/room/checkroomexist`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-        })
-    });
-    let data = await response.json();
-    return data.exist;
 }
 
 let generateShortLink = async () => {

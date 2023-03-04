@@ -20,8 +20,9 @@ func Routers(router *gin.Engine) {
 		user.POST("/signup", api.Signup)
 		user.POST("/signin", api.Signin)
 		user.GET("/signout", api.Signout)
-		// user.POST("/getremoteuser", api.GetRemoteUser)
 		user.PATCH("/photo", api.UploadImg)
+
+		// user.POST("/getremoteuser", api.GetRemoteUser)
 
 		// /room/:roomid/user/:id
 
@@ -31,6 +32,8 @@ func Routers(router *gin.Engine) {
 
 	room := router.Group("/room")
 	{
+		room.GET("/:roomId", api.GetRoomExist)
+
 		room.GET("/:roomId/user/:id", api.GetRemoteUser)
 		room.POST("/:roomId/user/:id", api.InsertUserRoomData)
 		room.PATCH("/:roomId/user/:id", api.UpdateRoomUserData)
@@ -38,6 +41,8 @@ func Routers(router *gin.Engine) {
 		room.GET("/:roomId/users", api.GetRoomUsers)
 		room.GET("/:roomId/auth", api.GetAuth)
 		room.GET("/:roomId/chatAndShare", api.GetRoomChatAndShare)
+		room.GET("/:roomId/token", api.GetEnterToken)
+
 		room.PATCH("/:roomId/screen", api.UpdateScreenShareBool)
 		room.PATCH("/:roomId/auth", api.UpdateNewAuthAndOldAuth)
 		room.PATCH("/:roomId/chat", api.UpdateRoomChatStatus)
@@ -47,10 +52,10 @@ func Routers(router *gin.Engine) {
 		// room.POST("/setusertoroom", api.SetUserRoomData)
 		// room.POST("/setLeaveTrueOrDeleteRoom", api.SetUserLeaveTrue)
 		// room.POST("/deleteUserArray", api.RefuseUserInRoom)
-		room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
-		room.POST("/checkroomexist", api.CheckRoomExist)
+		// room.POST("/checkneedreconnect", api.CheckUserStillInRoom)
+		// room.POST("/checkroomexist", api.CheckRoomExist)
 		// room.POST("/streamstatus", api.SetUserStreamStatus)
-		room.POST("/entertoken", api.SetEnterToken)
+		// room.POST("/entertoken", api.SetEnterToken)
 		// room.POST("/checkAuth", api.CheckAuth)
 		// room.POST("/setLeaveFalse", api.SetUserLeaveFalse)
 		// room.POST("/checkAuthChange", api.GetUserAuth)
