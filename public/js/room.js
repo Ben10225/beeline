@@ -177,7 +177,7 @@ navigator.mediaDevices.getUserMedia({
         socket.emit('join-room', ROOM_ID, USER_ID);
 
         if(auth){
-            s2InRoomAuthInit();
+            socketWaitInRoomAuthInit();
             socketWait.emit('join-room', ROOM_ID, USER_ID);
         }
 
@@ -298,7 +298,7 @@ navigator.mediaDevices.getUserMedia({
             window.location = "/";
         }
 
-        socketConn(socketWait, stream)
+        socketConn(socketWait, stream);
         socketWait.emit('join-room', ROOM_ID, USER_ID);
     }
 
@@ -366,7 +366,7 @@ let socketConn = async (sk, stream) => {
     })
 }
 
-let s2InRoomAuthInit = async () => {
+let socketWaitInRoomAuthInit = async () => {
     // s2 connect
     socketWait.on('user-connected', async uuid => {
         console.log(`waiter user ${uuid} enter room ${ROOM_ID}`);
@@ -616,15 +616,15 @@ let inRoomSocketInit = async () => {
                 </div>
                 `;
                 document.querySelector(".service-wrapper").insertAdjacentHTML("afterbegin", gameTag);
-                socketWait.disconnect();
+                // socketWait.disconnect();
             }
             if(USER_ID === newUuid){
                 if(firstSocketWait){
                     socketWait = io("/enter", {transports: ['websocket']});
+                    socketWait.emit('join-room', ROOM_ID, USER_ID);
                     firstSocketWait = false;
+                    socketWaitInRoomAuthInit();
                 }
-                socketWait.emit('join-room', ROOM_ID, USER_ID);
-                s2InRoomAuthInit();
                 // group
                 newAuthGroupSetting();
 
@@ -808,11 +808,12 @@ let inRoomSocketInit = async () => {
                     eyeGameInit();
                     document.querySelector("#eye-game .service-txt p").textContent = "點擊發起遊戲";
 
-                    //s2
-                    socketWait = io("/enter", {transports: ['websocket']});
-                    socketWait.emit('join-room', ROOM_ID, USER_ID);
-                    s2InRoomAuthInit();
-
+                    // socketWait
+                    if(firstSocketWait){
+                        socketWait = io("/enter", {transports: ['websocket']});
+                        socketWait.emit('join-room', ROOM_ID, USER_ID);
+                        socketWaitInRoomAuthInit();
+                    }
                 }else{
                     auth = false;
                 }
@@ -1079,7 +1080,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
             createGroupDomNew(remoteName, host, remoteUuid, remoteImgUrl, remoteAudioStatus, "beforeend");
             userInRoomObj[remoteUuid] = [remoteName, remoteImgUrl];
         }
-        
+
         socket.emit('remote-track-reload', ROOM_ID, remoteUuid);
         if(screenShareBtn.classList.contains("stopShareClick")){
             socket.emit('get-already-screen-share', ROOM_ID);
