@@ -608,6 +608,7 @@ let inRoomSocketInit = async () => {
             gameDelay = parseFloat(gameValue[2]);
             let clicked = false;
             showRecord = false;
+            let needStop = false;
 
             let gameBg = document.querySelector(".game-bg");
             if(gameBg){
@@ -644,12 +645,21 @@ let inRoomSocketInit = async () => {
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
 
                             let quitGame = await modal.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
+                            console.log("qG", quitGame)
                             if(quitGame){
                                 socket.emit("five-sec-end-game", ROOM_ID);
                             }
                         })
                     }, 1)
+                    let timer = setInterval(() => {
+                        if(showRecord){
+                            clearInterval(timer);
+                            needStop = true;
+                            return;
+                        };
+                    } ,100)
                     setTimeout(() => {
+                        if (needStop) return;
                         if(!clicked){
                             modal.sendUserSecToDB(ROOM_ID, USER_ID, 5, false);
                             dom.remove();
@@ -661,9 +671,7 @@ let inRoomSocketInit = async () => {
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
                         }
-                        if(auth && !showRecord){
-                           socket.emit("five-sec-end-game", ROOM_ID);
-                        }
+                        auth && (socket.emit("five-sec-end-game", ROOM_ID));
                     }, 5000)
                 }, gameDelay * 1000)
             }, 8000)
