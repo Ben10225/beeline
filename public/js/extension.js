@@ -1,4 +1,3 @@
-
 const userContainer = document.querySelector(".user-container");
 
 const infoIcon =  document.querySelector(".fa-link");
@@ -453,7 +452,6 @@ let uuid = () => {
 let randomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
-
 
 export default {
     rightIconsInit,

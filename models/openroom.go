@@ -188,26 +188,6 @@ func FindRoom(c *gin.Context, roomId string) bool {
 	return err == nil
 }
 
-func SetStreamStatus(c *gin.Context, roomId, uuid, status string, b bool) {
-	filter := bson.D{{"roomId", roomId}}
-
-	var s string
-	if status == "video" {
-		s = "videoStatus"
-	} else {
-		s = "audioStatus"
-	}
-
-	coll.FindOneAndUpdate(
-		context.Background(),
-		filter,
-		bson.M{"$set": bson.M{fmt.Sprintf("user.$[elem].%s", s): b}},
-		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
-			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
-		}),
-	)
-}
-
 func GetStatusByUuid(c *gin.Context, roomId, uuid string) *structs.RoomUserData {
 	var room structs.RoomInfo
 	filter := bson.D{{"roomId", roomId}}
@@ -238,19 +218,6 @@ func CheckAuthAlready(c *gin.Context, roomId string) (bool, string) {
 		}
 	}
 	return false, ""
-}
-
-func UserBackToRoomLeaveStatus(c *gin.Context, roomId, uuid string) {
-	filter := bson.D{{"roomId", roomId}}
-
-	coll.FindOneAndUpdate(
-		context.Background(),
-		filter,
-		bson.M{"$set": bson.M{"user.$[elem].leave": false}},
-		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
-			Filters: []interface{}{bson.M{"elem.uuid": uuid}},
-		}),
-	)
 }
 
 func GetRoomNewHost(c *gin.Context, roomId, uuid string) (string, bool) {
@@ -442,23 +409,6 @@ func GetGameSlice(c *gin.Context, roomId string) ([]structs.Game, []structs.Game
 		}
 	}
 	return lst, userInfo
-}
-
-func CheckUserLeave(c *gin.Context, roomId, uuid string) bool {
-	var room structs.RoomInfo
-	filter := bson.D{{"roomId", roomId}}
-	err := coll.FindOne(context.TODO(), filter).Decode(&room)
-	if err != nil {
-		fmt.Println(err)
-	}
-	user := room.User
-	var b bool
-	for _, v := range user {
-		if v.Uuid == uuid {
-			b = v.Leave
-		}
-	}
-	return b
 }
 
 func ResetAllUserGameClickFalseData(c *gin.Context, roomId string) {

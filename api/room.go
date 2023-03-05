@@ -4,7 +4,6 @@ import (
 	"beeline/models"
 	"beeline/structs"
 	"beeline/utils"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,29 +70,6 @@ func GetRoomExist(c *gin.Context) {
 	}
 }
 
-func SetUserStreamStatus(c *gin.Context) {
-	req := struct {
-		RoomId string
-		Uuid   string
-		Status string
-		B      bool
-	}{}
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	roomId := req.RoomId
-	uuid := req.Uuid
-	status := req.Status
-	b := req.B
-
-	models.SetStreamStatus(c, roomId, uuid, status, b)
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
-}
-
 func GetAuth(c *gin.Context) {
 	roomId := c.Param("roomId")
 	result, authUuid := models.CheckAuthAlready(c, roomId)
@@ -109,22 +85,6 @@ func GetAuth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":  msg,
 		"authUuid": authUuid,
-	})
-}
-
-func SetUserLeaveFalse(c *gin.Context) {
-	var req structs.RoomUserData
-	err := c.BindJSON(&req)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	roomId := req.RoomId
-	uuid := req.Uuid
-
-	models.UserBackToRoomLeaveStatus(c, roomId, uuid)
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
 	})
 }
 
@@ -229,20 +189,6 @@ func GetGameResult(c *gin.Context) {
 			"result": result,
 			"info":   info,
 		},
-	})
-}
-
-func CheckUserLeaveFalse(c *gin.Context) {
-	var req structs.RoomUserData
-	c.BindJSON(&req)
-
-	roomId := req.RoomId
-	uuid := req.Uuid
-
-	leave := models.CheckUserLeave(c, roomId, uuid)
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": leave,
 	})
 }
 

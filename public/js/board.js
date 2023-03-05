@@ -82,7 +82,7 @@ let boardInit = async (socketDraw) => {
     })
     
     socketDraw.on('user-connected', async uuid => {
-        console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
+        // console.log(`drawer user ${uuid} enter room ${ROOM_ID}`);
     })
     
     canvas.onmousemove = (e) => {

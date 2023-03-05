@@ -330,7 +330,6 @@ let playAudio = (url, volume) => {
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
         .then(audioBuffer => {
-
             play(context, audioBuffer, volume);
         });
       
