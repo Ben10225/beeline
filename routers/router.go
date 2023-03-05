@@ -28,7 +28,7 @@ func Routers(router *gin.Engine) {
 		room.GET("/:roomId", api.GetRoomExist)
 
 		room.GET("/:roomId/user/:id", api.GetRemoteUser)
-		room.POST("/:roomId/user/:id", api.InsertUserRoomData)
+		room.POST("/:roomId/user/:id", api.CreateUserRoomData)
 		room.PATCH("/:roomId/user/:id", api.UpdateRoomUserData)
 
 		room.GET("/:roomId/users", api.GetRoomUsers)
@@ -43,8 +43,8 @@ func Routers(router *gin.Engine) {
 
 	leave := router.Group("/leave")
 	{
-		leave.PATCH("/:roomId/user/:id", api.SetUserLeaveTrue)
-		leave.DELETE("/:roomId/user/:id", api.RefuseUserInRoom)
+		leave.PATCH("/:roomId/user/:id", api.UpdateUserLeaveTrue)
+		leave.DELETE("/:roomId/user/:id", api.DeleteRefuseUserArray)
 	}
 
 	chat := router.Group("/chat")
@@ -55,6 +55,6 @@ func Routers(router *gin.Engine) {
 	game := router.Group("/game")
 	{
 		game.GET("/:roomId", api.GetGameResult)
-		game.PATCH("/:roomId", api.ResetAllUserGameClickFalse)
+		game.PATCH("/:roomId", api.UpdateAllUserGameClickFalse)
 	}
 }

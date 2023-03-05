@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InsertUserRoomData(c *gin.Context) {
+func CreateUserRoomData(c *gin.Context) {
 	roomId := c.Param("roomId")
 	uuid := c.Param("id")
 
@@ -29,7 +29,7 @@ func InsertUserRoomData(c *gin.Context) {
 	})
 }
 
-func SetUserLeaveTrue(c *gin.Context) {
+func UpdateUserLeaveTrue(c *gin.Context) {
 	roomId := c.Param("roomId")
 	uuid := c.Param("id")
 
@@ -45,7 +45,7 @@ func SetUserLeaveTrue(c *gin.Context) {
 	})
 }
 
-func RefuseUserInRoom(c *gin.Context) {
+func DeleteRefuseUserArray(c *gin.Context) {
 	roomId := c.Param("roomId")
 	uuid := c.Param("id")
 
@@ -192,7 +192,7 @@ func GetGameResult(c *gin.Context) {
 	})
 }
 
-func ResetAllUserGameClickFalse(c *gin.Context) {
+func UpdateAllUserGameClickFalse(c *gin.Context) {
 	roomId := c.Param("roomId")
 	models.ResetAllUserGameClickFalseData(c, roomId)
 
