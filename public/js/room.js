@@ -645,7 +645,6 @@ let inRoomSocketInit = async () => {
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
 
                             let quitGame = await modal.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
-                            console.log("qG", quitGame)
                             if(quitGame){
                                 socket.emit("five-sec-end-game", ROOM_ID);
                             }
