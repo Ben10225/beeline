@@ -697,7 +697,7 @@ let inRoomSocketInit = async () => {
         // socket disconnect
         if (userInRoomObj[uuid]){
             delete userInRoomObj[uuid];
-            groupNumber.textContent = Object.keys(userInRoomObj).length;
+            groupNumber.textContent = document.querySelectorAll(".group .user-one").length;
         } 
 
         if(userInRoomObj[USER_ID] && uuid !== USER_ID){
