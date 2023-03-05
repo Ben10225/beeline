@@ -425,6 +425,7 @@ let inRoomSocketInit = async () => {
         if(groupUserWrapper){
             groupUserWrapper.remove();
         }
+        groupNumber.textContent = document.querySelectorAll(".group .user-one").length;
         utils.settingVideoSize();
     })
 
@@ -660,7 +661,7 @@ let inRoomSocketInit = async () => {
                             `;
                             gameBlock.insertAdjacentHTML("afterbegin", waitHtml);
                         }
-                        if(auth && !document.querySelector(".record-exit")){
+                        if(auth && !showRecord){
                            socket.emit("five-sec-end-game", ROOM_ID);
                         }
                     }, 5000)
@@ -672,6 +673,7 @@ let inRoomSocketInit = async () => {
     // 5 end
     socket.on('five-end', async (roomId) => {
         if(ROOM_ID === roomId){
+            console.log("aa")
             setTimeout(async () => {
                 let data = await modal.getGameResult(ROOM_ID);
                 let wait =  document.querySelector(".game-wait");
@@ -697,7 +699,6 @@ let inRoomSocketInit = async () => {
         // socket disconnect
         if (userInRoomObj[uuid]){
             delete userInRoomObj[uuid];
-            groupNumber.textContent = document.querySelectorAll(".group .user-one").length;
         } 
 
         if(userInRoomObj[USER_ID] && uuid !== USER_ID){
