@@ -56,6 +56,7 @@ let gameLeft = 0;
 let gameTop = 0;
 let gameDelay = 0;
 let userSec = 5;
+let showRecord = false;
 
 let socket;
 let socketWait;
@@ -606,7 +607,7 @@ let inRoomSocketInit = async () => {
             gameTop = gameValue[1];
             gameDelay = parseFloat(gameValue[2]);
             let clicked = false;
-            let showRecord = false;
+            showRecord = false;
 
             let gameBg = document.querySelector(".game-bg");
             if(gameBg){
@@ -645,7 +646,6 @@ let inRoomSocketInit = async () => {
                             let quitGame = await modal.sendUserSecToDB(ROOM_ID, USER_ID, sec, true);
                             if(quitGame){
                                 socket.emit("five-sec-end-game", ROOM_ID);
-                                showRecord = true;
                             }
                         })
                     }, 1)
@@ -673,7 +673,7 @@ let inRoomSocketInit = async () => {
     // 5 end
     socket.on('five-end', async (roomId) => {
         if(ROOM_ID === roomId){
-            console.log("aa")
+            showRecord = true;
             setTimeout(async () => {
                 let data = await modal.getGameResult(ROOM_ID);
                 let wait =  document.querySelector(".game-wait");
