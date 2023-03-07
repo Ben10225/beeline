@@ -1,7 +1,7 @@
 import modal from "./modal.js"
 
 let auth = async (page) => {
-    let response = await fetch(`/api/auth`);
+    let response = await fetch(`/user/auth`);
     let data = await response.json();
     if(page === "index" && data.ok){
         setTimeout(() => {

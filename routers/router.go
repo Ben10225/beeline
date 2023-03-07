@@ -14,7 +14,7 @@ func Routers(router *gin.Engine) {
 		handler.GET("/:room", handlers.Room)
 	}
 
-	user := router.Group("/api")
+	user := router.Group("/user")
 	{
 		user.GET("/auth", api.Auth)
 		user.POST("/signup", api.Signup)

@@ -147,7 +147,7 @@ let signinsubmit = async (e) => {
     let email = e.target.email_signin.value;
     let password = e.target.password_signin.value;
 
-    let response = await fetch(`/api/signin`, {
+    let response = await fetch(`/user/signin`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
@@ -303,7 +303,7 @@ let signupSubmit = async (e) => {
     let email = e.target.email.value;
     let password = e.target.password.value;
 
-    let response = await fetch(`/api/signup`, {
+    let response = await fetch(`/user/signup`, {
         method: "POST",
         headers: {
             "Content-Type":"application/json"
@@ -336,7 +336,7 @@ let signupSubmit = async (e) => {
 
 
 let signout = async () => {
-    let response = await fetch(`/api/signout`);
+    let response = await fetch(`/user/signout`);
     let data = await response.json();
     if(data.ok){
         window.location = "/";
@@ -350,7 +350,7 @@ let uploadImg = async () => {
     waitingImgBlock.classList.add("show");
   
     toDataURL(window.URL.createObjectURL(uploadImg[0]), async function (dataUrl) {
-        let response = await fetch(`/api/photo`, {
+        let response = await fetch(`/user/photo`, {
             method: "PATCH",
             headers: {
                 "Content-Type":"application/json"

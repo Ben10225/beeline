@@ -845,6 +845,7 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
                 audioBtn.classList.add("disable");
             }
             if(!localVideoStatus){
+                stream.getVideoTracks()[0].enabled = false;
                 stream.getVideoTracks()[0].stop();
                 document.querySelector(`#user-${USER_ID} .user-block`).classList.add("show");
                 document.querySelector(`.username-wrapper-room.local`).classList.add("bg-none");
@@ -997,6 +998,7 @@ let toggleCamera = async (stream, dom, inRoom) => {
     if(!document.querySelector(".user-block.local").classList.contains("show")){
         dom.classList.add("disable");
         document.querySelector(".user-block.local").classList.add("show");
+        stream.getVideoTracks()[0].enabled = false;
         stream.getVideoTracks()[0].stop();
 
         inRoom && socket.emit("set-option", ROOM_ID, "video", USER_ID, false);
