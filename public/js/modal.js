@@ -1,100 +1,8 @@
-let setWaitingStatus = async (roomId, uuid, audioStatus, videoStatus) => {
-    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "option": "bothStatus",
-            "bothAudio": audioStatus,
-            "bothVideo": videoStatus,
-        })
-    });
+// room api
+let checkRoomExist = async (roomId) => {
+    let response = await fetch(`/room/${roomId}`);
     let data = await response.json();
-}
-
-let getGameResult = async (roomId) => {
-    let response = await fetch(`/game/${roomId}`);
-    let data = await response.json();
-    return data.data;
-}
-
-let resetAllUserGameClickFalse = async (roomId) => {
-    let response = await fetch(`/game/${roomId}`, {
-        method: "PATCH",
-    });
-    let data = await response.json();
-}
-
-let setUserStreamStatus = async (roomId, uuid, status, bool) => {
-    let body;
-    if(status === "audio"){
-        body = JSON.stringify({
-            "option": "audioStatus",
-            "videoOrAudio": bool,
-        })
-    }else if(status === "video"){
-        body = JSON.stringify({
-            "option": "videoStatus",
-            "videoOrAudio": bool,
-        })
-    }
-    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: body,
-    });
-    let data = await response.json();
-}
-
-let setRoomEnterToken = async (roomId) => {
-    let response = await fetch(`/room/${roomId}/token`);
-    let data = await response.json();
-}
-
-let setBackRoomLeaveStatus = async (roomId, uuid) => {
-    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "option": "leave",
-            "leave": false,
-        })
-    });
-    let data = await response.json();
-}
-
-let resetAuthData = async (roomId, uuid) => {
-    let response = await fetch(`/chat/${roomId}/user/${uuid}`);
-    let data = await response.json();
-    if(data){
-        return [data.newHost, data.chatOpen];
-    }
-}
-
-let setRoomChatStatus = async (roomId, b) => {
-    let response = await fetch(`/room/${roomId}/chat`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "chatOpen": b,
-        })
-    });
-    let data = await response.json();
-}
-
-let getRoomChatAndShare = async (roomId) => {
-    let response = await fetch(`/room/${roomId}/chatAndShare`);
-    let data = await response.json();
-    if(data){
-        return [data.chatOpen, data.screenShare];
-    }
+    return data.exist;
 }
 
 let getRemoteUser = async (roomId, remoteUuid) => {
@@ -122,6 +30,142 @@ let insertMongoRoomData = async (roomId, uuid, audioStatus, videoStatus, auth, u
     let data = await response.json();
 }
 
+let setUserStreamStatus = async (roomId, uuid, status, bool) => {
+    let body;
+    if(status === "audio"){
+        body = JSON.stringify({
+            "option": "audioStatus",
+            "videoOrAudio": bool,
+        })
+    }else if(status === "video"){
+        body = JSON.stringify({
+            "option": "videoStatus",
+            "videoOrAudio": bool,
+        })
+    }
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: body,
+    });
+    let data = await response.json();
+}
+
+let setBackRoomLeaveStatus = async (roomId, uuid) => {
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "option": "leave",
+            "leave": false,
+        })
+    });
+    let data = await response.json();
+}
+
+let setWaitingStatus = async (roomId, uuid, audioStatus, videoStatus) => {
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "option": "bothStatus",
+            "bothAudio": audioStatus,
+            "bothVideo": videoStatus,
+        })
+    });
+    let data = await response.json();
+}
+
+let sendUserSecToDB = async (roomId, uuid, sec, click) => {
+    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "option": "game",
+            "sec": sec,
+            "gameClick": click,
+        })
+    });
+    let data = await response.json();
+    return data.data;
+}
+
+let getGroupInfo = async (roomId) => {
+    let response = await fetch(`/room/${roomId}/users`);
+    let data = await response.json();
+    return [data.data, data.host];
+}
+
+let checkIfAuthAlready = async (roomId) => {
+    let response = await fetch(`/room/${roomId}/auth`);
+    let data = await response.json();
+    if(data){
+        return [data.message, data.authUuid]
+    }
+}
+
+let getRoomChatAndShare = async (roomId) => {
+    let response = await fetch(`/room/${roomId}/chatAndShare`);
+    let data = await response.json();
+    if(data){
+        return [data.chatOpen, data.screenShare];
+    }
+}
+
+let setRoomEnterToken = async (roomId) => {
+    let response = await fetch(`/room/${roomId}/token`);
+    let data = await response.json();
+}
+
+let setScreenShareBool = async (roomId, bool) => {
+    let response = await fetch(`/room/${roomId}/screen`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "screenShare": bool,
+        })
+    });
+    let data = await response.json();
+}
+
+let assignNewAuth = async (roomId, oldUuid, newUuid) => {
+    let response = await fetch(`/room/${roomId}/auth`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "oldUuid": oldUuid,
+            "newUuid": newUuid,
+        })
+    });
+    let data = await response.json();
+}
+
+let setRoomChatStatus = async (roomId, b) => {
+    let response = await fetch(`/room/${roomId}/chat`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            "chatOpen": b,
+        })
+    });
+    let data = await response.json();
+}
+
+// leave api
 let setLeaveTrueOrDeleteRoom = async (roomId, uuid, auth) => {
     let response = await fetch(`/leave/${roomId}/user/${uuid}`, {
         method: "PATCH",
@@ -146,82 +190,27 @@ let refuseUserInRoom = async (roomId, uuid) => {
     let data = await response.json();
 }
 
-let checkNeedReconnect = async (roomId, uuid) => {
-    let response = await fetch(`/room/checkneedreconnect`, {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "roomId": roomId,
-            "uuid": uuid,
-        })
-    });
+// chat api
+let resetAuthData = async (roomId, uuid) => {
+    let response = await fetch(`/chat/${roomId}/user/${uuid}`);
     let data = await response.json();
-    return data.message;
+    if(data){
+        return [data.newHost, data.chatOpen];
+    }
 }
 
-let setScreenShareBool = async (roomId, bool) => {
-    let response = await fetch(`/room/${roomId}/screen`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "screenShare": bool,
-        })
-    });
-    let data = await response.json();
-}
-
-let sendUserSecToDB = async (roomId, uuid, sec, click) => {
-    let response = await fetch(`/room/${roomId}/user/${uuid}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "option": "game",
-            "sec": sec,
-            "gameClick": click,
-        })
-    });
+// game api
+let getGameResult = async (roomId) => {
+    let response = await fetch(`/game/${roomId}`);
     let data = await response.json();
     return data.data;
 }
 
-let checkIfAuthAlready = async (roomId) => {
-    let response = await fetch(`/room/${roomId}/auth`);
-    let data = await response.json();
-    if(data){
-        return [data.message, data.authUuid]
-    }
-}
-
-let assignNewAuth = async (roomId, oldUuid, newUuid) => {
-    let response = await fetch(`/room/${roomId}/auth`, {
+let resetAllUserGameClickFalse = async (roomId) => {
+    let response = await fetch(`/game/${roomId}`, {
         method: "PATCH",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            "oldUuid": oldUuid,
-            "newUuid": newUuid,
-        })
     });
     let data = await response.json();
-}
-
-let getGroupInfo = async (roomId) => {
-    let response = await fetch(`/room/${roomId}/users`);
-    let data = await response.json();
-    return [data.data, data.host];
-}
-
-let checkRoomExist = async (roomId) => {
-    let response = await fetch(`/room/${roomId}`);
-    let data = await response.json();
-    return data.exist;
 }
 
 export default {
@@ -237,7 +226,6 @@ export default {
     insertMongoRoomData,
     setLeaveTrueOrDeleteRoom,
     refuseUserInRoom,
-    checkNeedReconnect,
     setScreenShareBool,
     sendUserSecToDB,
     getGameResult,

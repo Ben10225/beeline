@@ -224,9 +224,7 @@ func UpdateRoomUserData(c *gin.Context) {
 	sec := req.Sec
 	gameClick := req.GameClick
 
-	if option == "auth" {
-
-	} else if option == "audioStatus" {
+	if option == "audioStatus" {
 		models.ChangeRoomUserDataAudioOrVideo(c, roomId, uuid, "audio", videoOrAudio)
 
 	} else if option == "videoStatus" {

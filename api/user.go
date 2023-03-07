@@ -23,7 +23,7 @@ import (
 func Auth(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": true,
 		})
 		return
@@ -31,7 +31,7 @@ func Auth(c *gin.Context) {
 	payload, err := utils.ParseToken(token)
 	if err != nil {
 		c.SetCookie("token", "", -1, "/", "", false, true)
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": true,
 		})
 		return
@@ -160,7 +160,7 @@ func GetRemoteUser(c *gin.Context) {
 func UploadImg(c *gin.Context) {
 	token, err := c.Cookie("token")
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": true,
 		})
 		return
@@ -168,7 +168,7 @@ func UploadImg(c *gin.Context) {
 	payload, err := utils.ParseToken(token)
 	if err != nil {
 		c.SetCookie("token", "", -1, "/", "", false, true)
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": true,
 		})
 		return
