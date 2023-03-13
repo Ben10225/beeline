@@ -265,7 +265,6 @@ let waitingSocketInit = async () => {
 let socketConn = async (sk, stream) => {
     sk.on('user-connected', async uuid => {
         // socket user enter room
-        console.log("user-conn")
         if (uuid.split("-")[1] === "screen" && document.querySelector("#screen-wrapper")) return;
         connectToNewUser(uuid, stream);
         
@@ -878,8 +877,8 @@ let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
 
     }else{
         // console.log(remoteUuid);
-        // if (tmpScreenShareStreamId === remoteUuid) return;
-        console.log("remote", remoteUuid)
+        if (tmpScreenShareStreamId === remoteUuid) return;
+        // console.log("remote", remoteUuid)
         if(remoteUuid.split("-")[1] === "screen"){
             tmpScreenShareStreamId = remoteUuid;
             let shareName = userInRoomObj[remoteUuid.split("-")[0]][0];
