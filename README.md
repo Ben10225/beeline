@@ -25,6 +25,7 @@ Beeline is an innovative solution of online meeting, you can meet each other wit
 - [Main Features](#main-features)
   - [Host system](#host-system)
   - [Real-time services](#real-time-services)
+  - [Screen sharing](#screen-sharing)
 - [Architecture](#architecture)
 - [Backend Technique](#backend-technique)
 - [Frontend Technique](#frontend-technique)
@@ -34,10 +35,10 @@ Beeline is an innovative solution of online meeting, you can meet each other wit
 
 ### Host system
 
-+ The user who first enters the room is the room host.
-+ Room members need to submit the request to enter the room.
-+ Host can assign the other member to be the host.
-+ If host leave the room without assign a new host, server will assign one automatically.
++ The user who enters room the first is the room host.
++ Room members should send a request for entering the room .
++ The host can assign the other member to be the host.
++ If the host leaves the room without assigning a new host, server will randomly assign one of the left members to be the host.
 
 <img src="https://github.com/Ben10225/beeline/blob/main/public/images/host-demo.gif" width=600 />
 
@@ -47,6 +48,9 @@ Beeline is an innovative solution of online meeting, you can meet each other wit
 
 <img src="https://github.com/Ben10225/beeline/blob/main/public/images/real-time-demo.gif" width=600 />
 
+### Screen sharing
+
+<img src="https://github.com/Ben10225/beeline/blob/main/public/images/screen-share-demo.gif" width=600 />
 
 ## Architecture
 
