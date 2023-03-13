@@ -147,9 +147,7 @@ navigator.mediaDevices.getUserMedia({
         })
 
         socketConn(socket, stream);
-        myPeer.on('open', id => {
-            socket.emit('join-room', ROOM_ID, USER_ID);
-        })
+        socket.emit('join-room', ROOM_ID, USER_ID);
 
         if(auth){
             socketWaitInRoomAuthInit();
@@ -752,12 +750,10 @@ let inRoomSocketInit = async () => {
 }
 
 
-let addVideoStream = async (video, stream, islocal, remoteUuid, screen) => {
+let addVideoStream = async (video, stream, islocal, remoteUuid) => {
     video.srcObject = stream;
     if (tempMediaStreamId === stream.id) return
     if (tempRemoteMediaStreamId === stream.id) return
-
-    if (screen === "screen") return
     
     if(islocal){
         userInRoomObj[remoteUuid] = [USER_NAME, USER_IMG];
