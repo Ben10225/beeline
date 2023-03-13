@@ -146,8 +146,10 @@ navigator.mediaDevices.getUserMedia({
             })
         })
 
-        socketConn(socket, stream)
-        socket.emit('join-room', ROOM_ID, USER_ID);
+        socketConn(socket, stream);
+        myPeer.on('open', id => {
+            socket.emit('join-room', ROOM_ID, USER_ID);
+        })
 
         if(auth){
             socketWaitInRoomAuthInit();
@@ -1318,7 +1320,9 @@ let screenShareBtnInit = async () => {
                 call.answer(stream);
             })
         
-            socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+            nPeer.on('open', id => {
+                socket.emit('join-room', ROOM_ID, `${USER_ID}-screen-${sct}`);
+            })
     
             socket.on('screen-share-emit-for-late-users', async (roomId) => {
                 if(ROOM_ID === roomId){
